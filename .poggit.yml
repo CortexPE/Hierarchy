@@ -7,6 +7,6 @@ projects:
     libs:
       - src: poggit/libasynql/libasynql
         version: ^3.2.0
-      - src: SOFe/AwaitGenerator/await-generator
+      - src: SOFe/await-generator/await-generator
         version: ^2.2.0
 ...
