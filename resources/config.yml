@@ -1,0 +1,26 @@
+---
+dataSource:
+  # Available Types: json, sqlite3, mysql
+  type: "sqlite3"
+
+  # These settings will only apply when you chose json as dataSource type
+  json:
+    # Save JSON data files in a human-readable way... Excluding JSON configuration files.
+    prettyPrint: false
+
+  # These settings will only apply when you chose sqlite3 as dataSource type
+  sqlite3:
+    # Database path
+    dbPath: "hierarchy.sqlite"
+    # The maximum number of simultaneous queries
+    workerLimit: 1
+
+  # These settings will only apply when you chose mysql as dataSource type
+  mysql:
+    host: "localhost"
+    user: "hierarchy"
+    password: "youShallNotPass"
+    database: "hierarchy"
+    # The maximum number of simultaneous queries
+    workerLimit: 2 # Increase the value if you have slow connection to the MySQL server
+...

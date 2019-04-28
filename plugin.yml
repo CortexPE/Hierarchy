@@ -1,0 +1,30 @@
+name: Hierarchy
+main: CortexPE\Hierarchy\Loader
+version: 1.0.0
+api: 3.0.0
+load: POSTWORLD
+author: CortexPE
+description: "Role-based permission management system"
+website: "https://CortexPE.xyz"
+
+permissions:
+  hierarchy:
+    default: "false"
+    description: "Main Hierarchy root permission node"
+    children:
+      hierarchy.list_roles:
+        default: "op"
+        description: "Allows to check role list"
+      hierarchy.user_info:
+        default: "true"
+        description: "Allows to check role and permissions list"
+      hierarchy.role:
+        default: "false"
+        description: "Allows role commands"
+        children:
+          hierarchy.role.give:
+            default: "op"
+            description: "Allows the giving of roles"
+          hierarchy.role.take:
+            default: "op"
+            description: "Allows the giving of roles"
