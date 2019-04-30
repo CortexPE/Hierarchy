@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
 use CortexPE\Hierarchy\cmd\SubCommand;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
@@ -60,16 +61,20 @@ class GiveRoleCommand extends SubCommand {
 						  if(!$role->isDefault()) {
 							  if(!$member->hasRole($role)) {
 								  $member->addRole($role);
-								  $sender->sendMessage(TextFormat::GREEN . "Given '" . $role->getName() . "' role to member");
+								  MessageStore::getMessage("cmd.give.success", [
+								  	"role" => $role->getName()
+								  ]);
 							  } else {
-								  $sender->sendMessage(TextFormat::RED . "Member already has the role " . $role->getName());
+								  MessageStore::getMessage("cmd.give.has_role", [
+									  "role" => $role->getName()
+								  ]);
 							  }
 						  } else {
-							  $sender->sendMessage(TextFormat::RED . "Member already has the default role");
+							  MessageStore::getMessage("cmd.give.default");
 						  }
 					  });
 			} else {
-				$sender->sendMessage("Role not found. For a complete list of roles, please use '/role list'");
+				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
 			}
 		} else {
 			$sender->sendMessage("Usage: " . $this->getUsage());

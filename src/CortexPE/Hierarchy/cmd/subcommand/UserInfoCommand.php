@@ -31,7 +31,9 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
 use CortexPE\Hierarchy\cmd\SubCommand;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -43,26 +45,33 @@ class UserInfoCommand extends SubCommand {
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
-		$target = $sender->getServer()->getPlayer($args[0]);
-		if($target instanceof Player){
-			$member = Loader::getInstance()->getMemberFactory()->getMember($target);
+		$target = $args[0];
+		$tmp = $sender->getServer()->getPlayer($target);
+		if($tmp instanceof Player) {
+			$target = $tmp;
+		}
+		Loader::getInstance()->getMemberFactory()->getMember($target, true, function (BaseMember $member) use ($sender) {
 			$roles = $member->getRoles();
 			$permissions = $member->getPermissions();
-			$sender->sendMessage(TextFormat::GOLD . $member->getName() . "'s Role(s) and Permissions:");
-			if(!empty($roles)){
-				$sender->sendMessage("Role(s):");
-				foreach($roles as $role){
-					$sender->sendMessage(" - " . $role->getName());
+			$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.header", [
+				"member" => $member->getName()
+			]));
+			if(!empty($roles)) {
+				$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.role_header"));
+				foreach($roles as $role) {
+					$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.role_format", [
+						"role" => $role->getName()
+					]));
 				}
 			}
-			if(!empty($permissions)){
-				$sender->sendMessage("Permission(s):");
-				foreach($permissions as $permission => $allowed){
-					$sender->sendMessage(" - " . ($allowed ? TextFormat::GREEN : TextFormat::RED) . $permission);
+			if(!empty($permissions)) {
+				$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.perm_header"));
+				foreach($permissions as $permission => $allowed) {
+					$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.perm_format", [
+						"permission" => ($allowed ? TextFormat::GREEN : TextFormat::RED) . $permission
+					]));
 				}
 			}
-		} else {
-			$sender->sendMessage(TextFormat::RED . "Player is offline.");
-		}
+		});
 	}
 }

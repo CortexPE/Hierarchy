@@ -34,6 +34,7 @@ use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RemoveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
+use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -75,15 +76,18 @@ class RoleCommand extends Command {
 		if(isset($args[0]) && $this->getCommand($args[0]) != null) {
 			$cmd = $this->getCommand(array_shift($args));
 			if(($perm = $cmd->getPermission()) !== null && !$sender->hasPermission($perm)) {
-				$sender->sendMessage(TextFormat::RED . "You do not have permissions to use this command.");
+				$sender->sendMessage(MessageStore::getMessage("err.insufficient_permissions"));
 
 				return;
 			}
 			$cmd->execute($sender, $args);
 		} else {
-			$sender->sendMessage(TextFormat::GOLD . "Available Hierarchy Role Commands:");
+			$sender->sendMessage(MessageStore::getMessage("cmd.help_header"));
 			foreach($this->subCommands as $subCommand) {
-				$sender->sendMessage(TextFormat::AQUA . $subCommand->getUsage() . TextFormat::GRAY . " - " . TextFormat::GREEN . $subCommand->getDescription());
+				$sender->sendMessage(MessageStore::getMessage("cmd.help_format", [
+					"usage" => $subCommand->getUsage(),
+					"description" => $subCommand->getDescription()
+				]));
 			}
 		}
 	}

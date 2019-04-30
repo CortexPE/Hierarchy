@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy;
 use CortexPE\Hierarchy\cmd\RoleCommand;
 use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\data\SQLiteDataSource;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
 use pocketmine\plugin\PluginBase;
@@ -50,6 +51,7 @@ class Loader extends PluginBase {
 	public function onEnable(): void {
 		self::$instance = $this;
 		$this->saveResource("config.yml");
+		(new MessageStore($this->getDataFolder() . "messages.yml"));
 		$conf = new Config($this->getDataFolder() . "config.yml", Config::YAML);
 
 		switch($conf->getNested("dataSource.type", "json")) {

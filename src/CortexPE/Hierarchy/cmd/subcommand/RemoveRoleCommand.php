@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
 use CortexPE\Hierarchy\cmd\SubCommand;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
@@ -60,16 +61,20 @@ class RemoveRoleCommand extends SubCommand {
 					  	if(!$role->isDefault()) {
 							if($member->hasRole($role)) {
 								$member->removeRole($role);
-								$sender->sendMessage(TextFormat::YELLOW . "Removed '" . $role->getName() . "' role from member");
+								$sender->sendMessage(MessageStore::getMessage("cmd.remove.success", [
+									"role" => $role->getName()
+								]));
 							} else {
-								$sender->sendMessage(TextFormat::RED . "Member does not have the '" . $role->getName() . "' role");
+								$sender->sendMessage(MessageStore::getMessage("cmd.remove.no_role", [
+									"role" => $role->getName()
+								]));
 							}
 						} else {
-							$sender->sendMessage(TextFormat::RED . "Cannot remove default role");
+							$sender->sendMessage(MessageStore::getMessage("cmd.remove.default"));
 						}
 					  });
 			} else {
-				$sender->sendMessage("Role not found. For a complete list of roles, please use '/role list'");
+				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
 			}
 		} else {
 			$sender->sendMessage("Usage: " . $this->getUsage());
