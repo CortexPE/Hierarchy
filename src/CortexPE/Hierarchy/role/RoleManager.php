@@ -37,8 +37,6 @@ class RoleManager {
 	public function loadRoles(array $roles) {
 		foreach($roles as $roleData){
 			$role = new Role($roleData["ID"], $roleData["Name"], [
-				"chatFormat" => $roleData["ChatFormat"],
-				"nameTagFormat" => $roleData["NameTagFormat"],
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
 				"position" => $roleData["Position"],
 				"isDefault" => $roleData["isDefault"]

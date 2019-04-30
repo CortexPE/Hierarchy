@@ -13,6 +13,7 @@ use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\role\Role;
 use Exception;
+use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\Player;
 
@@ -46,7 +47,12 @@ class Member {
 	public function recalculatePermissions(): void {
 		$this->attachment->clearPermissions();
 
-		$perms = [PHP_INT_MAX => Loader::getInstance()->getRoleManager()->getDefaultRole()->getPermissions()]; // default
+		$perms = [
+			PHP_INT_MAX => Loader::getInstance()
+								 ->getRoleManager()
+								 ->getDefaultRole()
+								 ->getPermissions()
+		]; // default
 		foreach($this->roles as $role) {
 			$perms[$role->getPosition()] = $role->getPermissions();
 		}
@@ -62,7 +68,9 @@ class Member {
 
 	public function addRole(Role $role, bool $recalculate = true): void {
 		if(!$this->hasRole($role)) {
-			Loader::getInstance()->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_ADD, $role->getId());
+			Loader::getInstance()
+				  ->getDataSource()
+				  ->updateMemberData($this, DataSource::ACTION_ROLE_ADD, $role->getId());
 			$this->roles[$role->getId()] = $role;
 			$role->bind($this);
 			if($recalculate) {
@@ -93,6 +101,7 @@ class Member {
 
 	public function clearRoles(): void {
 		foreach($this->roles as $id => $role) {
+			Loader::getInstance()->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_REMOVE, $id);
 			$role->unbind($this);
 		}
 		$this->roles = [];
@@ -106,16 +115,8 @@ class Member {
 		return $this->roles;
 	}
 
-	public function getNameTagFormat(): string {
-		return $this->getHighestRole()->getNameTagFormat();
-	}
-
-	public function getHighestRole(): Role {
+	public function getTopRole(): Role {
 		return $this->roles[max(array_keys($this->roles))];
-	}
-
-	public function getChatFormat(): string {
-		return $this->getHighestRole()->getChatFormat();
 	}
 
 	/**
@@ -129,7 +130,52 @@ class Member {
 		return $this->player->getName();
 	}
 
-	public function getPermissions():array {
+	public function getPermissions(): array {
 		return $this->attachment->getPermissions();
+	}
+
+	/**
+	 * @param Permission|string $permissionNode
+	 *
+	 * @return Role|null
+	 */
+	public function getTopRoleWithPermission($permissionNode): ?Role {
+		if($permissionNode instanceof Permission) {
+			$permissionNode = $permissionNode->getName();
+		}
+		$topRolePosition = PHP_INT_MIN;
+		$topRoleWithPerm = null;
+		foreach($this->roles as $role) {
+			if(
+				isset(($role->getPermissions())[$permissionNode]) &&
+				$role->getPosition() > $topRolePosition
+			) {
+				$topRolePosition = $role->getPosition();
+				$topRoleWithPerm = $role;
+			}
+		}
+
+		return $topRoleWithPerm;
+	}
+
+	/**
+	 * @param Permission|string $permissionNode
+	 * @param Member $target
+	 *
+	 * @return bool
+	 */
+	public function hasHigherPermissionHierarchy($permissionNode, Member $target): bool {
+		if($permissionNode instanceof Permission) {
+			$permissionNode = $permissionNode->getName();
+		}
+		$myTopRole = $this->getTopRoleWithPermission($permissionNode);
+		if($myTopRole instanceof Role) {
+			$targetTopRole = $target->getTopRoleWithPermission($permissionNode);
+			if($targetTopRole instanceof Role) {
+				return $myTopRole->getPosition() > $targetTopRole->getPosition();
+			}
+			return true;
+		}
+		return false;
 	}
 }

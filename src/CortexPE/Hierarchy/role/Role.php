@@ -27,10 +27,6 @@ class Role {
 
 	/** @var int */
 	protected $position;
-	/** @var string */
-	protected $chatFormat;
-	/** @var string */
-	protected $nameTagFormat;
 	/** @var bool[] */
 	protected $permissions = [];
 	/** @var bool */
@@ -44,8 +40,6 @@ class Role {
 		$this->name = $name;
 
 		$this->position = $roleData["position"];
-		$this->chatFormat = $roleData["chatFormat"];
-		$this->nameTagFormat = $roleData["nameTagFormat"];
 		$this->isDefault = $roleData["isDefault"];
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission){
@@ -93,20 +87,6 @@ class Role {
 	 */
 	public function getPermissions(): array{
 		return $this->permissions;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getNameTagFormat(): string{
-		return $this->nameTagFormat;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getChatFormat(): string{
-		return $this->chatFormat;
 	}
 
 	public function bind(Member $member):void{

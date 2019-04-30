@@ -9,8 +9,6 @@ CREATE TABLE IF NOT EXISTS Roles
     ID            INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
     Position      INTEGER NOT NULL UNIQUE,
     Name          TEXT    NOT NULL DEFAULT 'new role',
-    ChatFormat    TEXT    NOT NULL DEFAULT '<{player}> {msg}',
-    NameTagFormat TEXT    NOT NULL DEFAULT '{player}',
     isDefault     BOOLEAN NOT NULL DEFAULT FALSE
 );
 -- #    }
