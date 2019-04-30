@@ -42,7 +42,7 @@ class ListCommand extends SubCommand {
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
-		$sender->sendMessage("Roles:");
+		$sender->sendMessage(MessageStore::getMessage("cmd.list.role_header"));
 		$roles = Loader::getInstance()->getRoleManager()->getRoles();
 		foreach($roles as $roleID => $role){
 			$sender->sendMessage(MessageStore::getMessage("cmd.list.role_format", [
