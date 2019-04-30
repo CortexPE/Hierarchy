@@ -83,7 +83,7 @@ abstract class SQLDataSource extends DataSource {
 				"username" => $member->getName()
 			]);
 			foreach($rows as $row){
-				$data["roles"][] = $row["Role"];
+				$data["roles"][] = $row["RoleID"];
 			}
 			if($p instanceof Player && $p->isOnline()){
 				$this->plugin->getMemberFactory()->getMember($p)->loadData($data);
