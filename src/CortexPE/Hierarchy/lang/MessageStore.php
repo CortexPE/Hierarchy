@@ -54,7 +54,8 @@ class MessageStore {
 		"cmd.usr_info.role_format" => " - {role}",
 		"cmd.usr_info.perm_header" => "Permission(s):",
 		"cmd.usr_info.perm_format" => " - {permission}",
-		
+
+		"err.target_higher_hrk" => "&cYou cannot use this command on {target} due to higher role hierarchy",
 		"err.insufficient_permissions" => "&cYou do not have enough permissions to use this command.",
 		"err.unknown_role" => "&cRole not found. For a complete list of roles, please use '/role list'",
 	];

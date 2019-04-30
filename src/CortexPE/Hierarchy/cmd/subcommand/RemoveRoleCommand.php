@@ -58,6 +58,18 @@ class RemoveRoleCommand extends SubCommand {
 				Loader::getInstance()
 					  ->getMemberFactory()
 					  ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
+						  if($sender instanceof Player) {
+							  if(!Loader::getInstance()
+										->getMemberFactory()
+										->getMember($sender)
+										->hasHigherPermissionHierarchy($this->getPermission(), $member)) {
+								  $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
+									  "target" => $member->getName()
+								  ]));
+
+								  return;
+							  }
+						  }
 					  	if(!$role->isDefault()) {
 							if($member->hasRole($role)) {
 								$member->removeRole($role);
