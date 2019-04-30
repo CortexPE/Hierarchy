@@ -4,7 +4,7 @@ Role-based permission management system
 ## Advantages:
 | Feature | Hierarchy | PurePerms |
 | :-----: | :-------: | :-------: |
-| Multiple roles/groups | ✔️ | ❌ |
+| Multiple roles/groups per user | ✔️ | ❌ |
 | Allows same role/group names | ✔️ | ❌ |
 | Multiworld (TO-DO w/ extension) | ✔️ | ✔️ |
 | Asynchronous I/O | ✔️ | ❌ |
