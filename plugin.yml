@@ -27,4 +27,4 @@ permissions:
             description: "Allows the giving of roles"
           hierarchy.role.remove:
             default: "op"
-            description: "Allows the giving of roles"
+            description: "Allows the sender to remove roles"
