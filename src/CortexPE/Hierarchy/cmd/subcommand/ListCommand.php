@@ -7,8 +7,6 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class ListCommand extends SubCommand {
 	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {

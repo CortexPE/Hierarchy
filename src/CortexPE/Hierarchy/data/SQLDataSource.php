@@ -5,8 +5,7 @@ namespace CortexPE\Hierarchy\data;
 
 
 use CortexPE\Hierarchy\Loader;
-use CortexPE\Hierarchy\member\Member;
-use pocketmine\Player;
+use CortexPE\Hierarchy\member\BaseMember;
 use Throwable;
 use Generator;
 use pocketmine\permission\PermissionManager;
@@ -75,25 +74,25 @@ abstract class SQLDataSource extends DataSource {
 		});
 	}
 
-	public function loadMemberData(Member $member): void {
-		Await::f2c(function () use ($member) {
+	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
+		Await::f2c(function () use ($member, $onLoad) {
 			$data = [];
-			$p = $member->getPlayer();
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);
 			foreach($rows as $row){
 				$data["roles"][] = $row["RoleID"];
 			}
-			if($p instanceof Player && $p->isOnline()){
-				$this->plugin->getMemberFactory()->getMember($p)->loadData($data);
+			$member->loadData($data);
+			if($onLoad !== null){
+				$onLoad($member);
 			}
 		}, function(){}, function (Throwable $err){
 			$this->getPlugin()->getLogger()->logException($err);
 		});
 	}
 
-	public function updateMemberData(Member $member, string $action, $data): void {
+	public function updateMemberData(BaseMember $member, string $action, $data): void {
 		switch($action){
 			case self::ACTION_ROLE_ADD:
 				$this->db->executeChange("hierarchy.member.roles.add", [

@@ -11,6 +11,7 @@ namespace CortexPE\Hierarchy\cmd;
 
 use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
+use CortexPE\Hierarchy\cmd\subcommand\RemoveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -27,6 +28,7 @@ class RoleCommand extends Command {
 		$this->registerCommand(new GiveRoleCommand("give", ["add"], "/role give <player> <roleID>", "Give role to player"));
 		$this->registerCommand(new UserInfoCommand("who", [], "/role who <player>", "Check user info"));
 		$this->registerCommand(new ListCommand("list", [], "/role list", "Lists all roles"));
+		$this->registerCommand(new RemoveRoleCommand("remove", [], "/role remove <player> <roleID>", "Remove role from player"));
 	}
 
 	/**

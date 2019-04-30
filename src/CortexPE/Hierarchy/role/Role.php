@@ -9,10 +9,8 @@
 namespace CortexPE\Hierarchy\role;
 
 
-use CortexPE\Hierarchy\data\AsyncDataSource;
 use CortexPE\Hierarchy\exception\UnknownPermissionNode;
-use CortexPE\Hierarchy\Loader;
-use CortexPE\Hierarchy\member\Member;
+use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 
@@ -32,7 +30,7 @@ class Role {
 	/** @var bool */
 	protected $isDefault = false;
 
-	/** @var Member[] */
+	/** @var BaseMember[] */
 	protected $members = [];
 
 	public function __construct(int $id, string $name, array $roleData){
@@ -89,16 +87,16 @@ class Role {
 		return $this->permissions;
 	}
 
-	public function bind(Member $member):void{
+	public function bind(BaseMember $member):void{
 		$this->members[$member->getName()] = &$member;
 	}
 
-	public function unbind(Member $member):void{
+	public function unbind(BaseMember $member):void{
 		unset($this->members[$member->getName()]);
 	}
 
 	/**
-	 * @return Member[]
+	 * @return BaseMember[]
 	 */
 	public function getMembers(): array{
 		return $this->members;

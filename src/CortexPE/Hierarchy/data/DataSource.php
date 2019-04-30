@@ -5,7 +5,7 @@ namespace CortexPE\Hierarchy\data;
 
 
 use CortexPE\Hierarchy\Loader;
-use CortexPE\Hierarchy\member\Member;
+use CortexPE\Hierarchy\member\BaseMember;
 
 abstract class DataSource {
 	public const ACTION_ROLE_ADD = "role.add";
@@ -28,18 +28,19 @@ abstract class DataSource {
 	/**
 	 * @internal Get member data from the data source then pass to member object
 	 *
-	 * @param Member $member
+	 * @param BaseMember $member
+	 * @param callable $onLoad
 	 */
-	abstract public function loadMemberData(Member $member): void;
+	abstract public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void;
 
 	/**
 	 * @internal Update member data on data source
 	 *
-	 * @param Member $member
+	 * @param BaseMember $member
 	 * @param string $action
 	 * @param mixed  $data
 	 */
-	abstract public function updateMemberData(Member $member, string $action, $data): void;
+	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
 
 	/**
 	 * Gracefully shutdown the data source

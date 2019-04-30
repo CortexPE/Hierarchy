@@ -25,6 +25,6 @@ permissions:
           hierarchy.role.give:
             default: "op"
             description: "Allows the giving of roles"
-          hierarchy.role.take:
+          hierarchy.role.remove:
             default: "op"
             description: "Allows the giving of roles"
