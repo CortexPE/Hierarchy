@@ -34,17 +34,18 @@ use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\member\BaseMember;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class UserInfoCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.user_info");
-	}
+    public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+        parent::__construct($parent, $name, $aliases, $usageMessage, $descriptionMessage);
+        $this->setPermission("hierarchy.user_info");
+    }
 
-	public function execute(CommandSender $sender, array $args): void {
+    public function execute(CommandSender $sender, array $args): void {
 		$target = $args[0];
 		$tmp = $sender->getServer()->getPlayer($target);
 		if($tmp instanceof Player) {

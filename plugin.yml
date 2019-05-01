@@ -28,3 +28,12 @@ permissions:
           hierarchy.role.remove:
             default: "op"
             description: "Allows the sender to remove roles"
+          hierarchy.role.options:
+            default: "op"
+            description: "Intermediate form for choosing players or permissions for a group"
+          hierarchy.role.list_permissions:
+            default: "op"
+            description: "Allows to list the permissions for a role"
+          hierarchy.role.list_players:
+            default: "op"
+            description: "Allows to list the players with a role"

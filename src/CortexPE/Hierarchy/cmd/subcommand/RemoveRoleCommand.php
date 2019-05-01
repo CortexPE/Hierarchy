@@ -35,17 +35,17 @@ use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class RemoveRoleCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.remove");
-	}
+    public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+        parent::__construct($parent, $name, $aliases, $usageMessage, $descriptionMessage);
+        $this->setPermission("hierarchy.role.remove");
+    }
 
-	public function execute(CommandSender $sender, array $args): void {
+    public function execute(CommandSender $sender, array $args): void {
 		if(count($args) == 2) {
 			$role = Loader::getInstance()->getRoleManager()->getRole((int)$args[1]);
 			if($role instanceof Role) {
@@ -89,7 +89,7 @@ class RemoveRoleCommand extends SubCommand {
 				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
 			}
 		} else {
-			$sender->sendMessage("Usage: " . $this->getUsage());
+			$this->sendUsage($sender);
 		}
 	}
 }

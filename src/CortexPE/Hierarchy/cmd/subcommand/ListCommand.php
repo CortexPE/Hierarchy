@@ -30,25 +30,55 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
+use CortexPE\Hierarchy\cmd\RoleCommand;
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
+use dktapps\pmforms\MenuForm;
+use dktapps\pmforms\MenuOption;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
+use function array_values;
+
 
 class ListCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.list_roles");
-	}
+    public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+        parent::__construct($parent, $name, $aliases, $usageMessage, $descriptionMessage);
+        $this->setPermission("hierarchy.list_roles");
+    }
 
-	public function execute(CommandSender $sender, array $args): void {
-		$sender->sendMessage(MessageStore::getMessage("cmd.list.role_header"));
-		$roles = Loader::getInstance()->getRoleManager()->getRoles();
-		foreach($roles as $roleID => $role){
-			$sender->sendMessage(MessageStore::getMessage("cmd.list.role_format", [
-				"role" => $role->getName(),
-				"role_id" => $role->getId(),
-			]));
-		}
+    public function execute(CommandSender $sender, array $args): void {
+		$loader = Loader::getInstance();
+
+		$roles = $loader->getRoleManager()->getRoles();
+
+		if($sender instanceof Player) {
+
+            foreach($roles as $roleID => $role)
+                $options[] = new MenuOption("{$role->getName()} (ID: {$roleID})");
+
+            $options = $options ?? [new MenuOption("err.no_roles")];
+
+            $roleForm = new MenuForm(MessageStore::getMessage("form.title"), "Roles:", $options, function (Player $player, int $selected): void {
+
+                /** @var RoleCommand $parent */
+                $parent = $this->getParent();
+
+                $parent->getCommand('options')->execute($player, [++$selected], true);
+
+            });
+
+            $sender->sendForm($roleForm);
+
+        } else {
+            $sender->sendMessage("Roles:");
+            foreach($roles as $roleID => $role){
+                $sender->sendMessage(MessageStore::getMessage("cmd.list.role_format", [
+                    "role" => $role->getName(),
+                    "role_id" => $role->getId(),
+                ]));
+            }
+        }
 	}
 }

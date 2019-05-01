@@ -30,6 +30,10 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd;
 
 
+use CortexPE\Hierarchy\lang\MessageStore;
+use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\role\Role;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 
 abstract class SubCommand {
@@ -49,19 +53,31 @@ abstract class SubCommand {
 	/** @var string */
 	private $permission = null;
 
-	/**
-	 * SubCommand constructor.
-	 * @param string $name
-	 * @param array $aliases
-	 * @param string $usageMessage
-	 * @param string $descriptionMessage
-	 */
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+	/** @var Command $parent */
+	private $parent;
+
+    /**
+     * SubCommand constructor.
+     * @param Command $parent
+     * @param string $name
+     * @param array $aliases
+     * @param string $usageMessage
+     * @param string $descriptionMessage
+     */
+	public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+	    $this->parent = $parent;
 		$this->aliases = array_map("strtolower", $aliases);
 		$this->name = strtolower($name);
 		$this->usageMessage = $usageMessage;
 		$this->descriptionMessage = $descriptionMessage;
 	}
+
+    /**
+     * @return Command
+     */
+	protected function getParent(): Command{
+	    return $this->parent;
+    }
 
 	/**
 	 * @return string
@@ -111,7 +127,22 @@ abstract class SubCommand {
 		$this->permission = $permission;
 	}
 
-	public function sendUsage(CommandSender $sender):void{
+	public function sendUsage(CommandSender $sender): void{
 		$sender->sendMessage("Usage: " . $this->getUsage());
 	}
+
+    /**
+     * @param CommandSender $sender
+     * @param int $roleID
+     * @param bool $silent
+     * @return Role|null
+     */
+    protected function resolveRole(CommandSender $sender, int $roleID, bool $silent = false): ?Role{
+        $role = Loader::getInstance()->getRoleManager()->getRole($roleID);
+        if($role instanceof Role) {
+            return $role;
+        } elseif(!$silent)
+            $sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
+        return null;
+    }
 }

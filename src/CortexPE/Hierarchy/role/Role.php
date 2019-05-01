@@ -54,12 +54,18 @@ class Role {
 	/** @var BaseMember[] */
 	protected $members = [];
 
+    /**
+     * Role constructor.
+     * @param int $id
+     * @param string $name
+     * @param array $roleData
+     * @throws UnknownPermissionNode
+     */
 	public function __construct(int $id, string $name, array $roleData){
 		$this->id = $id;
 		$this->name = $name;
-
 		$this->position = $roleData["position"];
-		$this->isDefault = $roleData["isDefault"];
+		$this->isDefault = (bool) $roleData["isDefault"];
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission){
 			if($permission == "*"){
