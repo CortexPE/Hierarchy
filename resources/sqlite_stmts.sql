@@ -6,10 +6,10 @@
 -- #    { rolesTable
 CREATE TABLE IF NOT EXISTS Roles
 (
-    ID            INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-    Position      INTEGER NOT NULL UNIQUE,
-    Name          TEXT    NOT NULL DEFAULT 'new role',
-    isDefault     BOOLEAN NOT NULL DEFAULT FALSE
+    ID        INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+    Position  INTEGER NOT NULL UNIQUE,
+    Name      TEXT    NOT NULL DEFAULT 'new role',
+    isDefault BOOLEAN NOT NULL DEFAULT FALSE
 );
 -- #    }
 -- #    { rolePermissionTable

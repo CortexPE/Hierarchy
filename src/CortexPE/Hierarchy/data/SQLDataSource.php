@@ -72,6 +72,7 @@ abstract class SQLDataSource extends DataSource {
 
 			$roles = yield $this->asyncSelect("hierarchy.role.list");
 			if(empty($roles)) {
+				// create default role & add default permissions
 				yield $this->asyncInsert("hierarchy.role.createDefault", [
 					"name" => "Member"
 				]);
