@@ -104,7 +104,7 @@ class RoleCommand extends Command {
 	 */
 	public function getCommand(string $alias): ?SubCommand {
 		foreach($this->subCommands as $key => $command) {
-			if(in_array(strtolower($alias), $command->getAliases()) or $alias === $command->getName()) {
+			if(in_array(strtolower($alias), $command->getAliases(), true) or $alias === $command->getName()) {
 				return $command;
 			}
 		}

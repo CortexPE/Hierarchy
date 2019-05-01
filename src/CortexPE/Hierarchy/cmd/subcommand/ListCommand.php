@@ -39,8 +39,6 @@ use dktapps\pmforms\MenuOption;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use function array_values;
-
 
 class ListCommand extends SubCommand {
     public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
