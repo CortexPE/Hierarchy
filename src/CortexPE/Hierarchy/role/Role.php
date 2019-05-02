@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\role;
 
 
-use CortexPE\Hierarchy\exception\UnknownPermissionNode;
+use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
@@ -75,7 +75,8 @@ class Role {
 			if($perm instanceof Permission){
 				$this->permissions[$perm->getName()] = !$invert;
 			} else {
-				throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
+				Loader::getInstance()->getLogger()->warning("Unknown permission node '" . $permission . "' on " . $name . " role");
+				//throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
 			}
 		}
 	}
