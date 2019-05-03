@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\role;
 
 
-use CortexPE\Hierarchy\exception\UnknownPermissionNode;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
@@ -54,18 +54,12 @@ class Role {
 	/** @var BaseMember[] */
 	protected $members = [];
 
-    /**
-     * Role constructor.
-     * @param int $id
-     * @param string $name
-     * @param array $roleData
-     * @throws UnknownPermissionNode
-     */
-	public function __construct(int $id, string $name, array $roleData){
+	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData){
 		$this->id = $id;
 		$this->name = $name;
 		$this->position = $roleData["position"];
-		$this->isDefault = (bool) $roleData["isDefault"];
+		$this->isDefault = (bool)$roleData["isDefault"];
+
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission){
 			if($permission == "*"){
@@ -81,7 +75,8 @@ class Role {
 			if($perm instanceof Permission){
 				$this->permissions[$perm->getName()] = !$invert;
 			} else {
-				throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
+				$plugin->getLogger()->warning("Unknown permission node '" . $permission . "' on " . $name . " role");
+				//throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
 			}
 		}
 	}
@@ -115,7 +110,7 @@ class Role {
 	}
 
 	public function bind(BaseMember $member):void{
-		$this->members[$member->getName()] = &$member;
+		$this->members[$member->getName()] = $member;
 	}
 
 	public function unbind(BaseMember $member):void{

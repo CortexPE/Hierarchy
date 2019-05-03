@@ -30,14 +30,14 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\data;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
-use Throwable;
 use Generator;
 use pocketmine\permission\PermissionManager;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use SOFe\AwaitGenerator\Await;
+use Throwable;
 
 abstract class SQLDataSource extends DataSource {
 	/** @var DataConnector */
@@ -46,17 +46,15 @@ abstract class SQLDataSource extends DataSource {
 	protected const STMTS_FILE = null;
 	protected const DIALECT = null;
 
-	public function __construct(Loader $plugin, array $config) {
+	public function __construct(Hierarchy $plugin, array $config) {
 		parent::__construct($plugin);
 
-		$this->db = libasynql::create(Loader::getInstance(), [
+		$this->db = libasynql::create($plugin, [
 			"type" => static::DIALECT,
-			"sqlite" => [
-				"file" => Loader::getInstance()->getDataFolder() . $config["dbPath"]
-			],
+			static::DIALECT => $this->getExtraDBSettings($plugin, $config),
 			"worker-limit" => $config["workerLimit"]
 		], [
-			"sqlite" => static::STMTS_FILE
+			static::DIALECT => static::STMTS_FILE
 		]);
 
 		Await::f2c(function () {
@@ -72,6 +70,7 @@ abstract class SQLDataSource extends DataSource {
 
 			$roles = yield $this->asyncSelect("hierarchy.role.list");
 			if(empty($roles)) {
+				// create default role & add default permissions
 				yield $this->asyncInsert("hierarchy.role.createDefault", [
 					"name" => "Member"
 				]);
@@ -100,9 +99,15 @@ abstract class SQLDataSource extends DataSource {
 		});
 	}
 
+	abstract function getExtraDBSettings(Hierarchy $plugin, array $config): array;
+
 	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
 		Await::f2c(function () use ($member, $onLoad) {
-			$data = [];
+			$data = [
+				"roles" => [
+					$this->plugin->getRoleManager()->getDefaultRole()->getId()
+				]
+			];
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);

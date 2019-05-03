@@ -30,19 +30,19 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\member;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\Player;
 use pocketmine\Server;
 
 class MemberFactory {
-	/** @var Loader */
+	/** @var Hierarchy */
 	protected $plugin;
 	/** @var Member[] */
 	protected $onlineMembers = [];
 	/** @var OfflineMember[] */
 	protected $offlineMembers = [];
 
-	public function __construct(Loader $plugin){
+	public function __construct(Hierarchy $plugin){
 		$this->plugin = $plugin;
 	}
 
@@ -70,13 +70,13 @@ class MemberFactory {
 		}
 		if($player instanceof Player){
 			if(!isset($this->onlineMembers[($n = $player->getId())])){
-				$this->onlineMembers[$n] = new Member($player);
+				$this->onlineMembers[$n] = new Member($this->plugin, $player);
 				$newMember = true;
 			}
 			$m = $this->onlineMembers[$n];
 		} else {
 			if(!isset($this->offlineMembers[$player])) {
-				$this->offlineMembers[$player] = new OfflineMember($player);
+				$this->offlineMembers[$player] = new OfflineMember($this->plugin, $player);
 				$newMember = true;
 			}
 			$m = $this->offlineMembers[$player];

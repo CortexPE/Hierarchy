@@ -34,9 +34,13 @@ use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\command\Command;
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
 abstract class SubCommand {
+
+	/** @var Hierarchy */
+	protected $plugin;
 
 	/** @var string */
 	private $name;
@@ -56,28 +60,31 @@ abstract class SubCommand {
 	/** @var Command $parent */
 	private $parent;
 
-    /**
-     * SubCommand constructor.
-     * @param Command $parent
-     * @param string $name
-     * @param array $aliases
-     * @param string $usageMessage
-     * @param string $descriptionMessage
-     */
-	public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage){
-	    $this->parent = $parent;
+	/**
+	 * SubCommand constructor.
+	 *
+	 * @param Hierarchy $plugin
+   * @param Command   $parent
+	 * @param string    $name
+	 * @param array     $aliases
+	 * @param string    $usageMessage
+	 * @param string    $descriptionMessage
+	 */
+	public function __construct(Hierarchy $plugin, Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+		$this->plugin = $plugin;
+    $this->parent = $parent;
 		$this->aliases = array_map("strtolower", $aliases);
 		$this->name = strtolower($name);
 		$this->usageMessage = $usageMessage;
 		$this->descriptionMessage = $descriptionMessage;
 	}
 
-    /**
-     * @return Command
-     */
+	/**
+	 * @return Command
+	 */
 	protected function getParent(): Command{
 	    return $this->parent;
-    }
+	}
 
 	/**
 	 * @return string

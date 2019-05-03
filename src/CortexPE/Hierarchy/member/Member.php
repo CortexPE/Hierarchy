@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\member;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\Player;
 
@@ -40,9 +40,10 @@ class Member extends BaseMember {
 	/** @var PermissionAttachment */
 	protected $attachment;
 
-	public function __construct(Player $player) {
+	public function __construct(Hierarchy $plugin, Player $player) {
+		parent::__construct($plugin);
 		$this->player = $player;
-		$this->attachment = $player->addAttachment(Loader::getInstance());
+		$this->attachment = $player->addAttachment($plugin);
 	}
 
 	/**

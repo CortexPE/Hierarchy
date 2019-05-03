@@ -27,31 +27,18 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\member;
+namespace CortexPE\Hierarchy\data;
 
 
 use CortexPE\Hierarchy\Hierarchy;
-use pocketmine\permission\PermissionAttachment;
-use pocketmine\Player;
 
-class OfflineMember extends BaseMember {
-	/** @var string */
-	protected $username;
+class MySQLDataSource extends SQLDataSource {
+	protected const DIALECT = "mysql";
+	protected const STMTS_FILE = "mysql_stmts.sql";
 
-	public function __construct(Hierarchy $plugin, string $username) {
-		parent::__construct($plugin);
-		$this->username = $username;
-	}
+	public function getExtraDBSettings(Hierarchy $plugin, array $config): array {
+		$config["schema"] = $config["schema"] ?? strtolower($plugin->getName());
 
-	public function getPlayer(): ?Player {
-		return $this->server->getPlayerExact($this->username);
-	}
-
-	public function getName(): string {
-		return $this->username;
-	}
-
-	public function getAttachment(): ?PermissionAttachment {
-		return null;
+		return $config;
 	}
 }

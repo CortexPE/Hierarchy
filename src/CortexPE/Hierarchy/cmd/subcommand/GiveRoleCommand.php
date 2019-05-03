@@ -54,7 +54,7 @@ class GiveRoleCommand extends SubCommand {
 					$target = $tmp;
 				}
 
-				$memberFactory = Loader::getInstance()->getMemberFactory();
+				$memberFactory = $this->plugin->getMemberFactory();
 
 				$memberFactory
                         ->getMember($target, true, function (BaseMember $member) use ($memberFactory, $role, $sender): void {

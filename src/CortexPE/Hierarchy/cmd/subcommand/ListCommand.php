@@ -34,6 +34,7 @@ use CortexPE\Hierarchy\cmd\RoleCommand;
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use dktapps\pmforms\MenuForm;
 use dktapps\pmforms\MenuOption;
 use pocketmine\command\Command;
@@ -41,15 +42,14 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 class ListCommand extends SubCommand {
-    public function __construct(Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-        parent::__construct($parent, $name, $aliases, $usageMessage, $descriptionMessage);
+    public function __construct(Hierarchy $plugin, Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+        parent::__construct($plugin, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
         $this->setPermission("hierarchy.list_roles");
     }
 
     public function execute(CommandSender $sender, array $args): void {
-		$loader = Loader::getInstance();
 
-		$roles = $loader->getRoleManager()->getRoles();
+		$roles = $this->plugin->getRoleManager()->getRoles();
 
 		if($sender instanceof Player) {
 

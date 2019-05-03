@@ -37,6 +37,7 @@ use CortexPE\Hierarchy\cmd\subcommand\ListPermissionsCommand;
 use CortexPE\Hierarchy\cmd\subcommand\PlayersCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RoleOptionsCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -46,16 +47,16 @@ class RoleCommand extends Command {
 	/** @var SubCommand[] */
 	private $subCommands = [];
 
-	public function __construct(string $name, string $description) {
+	public function __construct(Hierarchy $plugin, string $name, string $description) {
 		parent::__construct($name, $description);
 
-		$this->registerCommand(new GiveRoleCommand($this, "give", ["add"], "/role give <player> <roleID>", "Give role to player"));
-		$this->registerCommand(new UserInfoCommand($this, "who", [], "/role who <player>", "Check user info"));
-		$this->registerCommand(new ListCommand($this, "list", [], "/role list", "Lists all roles"));
-		$this->registerCommand(new RemoveRoleCommand($this, "remove", [], "/role remove <player> <roleID>", "Remove role from player"));
-		$this->registerCommand(new ListPermissionsCommand($this, "roleperm", [], "/role roleperm <roleID>", "Get the permissions of a role"));
-		$this->registerCommand(new PlayersCommand($this, "players", [], "/role players <roleID>", "Get the players in a group"));
-		$this->registerCommand(new RoleOptionsCommand($this, "options", [], "/role options <roleID>", "Menu for selecting either players or permissions"));
+		$this->registerCommand(new GiveRoleCommand($plugin, $this, "give", ["add"], "/role give <player> <roleID>", "Give role to player"));
+		$this->registerCommand(new UserInfoCommand($plugin, $this, "who", [], "/role who <player>", "Check user info"));
+		$this->registerCommand(new ListCommand($plugin, $this, "list", [], "/role list", "Lists all roles"));
+		$this->registerCommand(new RemoveRoleCommand($plugin, $this, "remove", [], "/role remove <player> <roleID>", "Remove role from player"));
+		$this->registerCommand(new ListPermissionsCommand($plugin, $this, "roleperm", [], "/role roleperm <roleID>", "Get the permissions of a role"));
+		$this->registerCommand(new PlayersCommand($plugin, $this, "players", [], "/role players <roleID>", "Get the players in a group"));
+		$this->registerCommand(new RoleOptionsCommand($plugin, $this, "options", [], "/role options <roleID>", "Menu for selecting either players or permissions"));
 	}
 
 	/**

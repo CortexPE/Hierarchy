@@ -30,24 +30,24 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\data;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 
 abstract class DataSource {
 	public const ACTION_ROLE_ADD = "role.add";
 	public const ACTION_ROLE_REMOVE = "role.remove";
 
-	/** @var Loader */
+	/** @var Hierarchy */
 	protected $plugin;
 
-	public function __construct(Loader $plugin) {
+	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
 	}
 
 	/**
-	 * @return Loader
+	 * @return Hierarchy
 	 */
-	public function getPlugin(): Loader {
+	public function getPlugin(): Hierarchy {
 		return $this->plugin;
 	}
 

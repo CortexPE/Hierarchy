@@ -27,31 +27,28 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\member;
+namespace CortexPE\Hierarchy\data;
 
 
 use CortexPE\Hierarchy\Hierarchy;
-use pocketmine\permission\PermissionAttachment;
-use pocketmine\Player;
 
-class OfflineMember extends BaseMember {
+class JSONDataSource extends IndexedDataSource {
 	/** @var string */
-	protected $username;
+	protected const FILE_EXTENSION = "json";
 
-	public function __construct(Hierarchy $plugin, string $username) {
+	/** @var bool */
+	protected $prettyPrint = false;
+
+	public function __construct(Hierarchy $plugin, array $config) {
+		$this->prettyPrint = (bool)$config["prettyPrint"];
 		parent::__construct($plugin);
-		$this->username = $username;
 	}
 
-	public function getPlayer(): ?Player {
-		return $this->server->getPlayerExact($this->username);
+	public function encode(array $data): string {
+		return json_encode($data, $this->prettyPrint ? JSON_PRETTY_PRINT : 0);
 	}
 
-	public function getName(): string {
-		return $this->username;
-	}
-
-	public function getAttachment(): ?PermissionAttachment {
-		return null;
+	public function decode(string $string): array {
+		return json_decode($string, true);
 	}
 }

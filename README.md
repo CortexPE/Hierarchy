@@ -8,10 +8,10 @@ Role-based permission management system
 | Allows same role/group names | ✔️ | ❌ |
 | Multiworld (TO-DO w/ extension) | ✔️ | ✔️ |
 | Asynchronous I/O | ✔️ | ❌ |
-| MySQL DB Support (TO-DO) | ✔️ | ✔️ |
+| MySQL DB Support | ✔️ | ✔️ |
 | SQLite3 DB Support | ✔️ | ✔️ |
-| YAML Storage Support (TO-DO) | ✔️ | ✔️ |
-| JSON Storage Support (TO-DO) | ✔️ | ❌ |
+| YAML Storage Support | ✔️ | ✔️ |
+| JSON Storage Support | ✔️ | ❌ |
 | Lightweight | ✔️ | ❌ |
 | Extremely modular | ✔️ | ❌ |
 | Form GUI | ✔️ | ❌ |

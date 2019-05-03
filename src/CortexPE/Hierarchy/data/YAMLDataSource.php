@@ -27,31 +27,18 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\member;
+namespace CortexPE\Hierarchy\data;
 
 
-use CortexPE\Hierarchy\Hierarchy;
-use pocketmine\permission\PermissionAttachment;
-use pocketmine\Player;
-
-class OfflineMember extends BaseMember {
+class YAMLDataSource extends IndexedDataSource {
 	/** @var string */
-	protected $username;
+	protected const FILE_EXTENSION = "yml";
 
-	public function __construct(Hierarchy $plugin, string $username) {
-		parent::__construct($plugin);
-		$this->username = $username;
+	public function encode(array $data): string {
+		return yaml_emit($data, YAML_UTF8_ENCODING);
 	}
 
-	public function getPlayer(): ?Player {
-		return $this->server->getPlayerExact($this->username);
-	}
-
-	public function getName(): string {
-		return $this->username;
-	}
-
-	public function getAttachment(): ?PermissionAttachment {
-		return null;
+	public function decode(string $string): array {
+		return yaml_parse($string);
 	}
 }

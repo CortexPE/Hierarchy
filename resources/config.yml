@@ -1,12 +1,12 @@
 ---
 dataSource:
-  # Available Types: json, sqlite3, mysql
+  # Available Types: json, sqlite3, mysql, yaml
   type: "sqlite3"
 
   # These settings will only apply when you chose json as dataSource type
   json:
     # Save JSON data files in a human-readable way... Excluding JSON configuration files.
-    prettyPrint: false
+    prettyPrint: true
 
   # These settings will only apply when you chose sqlite3 as dataSource type
   sqlite3:
@@ -21,6 +21,8 @@ dataSource:
     user: "hierarchy"
     password: "youShallNotPass"
     database: "hierarchy"
+    # Database schema to use, by default this is the plugin's name
+    schema: "hierarchy"
     # The maximum number of simultaneous queries
     workerLimit: 2 # Increase the value if you have slow connection to the MySQL server
 ...

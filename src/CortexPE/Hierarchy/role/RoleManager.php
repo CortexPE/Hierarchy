@@ -31,20 +31,18 @@ namespace CortexPE\Hierarchy\role;
 
 
 use CortexPE\Hierarchy\exception\RoleCollissionError;
-use CortexPE\Hierarchy\exception\UnknownPermissionNode;
-use CortexPE\Hierarchy\Loader;
-use pocketmine\scheduler\ClosureTask;
+use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
 
 class RoleManager {
-	/** @var Loader */
+	/** @var Hierarchy */
 	protected $plugin;
 	/** @var Role[] */
 	protected $roles = [];
 	/** @var Role */
 	protected $defaultRole = null;
 
-	public function __construct(Loader $plugin){
+	public function __construct(Hierarchy $plugin){
 		$this->plugin = $plugin;
 	}
 
@@ -53,11 +51,10 @@ class RoleManager {
 	 *
 	 * @param array $roles
 	 * @throws RoleCollissionError
-	 * @throws UnknownPermissionNode
 	 */
 	public function loadRoles(array $roles) {
 		foreach($roles as $roleData){
-			$role = new Role($roleData["ID"], $roleData["Name"], [
+			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
 				"position" => $roleData["Position"],
 				"isDefault" => $roleData["isDefault"]
