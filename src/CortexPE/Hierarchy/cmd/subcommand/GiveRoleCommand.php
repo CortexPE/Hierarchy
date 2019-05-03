@@ -81,7 +81,7 @@ class GiveRoleCommand extends SubCommand {
 								  ]));
 							  }
 						  } else {
-							  MessageStore::getMessage("cmd.give.default");
+							  $sender->sendMessage(MessageStore::getMessage("cmd.give.default"));
 						  }
 					  });
 			} else {

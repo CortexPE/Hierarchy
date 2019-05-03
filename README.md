@@ -10,7 +10,7 @@ Role-based permission management system
 | Asynchronous I/O | ✔️ | ❌ |
 | MySQL DB Support | ✔️ | ✔️ |
 | SQLite3 DB Support | ✔️ | ✔️ |
-| YAML Storage Support (TO-DO) | ✔️ | ✔️ |
-| JSON Storage Support (TO-DO) | ✔️ | ❌ |
+| YAML Storage Support | ✔️ | ✔️ |
+| JSON Storage Support | ✔️ | ❌ |
 | Lightweight | ✔️ | ❌ |
 | Extremely modular | ✔️ | ❌ |

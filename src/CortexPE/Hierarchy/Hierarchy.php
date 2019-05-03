@@ -31,8 +31,10 @@ namespace CortexPE\Hierarchy;
 
 use CortexPE\Hierarchy\cmd\RoleCommand;
 use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\data\JSONDataSource;
 use CortexPE\Hierarchy\data\MySQLDataSource;
 use CortexPE\Hierarchy\data\SQLiteDataSource;
+use CortexPE\Hierarchy\data\YAMLDataSource;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
@@ -52,9 +54,15 @@ class Hierarchy extends PluginBase {
 		(new MessageStore($this->getDataFolder() . "messages.yml"));
 		$conf = new Config($this->getDataFolder() . "config.yml", Config::YAML);
 
-		switch($conf->getNested("dataSource.type", "json")) {
+		$this->roleManager = new RoleManager($this);
+		$this->memberFactory = new MemberFactory($this);
+
+		switch($conf->getNested("dataSource.type", "sqlite3")) {
 			case "json":
-				// TODO: implement
+				$this->dataSource = new JSONDataSource($this, $conf->getNested("dataSource.json"));
+				break;
+			case "yaml":
+				$this->dataSource = new YAMLDataSource($this);
 				break;
 			case "sqlite3":
 				if(!extension_loaded("sqlite3")) {
@@ -78,14 +86,11 @@ class Hierarchy extends PluginBase {
 				break;
 			default:
 				$this->getLogger()
-					 ->error("Invalid data source type, must be one of the following: 'json', 'sqlite3', 'mysql'");
+					 ->error("Invalid data source type, must be one of the following: 'json', 'sqlite3', 'mysql', 'yaml'");
 				$this->getServer()->getPluginManager()->disablePlugin($this);
 
 				return;
 		}
-
-		$this->roleManager = new RoleManager($this);
-		$this->memberFactory = new MemberFactory($this);
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$cmd = new RoleCommand($this,"role", "Hierarchy main command");
