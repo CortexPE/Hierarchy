@@ -59,7 +59,7 @@ class GiveRoleCommand extends SubCommand {
 						  if($sender instanceof Player) {
 							  $sMember = $this->plugin->getMemberFactory()->getMember($sender);
 							  if(
-								  $sMember->getTopRole()->getPosition() <= $role ||
+								  $sMember->getTopRole()->getPosition() <= $role->getPosition() ||
 								  !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)
 							  ) {
 								  $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
