@@ -49,10 +49,10 @@ abstract class SQLDataSource extends DataSource {
 	public function __construct(Hierarchy $plugin, array $config) {
 		parent::__construct($plugin);
 
-		$this->db = libasynql::create(Hierarchy::getInstance(), [
+		$this->db = libasynql::create($plugin, [
 			"type" => static::DIALECT,
 			"sqlite" => [
-				"file" => Hierarchy::getInstance()->getDataFolder() . $config["dbPath"]
+				"file" => $plugin->getDataFolder() . $config["dbPath"]
 			],
 			"worker-limit" => $config["workerLimit"]
 		], [
@@ -105,7 +105,7 @@ abstract class SQLDataSource extends DataSource {
 		Await::f2c(function () use ($member, $onLoad) {
 			$data = [
 				"roles" => [
-					Hierarchy::getRoleManager()->getDefaultRole()->getId()
+					$this->plugin->getRoleManager()->getDefaultRole()->getId()
 				]
 			];
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [

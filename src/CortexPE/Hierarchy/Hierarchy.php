@@ -39,17 +39,14 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
 class Hierarchy extends PluginBase {
-	/** @var Hierarchy */
-	protected static $instance;
 	/** @var DataSource */
-	protected static $dataSource;
+	private $dataSource;
 	/** @var RoleManager */
-	protected static $roleManager;
+	private $roleManager;
 	/** @var MemberFactory */
-	protected static $memberFactory;
+	private $memberFactory;
 
 	public function onEnable(): void {
-		self::$instance = $this;
 		$this->saveResource("config.yml");
 		(new MessageStore($this->getDataFolder() . "messages.yml"));
 		$conf = new Config($this->getDataFolder() . "config.yml", Config::YAML);
@@ -66,7 +63,7 @@ class Hierarchy extends PluginBase {
 
 					return;
 				}
-				self::$dataSource = new SQLiteDataSource($this, $conf->getNested("dataSource.sqlite3"));
+				$this->dataSource = new SQLiteDataSource($this, $conf->getNested("dataSource.sqlite3"));
 				break;
 			case "mysql":
 				if(!extension_loaded("mysqli")) {
@@ -86,50 +83,44 @@ class Hierarchy extends PluginBase {
 				return;
 		}
 
-		self::$roleManager = new RoleManager($this);
-		self::$memberFactory = new MemberFactory($this);
+		$this->roleManager = new RoleManager($this);
+		$this->memberFactory = new MemberFactory($this);
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-		$cmd = new RoleCommand("role", "Hierarchy main command");
+		$cmd = new RoleCommand($this,"role", "Hierarchy main command");
 
 		$this->getServer()->getCommandMap()->register("hierarchy", $cmd);
 	}
 
 	public function onDisable(): void {
-		if(self::$memberFactory instanceof MemberFactory) {
-			self::$memberFactory->shutdown();
+		if($this->memberFactory instanceof MemberFactory) {
+			$this->memberFactory->shutdown();
 		}
 		// last
-		if(self::$dataSource instanceof DataSource) {
-			self::$dataSource->shutdown();
+		if($this->dataSource instanceof DataSource) {
+			$this->dataSource->shutdown();
 		}
 	}
 
 	/**
 	 * @return DataSource
 	 */
-	public static function getDataSource(): DataSource {
-		return self::$dataSource;
+	public function getDataSource(): DataSource {
+		return $this->dataSource;
 	}
 
 	/**
 	 * @return RoleManager
 	 */
-	public static function getRoleManager(): RoleManager {
-		return self::$roleManager;
+	public function getRoleManager(): RoleManager {
+		return $this->roleManager;
 	}
 
 	/**
+	 *
 	 * @return MemberFactory
 	 */
-	public static function getMemberFactory(): MemberFactory {
-		return self::$memberFactory;
-	}
-
-	/**
-	 * @return Hierarchy
-	 */
-	public static function getInstance(): Hierarchy {
-		return self::$instance;
+	public function getMemberFactory(): MemberFactory {
+		return $this->memberFactory;
 	}
 }

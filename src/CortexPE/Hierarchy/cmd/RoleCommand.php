@@ -34,23 +34,23 @@ use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RemoveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
 
 class RoleCommand extends Command {
 
 	/** @var SubCommand[] */
 	private $subCommands = [];
 
-	public function __construct(string $name, string $description) {
+	public function __construct(Hierarchy $plugin, string $name, string $description) {
 		parent::__construct($name, $description);
 
-		$this->registerCommand(new GiveRoleCommand("give", ["add"], "/role give <player> <roleID>", "Give role to player"));
-		$this->registerCommand(new UserInfoCommand("who", [], "/role who <player>", "Check user info"));
-		$this->registerCommand(new ListCommand("list", [], "/role list", "Lists all roles"));
-		$this->registerCommand(new RemoveRoleCommand("remove", [], "/role remove <player> <roleID>", "Remove role from player"));
+		$this->registerCommand(new GiveRoleCommand($plugin, "give", ["add"], "/role give <player> <roleID>", "Give role to player"));
+		$this->registerCommand(new UserInfoCommand($plugin, "who", [], "/role who <player>", "Check user info"));
+		$this->registerCommand(new ListCommand($plugin, "list", [], "/role list", "Lists all roles"));
+		$this->registerCommand(new RemoveRoleCommand($plugin, "remove", [], "/role remove <player> <roleID>", "Remove role from player"));
 	}
 
 	/**

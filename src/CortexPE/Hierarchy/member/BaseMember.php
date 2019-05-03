@@ -38,12 +38,22 @@ use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\Player;
+use pocketmine\Server;
 
 abstract class BaseMember {
+	/** @var Hierarchy */
+	protected $plugin;
 	/** @var bool[] */
 	protected $permissions = [];
 	/** @var Role[] */
 	protected $roles = [];
+	/** @var Server */
+	protected $server;
+
+	public function __construct(Hierarchy $plugin) {
+		$this->plugin = $plugin;
+		$this->server = $plugin->getServer();
+	}
 
 	/**
 	 * @return Role[]
@@ -60,7 +70,7 @@ abstract class BaseMember {
 	}
 
 	public function addRoleById(int $roleId, bool $recalculate = true): void {
-		$role = Hierarchy::getRoleManager()->getRole($roleId);
+		$role = $this->plugin->getRoleManager()->getRole($roleId);
 		$this->addRole($role, $recalculate);
 	}
 
@@ -69,9 +79,7 @@ abstract class BaseMember {
 			$ev = new MemberRoleAddEvent($this, $role);
 			$ev->call();
 			if(!$ev->isCancelled()) {
-				Hierarchy::getInstance()
-						 ->getDataSource()
-						 ->updateMemberData($this, DataSource::ACTION_ROLE_ADD, $role->getId());
+				$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_ADD, $role->getId());
 				$this->roles[$role->getId()] = $role;
 				$role->bind($this);
 				if($recalculate) {
@@ -93,9 +101,7 @@ abstract class BaseMember {
 			$ev->call();
 			if(!$ev->isCancelled()) {
 				unset($this->roles[$role->getId()]);
-				Hierarchy::getInstance()
-						 ->getDataSource()
-						 ->updateMemberData($this, DataSource::ACTION_ROLE_REMOVE, $role->getId());
+				$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_REMOVE, $role->getId());
 				$role->unbind($this);
 				if($recalculate) {
 					$this->recalculatePermissions();

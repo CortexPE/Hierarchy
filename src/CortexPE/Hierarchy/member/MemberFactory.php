@@ -70,13 +70,13 @@ class MemberFactory {
 		}
 		if($player instanceof Player){
 			if(!isset($this->onlineMembers[($n = $player->getId())])){
-				$this->onlineMembers[$n] = new Member($player);
+				$this->onlineMembers[$n] = new Member($this->plugin, $player);
 				$newMember = true;
 			}
 			$m = $this->onlineMembers[$n];
 		} else {
 			if(!isset($this->offlineMembers[$player])) {
-				$this->offlineMembers[$player] = new OfflineMember($player);
+				$this->offlineMembers[$player] = new OfflineMember($this->plugin, $player);
 				$newMember = true;
 			}
 			$m = $this->offlineMembers[$player];

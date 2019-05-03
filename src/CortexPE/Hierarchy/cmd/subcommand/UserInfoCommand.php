@@ -39,8 +39,8 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class UserInfoCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
+	public function __construct(Hierarchy $plugin, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+		parent::__construct($plugin, $name, $aliases, $usageMessage, $descriptionMessage);
 		$this->setPermission("hierarchy.user_info");
 	}
 
@@ -50,7 +50,7 @@ class UserInfoCommand extends SubCommand {
 		if($tmp instanceof Player) {
 			$target = $tmp;
 		}
-		Hierarchy::getMemberFactory()->getMember($target, true, function (BaseMember $member) use ($sender) {
+		$this->plugin->getMemberFactory()->getMember($target, true, function (BaseMember $member) use ($sender) {
 			$roles = $member->getRoles();
 			$permissions = $member->getPermissions();
 			$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.header", [

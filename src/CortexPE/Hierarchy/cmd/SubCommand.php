@@ -30,9 +30,13 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd;
 
 
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
 abstract class SubCommand {
+
+	/** @var Hierarchy */
+	protected $plugin;
 
 	/** @var string */
 	private $name;
@@ -51,12 +55,15 @@ abstract class SubCommand {
 
 	/**
 	 * SubCommand constructor.
-	 * @param string $name
-	 * @param array $aliases
-	 * @param string $usageMessage
-	 * @param string $descriptionMessage
+	 *
+	 * @param Hierarchy $plugin
+	 * @param string    $name
+	 * @param array     $aliases
+	 * @param string    $usageMessage
+	 * @param string    $descriptionMessage
 	 */
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+	public function __construct(Hierarchy $plugin, string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+		$this->plugin = $plugin;
 		$this->aliases = array_map("strtolower", $aliases);
 		$this->name = strtolower($name);
 		$this->usageMessage = $usageMessage;

@@ -36,14 +36,14 @@ use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
 class ListCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
+	public function __construct(Hierarchy $plugin, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+		parent::__construct($plugin, $name, $aliases, $usageMessage, $descriptionMessage);
 		$this->setPermission("hierarchy.list_roles");
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
 		$sender->sendMessage(MessageStore::getMessage("cmd.list.role_header"));
-		$roles = Hierarchy::getRoleManager()->getRoles();
+		$roles = $this->plugin->getRoleManager()->getRoles();
 		foreach($roles as $roleID => $role){
 			$sender->sendMessage(MessageStore::getMessage("cmd.list.role_format", [
 				"role" => $role->getName(),

@@ -40,9 +40,10 @@ class Member extends BaseMember {
 	/** @var PermissionAttachment */
 	protected $attachment;
 
-	public function __construct(Player $player) {
+	public function __construct(Hierarchy $plugin, Player $player) {
+		parent::__construct($plugin);
 		$this->player = $player;
-		$this->attachment = $player->addAttachment(Hierarchy::getInstance());
+		$this->attachment = $player->addAttachment($plugin);
 	}
 
 	/**

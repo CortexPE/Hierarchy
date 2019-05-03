@@ -54,7 +54,7 @@ class Role {
 	/** @var BaseMember[] */
 	protected $members = [];
 
-	public function __construct(int $id, string $name, array $roleData){
+	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData){
 		$this->id = $id;
 		$this->name = $name;
 
@@ -75,7 +75,7 @@ class Role {
 			if($perm instanceof Permission){
 				$this->permissions[$perm->getName()] = !$invert;
 			} else {
-				Hierarchy::getInstance()->getLogger()->warning("Unknown permission node '" . $permission . "' on " . $name . " role");
+				$plugin->getLogger()->warning("Unknown permission node '" . $permission . "' on " . $name . " role");
 				//throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
 			}
 		}

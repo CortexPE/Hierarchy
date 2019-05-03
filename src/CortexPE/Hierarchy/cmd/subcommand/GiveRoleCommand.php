@@ -39,14 +39,14 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 class GiveRoleCommand extends SubCommand {
-	public function __construct(string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($name, $aliases, $usageMessage, $descriptionMessage);
+	public function __construct(Hierarchy $plugin, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+		parent::__construct($plugin, $name, $aliases, $usageMessage, $descriptionMessage);
 		$this->setPermission("hierarchy.role.give");
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
 		if(count($args) == 2) {
-			$role = Hierarchy::getRoleManager()->getRole((int)$args[1]);
+			$role = $this->plugin->getRoleManager()->getRole((int)$args[1]);
 			if($role instanceof Role) {
 				$target = $args[0];
 				$tmp = $sender->getServer()->getPlayer($target);
@@ -54,11 +54,10 @@ class GiveRoleCommand extends SubCommand {
 					$target = $tmp;
 				}
 
-				Hierarchy::getInstance()
-						 ->getMemberFactory()
+				$this->plugin->getMemberFactory()
 						 ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
 						  if($sender instanceof Player) {
-							  $sMember = Hierarchy::getMemberFactory()->getMember($sender);
+							  $sMember = $this->plugin->getMemberFactory()->getMember($sender);
 							  if(
 								  $sMember->getTopRole()->getPosition() <= $role ||
 								  !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)

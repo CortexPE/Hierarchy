@@ -31,7 +31,6 @@ namespace CortexPE\Hierarchy\role;
 
 
 use CortexPE\Hierarchy\exception\RoleCollissionError;
-use CortexPE\Hierarchy\exception\UnknownPermissionNode;
 use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
 
@@ -52,11 +51,10 @@ class RoleManager {
 	 *
 	 * @param array $roles
 	 * @throws RoleCollissionError
-	 * @throws UnknownPermissionNode
 	 */
 	public function loadRoles(array $roles) {
 		foreach($roles as $roleData){
-			$role = new Role($roleData["ID"], $roleData["Name"], [
+			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
 				"position" => $roleData["Position"],
 				"isDefault" => $roleData["isDefault"]
