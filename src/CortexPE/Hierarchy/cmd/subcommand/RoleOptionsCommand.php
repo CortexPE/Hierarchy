@@ -39,7 +39,6 @@ use dktapps\pmforms\MenuOption;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use function var_dump;
 
 class RoleOptionsCommand extends SubCommand
 {
