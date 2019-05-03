@@ -39,6 +39,7 @@ use dktapps\pmforms\MenuOption;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+use function var_dump;
 
 class RoleOptionsCommand extends SubCommand
 {
@@ -71,12 +72,12 @@ class RoleOptionsCommand extends SubCommand
                                 case self::PERMISSIONS:
                                     /** @var ListPermissionsCommand $rolePermissionCommand */
                                     $rolePermissionCommand = $parent->getCommand("roleperm");
-                                    $rolePermissionCommand->execute($player, [++$selected], true, $back);
+                                    $rolePermissionCommand->execute($player, [$role->getId()], true, $back);
                                     break;
                                 case self::PLAYERS:
                                     /** @var PlayersCommand $playersCommand */
                                     $playersCommand = $parent->getCommand("players");
-                                    $playersCommand->execute($player, [++$selected], true, $back);
+                                    $playersCommand->execute($player, [$role->getId()], true, $back);
                                     break;
                                 case self::BACK:
                                     $parent->getCommand("list")->execute($player, []);
