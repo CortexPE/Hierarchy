@@ -72,7 +72,8 @@ class PlayersCommand extends SubCommand {
                         } elseif($back)
                             /** @var RoleOptionsCommand $optionsCommand */
                             $optionsCommand = $parent->getCommand('options');
-                            $optionsCommand->execute($player, [$role->getId()], $previousBack);
+                            if(isset($optionsCommand))
+                                $optionsCommand->execute($player, [$role->getId()], $previousBack);
                     });
 
                     $sender->sendForm($memberForm);
