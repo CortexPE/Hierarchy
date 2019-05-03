@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy;
 
 use CortexPE\Hierarchy\cmd\RoleCommand;
 use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\data\MySQLDataSource;
 use CortexPE\Hierarchy\data\SQLiteDataSource;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
@@ -73,7 +74,7 @@ class Hierarchy extends PluginBase {
 
 					return;
 				}
-				// TODO: use libasyql
+				$this->dataSource = new MySQLDataSource($this, $conf->getNested("dataSource.mysql"));
 				break;
 			default:
 				$this->getLogger()

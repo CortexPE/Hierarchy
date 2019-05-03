@@ -31,8 +31,8 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
 use CortexPE\Hierarchy\cmd\SubCommand;
-use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\command\CommandSender;
@@ -56,16 +56,18 @@ class RemoveRoleCommand extends SubCommand {
 
 				$this->plugin->getMemberFactory()
 						 ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
-							 $sMember = $this->plugin->getMemberFactory()->getMember($sender);
-							 if(
-								 $sMember->getTopRole()->getPosition() <= $role ||
-								 !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)
-							 ) {
-								 $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
-									 "target" => $member->getName()
-								 ]));
+							 if($sender instanceof Player) {
+								 $sMember = $this->plugin->getMemberFactory()->getMember($sender);
+								 if(
+									 $sMember->getTopRole()->getPosition() <= $role ||
+									 !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)
+								 ) {
+									 $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
+										 "target" => $member->getName()
+									 ]));
 
-								 return;
+									 return;
+								 }
 							 }
 					  	if(!$role->isDefault()) {
 							if($member->hasRole($role)) {

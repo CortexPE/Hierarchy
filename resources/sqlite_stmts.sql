@@ -7,9 +7,9 @@
 CREATE TABLE IF NOT EXISTS Roles
 (
     ID        INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-    Position  INTEGER NOT NULL UNIQUE,
-    Name      TEXT    NOT NULL DEFAULT 'new role',
-    isDefault BOOLEAN NOT NULL DEFAULT FALSE
+    Position  INTEGER      NOT NULL UNIQUE,
+    Name      VARCHAR(100) NOT NULL DEFAULT 'new role',
+    isDefault BOOLEAN      NOT NULL DEFAULT FALSE
 );
 -- #    }
 -- #    { rolePermissionTable
@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS RolePermissions
 CREATE TABLE IF NOT EXISTS MemberRoles
 (
     Player VARCHAR(16) NOT NULL COLLATE NOCASE, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
-    RoleID INTEGER     NOT NULL
+    RoleID INTEGER     NOT NULL,
+    PRIMARY KEY (Player, RoleID)
 );
 -- #    }
 -- #  }

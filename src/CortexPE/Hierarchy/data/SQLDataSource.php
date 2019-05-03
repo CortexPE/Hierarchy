@@ -32,12 +32,12 @@ namespace CortexPE\Hierarchy\data;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
-use Throwable;
 use Generator;
 use pocketmine\permission\PermissionManager;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use SOFe\AwaitGenerator\Await;
+use Throwable;
 
 abstract class SQLDataSource extends DataSource {
 	/** @var DataConnector */
@@ -51,12 +51,10 @@ abstract class SQLDataSource extends DataSource {
 
 		$this->db = libasynql::create($plugin, [
 			"type" => static::DIALECT,
-			"sqlite" => [
-				"file" => $plugin->getDataFolder() . $config["dbPath"]
-			],
+			static::DIALECT => $this->getExtraDBSettings($plugin, $config),
 			"worker-limit" => $config["workerLimit"]
 		], [
-			"sqlite" => static::STMTS_FILE
+			static::DIALECT => static::STMTS_FILE
 		]);
 
 		Await::f2c(function () {
@@ -100,6 +98,8 @@ abstract class SQLDataSource extends DataSource {
 			$this->getPlugin()->getLogger()->logException($err);
 		});
 	}
+
+	abstract function getExtraDBSettings(Hierarchy $plugin, array $config): array;
 
 	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
 		Await::f2c(function () use ($member, $onLoad) {
