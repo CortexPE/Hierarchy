@@ -33,6 +33,9 @@ namespace CortexPE\Hierarchy\cmd;
 use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RemoveRoleCommand;
+use CortexPE\Hierarchy\cmd\subcommand\ListPermissionsCommand;
+use CortexPE\Hierarchy\cmd\subcommand\PlayersCommand;
+use CortexPE\Hierarchy\cmd\subcommand\RoleOptionsCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
@@ -47,10 +50,13 @@ class RoleCommand extends Command {
 	public function __construct(Hierarchy $plugin, string $name, string $description) {
 		parent::__construct($name, $description);
 
-		$this->registerCommand(new GiveRoleCommand($plugin, "give", ["add"], "/role give <player> <roleID>", "Give role to player"));
-		$this->registerCommand(new UserInfoCommand($plugin, "who", [], "/role who <player>", "Check user info"));
-		$this->registerCommand(new ListCommand($plugin, "list", [], "/role list", "Lists all roles"));
-		$this->registerCommand(new RemoveRoleCommand($plugin, "remove", [], "/role remove <player> <roleID>", "Remove role from player"));
+		$this->registerCommand(new GiveRoleCommand($plugin, $this, "give", ["add"], "/role give <player> <roleID>", "Give role to player"));
+		$this->registerCommand(new UserInfoCommand($plugin, $this, "who", [], "/role who <player>", "Check user info"));
+		$this->registerCommand(new ListCommand($plugin, $this, "list", [], "/role list", "Lists all roles"));
+		$this->registerCommand(new RemoveRoleCommand($plugin, $this, "remove", [], "/role remove <player> <roleID>", "Remove role from player"));
+		$this->registerCommand(new ListPermissionsCommand($plugin, $this, "roleperm", [], "/role roleperm <roleID>", "Get the permissions of a role"));
+		$this->registerCommand(new PlayersCommand($plugin, $this, "players", [], "/role players <roleID>", "Get the players in a group"));
+		$this->registerCommand(new RoleOptionsCommand($plugin, $this, "options", [], "/role options <roleID>", "Menu for selecting either players or permissions"));
 	}
 
 	/**
@@ -73,7 +79,7 @@ class RoleCommand extends Command {
 	 * @param array         $args
 	 */
 	final public function execute(CommandSender $sender, string $commandLabel, array $args): void {
-		if(isset($args[0]) && $this->getCommand($args[0]) != null) {
+		if(isset($args[0]) && $this->getCommand($args[0]) !== null) {
 			$cmd = $this->getCommand(array_shift($args));
 			if(($perm = $cmd->getPermission()) !== null && !$sender->hasPermission($perm)) {
 				$sender->sendMessage(MessageStore::getMessage("err.insufficient_permissions"));
@@ -99,7 +105,7 @@ class RoleCommand extends Command {
 	 */
 	public function getCommand(string $alias): ?SubCommand {
 		foreach($this->subCommands as $key => $command) {
-			if(in_array(strtolower($alias), $command->getAliases()) or $alias == $command->getName()) {
+			if(in_array(strtolower($alias), $command->getAliases(), true) or $alias === $command->getName()) {
 				return $command;
 			}
 		}

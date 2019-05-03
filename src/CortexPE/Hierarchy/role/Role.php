@@ -57,9 +57,9 @@ class Role {
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData){
 		$this->id = $id;
 		$this->name = $name;
-
 		$this->position = $roleData["position"];
 		$this->isDefault = (bool)$roleData["isDefault"];
+
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission){
 			if($permission == "*"){

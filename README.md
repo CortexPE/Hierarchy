@@ -14,3 +14,4 @@ Role-based permission management system
 | JSON Storage Support | ✔️ | ❌ |
 | Lightweight | ✔️ | ❌ |
 | Extremely modular | ✔️ | ❌ |
+| Form GUI | ✔️ | ❌ |

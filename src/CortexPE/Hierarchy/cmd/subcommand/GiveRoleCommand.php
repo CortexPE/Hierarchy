@@ -34,34 +34,34 @@ use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\BaseMember;
-use CortexPE\Hierarchy\role\Role;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 class GiveRoleCommand extends SubCommand {
-	public function __construct(Hierarchy $plugin, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-		parent::__construct($plugin, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.give");
-	}
+    public function __construct(Hierarchy $hierarchy, Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
+        parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
+        $this->setPermission("hierarchy.role.give");
+    }
 
-	public function execute(CommandSender $sender, array $args): void {
-		if(count($args) == 2) {
-			$role = $this->plugin->getRoleManager()->getRole((int)$args[1]);
-			if($role instanceof Role) {
+    public function execute(CommandSender $sender, array $args): void {
+		if(count($args) === 2) {
+            $role = $this->resolveRole($sender, (int)$args[1]);
+			if($role !== null) {
 				$target = $args[0];
 				$tmp = $sender->getServer()->getPlayer($target);
 				if($tmp instanceof Player) {
 					$target = $tmp;
 				}
 
-				$this->plugin->getMemberFactory()
-						 ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
+				$memberFactory = $this->plugin->getMemberFactory();
+
+				$memberFactory
+                        ->getMember($target, true, function (BaseMember $member) use ($memberFactory, $role, $sender): void {
 						  if($sender instanceof Player) {
-							  $sMember = $this->plugin->getMemberFactory()->getMember($sender);
-							  if(
-								  $sMember->getTopRole()->getPosition() <= $role->getPosition() ||
-								  !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)
-							  ) {
+							  if(!$memberFactory
+										->getMember($sender)
+										->hasHigherPermissionHierarchy($this->getPermission(), $member)) {
 								  $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
 									  "target" => $member->getName()
 								  ]));
@@ -72,23 +72,21 @@ class GiveRoleCommand extends SubCommand {
 						  if(!$role->isDefault()) {
 							  if(!$member->hasRole($role)) {
 								  $member->addRole($role);
-								  $sender->sendMessage(MessageStore::getMessage("cmd.give.success", [
+								  MessageStore::getMessage("cmd.give.success", [
 									  "role" => $role->getName()
-								  ]));
+								  ]);
 							  } else {
-								  $sender->sendMessage(MessageStore::getMessage("cmd.give.has_role", [
+								  MessageStore::getMessage("cmd.give.has_role", [
 									  "role" => $role->getName()
-								  ]));
+								  ]);
 							  }
 						  } else {
-							  $sender->sendMessage(MessageStore::getMessage("cmd.give.default"));
+							  MessageStore::getMessage("cmd.give.default");
 						  }
 					  });
-			} else {
-				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
 			}
 		} else {
-			$sender->sendMessage("Usage: " . $this->getUsage());
+			$this->sendUsage($sender);
 		}
 	}
 }

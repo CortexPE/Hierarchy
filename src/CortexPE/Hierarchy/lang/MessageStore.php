@@ -54,10 +54,21 @@ class MessageStore {
 		"cmd.usr_info.role_format" => " - {role}",
 		"cmd.usr_info.perm_header" => "Permission(s):",
 		"cmd.usr_info.perm_format" => " - {permission}",
+        "cmd.permission.header" => "Permission(s):",
+        "cmd.permission.true" => "&a{permission}",
+        "cmd.permission.false" => "&c{permission}",
+
+        "form.title" => "Hierarchy",
+        "form.player" => "{player}",
 
 		"err.target_higher_hrk" => "&cYou cannot use this command on {target} due to higher role hierarchy",
 		"err.insufficient_permissions" => "&cYou do not have enough permissions to use this command.",
 		"err.unknown_role" => "&cRole not found. For a complete list of roles, please use '/role list'",
+        "err.no_players" => "&cNo one is assigned this role",
+        "err.no_permissions" => "&cThis role is not assigned any permissions",
+        "err.no_roles" => "&cThere are no roles setup",
+        "err.console_only" => "&cThis command is console only",
+        "err.player_only" => "&cThis command is player only",
 	];
 
 	public function __construct(string $filePath, int $type = Config::YAML, ?array $defaults = null) {
