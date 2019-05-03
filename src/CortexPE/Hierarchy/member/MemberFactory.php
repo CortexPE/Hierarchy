@@ -30,19 +30,19 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\member;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\Player;
 use pocketmine\Server;
 
 class MemberFactory {
-	/** @var Loader */
+	/** @var Hierarchy */
 	protected $plugin;
 	/** @var Member[] */
 	protected $onlineMembers = [];
 	/** @var OfflineMember[] */
 	protected $offlineMembers = [];
 
-	public function __construct(Loader $plugin){
+	public function __construct(Hierarchy $plugin){
 		$this->plugin = $plugin;
 	}
 

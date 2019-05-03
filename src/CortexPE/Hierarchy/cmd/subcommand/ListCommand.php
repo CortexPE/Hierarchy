@@ -32,7 +32,7 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
 class ListCommand extends SubCommand {
@@ -43,12 +43,13 @@ class ListCommand extends SubCommand {
 
 	public function execute(CommandSender $sender, array $args): void {
 		$sender->sendMessage(MessageStore::getMessage("cmd.list.role_header"));
-		$roles = Loader::getInstance()->getRoleManager()->getRoles();
+		$roles = Hierarchy::getRoleManager()->getRoles();
 		foreach($roles as $roleID => $role){
 			$sender->sendMessage(MessageStore::getMessage("cmd.list.role_format", [
 				"role" => $role->getName(),
 				"role_id" => $role->getId(),
 			]));
+			//$sender->sendMessage("Member count: " . count($role->getMembers()));
 		}
 	}
 }

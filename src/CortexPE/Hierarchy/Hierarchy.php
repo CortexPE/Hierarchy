@@ -38,15 +38,15 @@ use CortexPE\Hierarchy\role\RoleManager;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
-class Loader extends PluginBase {
-	/** @var Loader */
+class Hierarchy extends PluginBase {
+	/** @var Hierarchy */
 	protected static $instance;
 	/** @var DataSource */
-	protected $dataSource;
+	protected static $dataSource;
 	/** @var RoleManager */
-	protected $roleManager;
+	protected static $roleManager;
 	/** @var MemberFactory */
-	protected $memberFactory;
+	protected static $memberFactory;
 
 	public function onEnable(): void {
 		self::$instance = $this;
@@ -66,7 +66,7 @@ class Loader extends PluginBase {
 
 					return;
 				}
-				$this->dataSource = new SQLiteDataSource($this, $conf->getNested("dataSource.sqlite3"));
+				self::$dataSource = new SQLiteDataSource($this, $conf->getNested("dataSource.sqlite3"));
 				break;
 			case "mysql":
 				if(!extension_loaded("mysqli")) {
@@ -86,8 +86,8 @@ class Loader extends PluginBase {
 				return;
 		}
 
-		$this->roleManager = new RoleManager($this);
-		$this->memberFactory = new MemberFactory($this);
+		self::$roleManager = new RoleManager($this);
+		self::$memberFactory = new MemberFactory($this);
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$cmd = new RoleCommand("role", "Hierarchy main command");
@@ -95,38 +95,41 @@ class Loader extends PluginBase {
 		$this->getServer()->getCommandMap()->register("hierarchy", $cmd);
 	}
 
-	public function getDataSource(): DataSource {
-		return $this->dataSource;
-	}
-
 	public function onDisable(): void {
-		if($this->memberFactory instanceof MemberFactory) {
-			$this->memberFactory->shutdown();
+		if(self::$memberFactory instanceof MemberFactory) {
+			self::$memberFactory->shutdown();
 		}
 		// last
-		if($this->dataSource instanceof DataSource) {
-			$this->dataSource->shutdown();
+		if(self::$dataSource instanceof DataSource) {
+			self::$dataSource->shutdown();
 		}
+	}
+
+	/**
+	 * @return DataSource
+	 */
+	public static function getDataSource(): DataSource {
+		return self::$dataSource;
 	}
 
 	/**
 	 * @return RoleManager
 	 */
-	public function getRoleManager(): RoleManager {
-		return $this->roleManager;
+	public static function getRoleManager(): RoleManager {
+		return self::$roleManager;
 	}
 
 	/**
 	 * @return MemberFactory
 	 */
-	public function getMemberFactory(): MemberFactory {
-		return $this->memberFactory;
+	public static function getMemberFactory(): MemberFactory {
+		return self::$memberFactory;
 	}
 
 	/**
-	 * @return Loader
+	 * @return Hierarchy
 	 */
-	public static function getInstance(): Loader {
+	public static function getInstance(): Hierarchy {
 		return self::$instance;
 	}
 }

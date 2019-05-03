@@ -35,10 +35,10 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 
 class EventListener implements Listener {
-	/** @var Loader */
+	/** @var Hierarchy */
 	protected $plugin;
 
-	public function __construct(Loader $plugin){
+	public function __construct(Hierarchy $plugin){
 		$this->plugin = $plugin;
 	}
 

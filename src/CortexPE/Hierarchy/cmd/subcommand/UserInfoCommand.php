@@ -32,7 +32,7 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -50,7 +50,7 @@ class UserInfoCommand extends SubCommand {
 		if($tmp instanceof Player) {
 			$target = $tmp;
 		}
-		Loader::getInstance()->getMemberFactory()->getMember($target, true, function (BaseMember $member) use ($sender) {
+		Hierarchy::getMemberFactory()->getMember($target, true, function (BaseMember $member) use ($sender) {
 			$roles = $member->getRoles();
 			$permissions = $member->getPermissions();
 			$sender->sendMessage(MessageStore::getMessage("cmd.usr_info.header", [

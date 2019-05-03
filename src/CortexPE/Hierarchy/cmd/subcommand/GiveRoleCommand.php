@@ -32,7 +32,7 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\lang\MessageStore;
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\command\CommandSender;
@@ -46,7 +46,7 @@ class GiveRoleCommand extends SubCommand {
 
 	public function execute(CommandSender $sender, array $args): void {
 		if(count($args) == 2) {
-			$role = Loader::getInstance()->getRoleManager()->getRole((int)$args[1]);
+			$role = Hierarchy::getRoleManager()->getRole((int)$args[1]);
 			if($role instanceof Role) {
 				$target = $args[0];
 				$tmp = $sender->getServer()->getPlayer($target);
@@ -54,14 +54,15 @@ class GiveRoleCommand extends SubCommand {
 					$target = $tmp;
 				}
 
-				Loader::getInstance()
-					  ->getMemberFactory()
-					  ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
+				Hierarchy::getInstance()
+						 ->getMemberFactory()
+						 ->getMember($target, true, function (BaseMember $member) use ($role, $sender) {
 						  if($sender instanceof Player) {
-							  if(!Loader::getInstance()
-										->getMemberFactory()
-										->getMember($sender)
-										->hasHigherPermissionHierarchy($this->getPermission(), $member)) {
+							  $sMember = Hierarchy::getMemberFactory()->getMember($sender);
+							  if(
+								  $sMember->getTopRole()->getPosition() <= $role ||
+								  !$sMember->hasHigherPermissionHierarchy($this->getPermission(), $member)
+							  ) {
 								  $sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
 									  "target" => $member->getName()
 								  ]));

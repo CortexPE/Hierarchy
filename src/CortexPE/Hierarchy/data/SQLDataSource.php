@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\data;
 
 
-use CortexPE\Hierarchy\Loader;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use Throwable;
 use Generator;
@@ -46,13 +46,13 @@ abstract class SQLDataSource extends DataSource {
 	protected const STMTS_FILE = null;
 	protected const DIALECT = null;
 
-	public function __construct(Loader $plugin, array $config) {
+	public function __construct(Hierarchy $plugin, array $config) {
 		parent::__construct($plugin);
 
-		$this->db = libasynql::create(Loader::getInstance(), [
+		$this->db = libasynql::create(Hierarchy::getInstance(), [
 			"type" => static::DIALECT,
 			"sqlite" => [
-				"file" => Loader::getInstance()->getDataFolder() . $config["dbPath"]
+				"file" => Hierarchy::getInstance()->getDataFolder() . $config["dbPath"]
 			],
 			"worker-limit" => $config["workerLimit"]
 		], [
@@ -103,7 +103,11 @@ abstract class SQLDataSource extends DataSource {
 
 	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
 		Await::f2c(function () use ($member, $onLoad) {
-			$data = [];
+			$data = [
+				"roles" => [
+					Hierarchy::getRoleManager()->getDefaultRole()->getId()
+				]
+			];
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);
