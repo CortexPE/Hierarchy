@@ -72,16 +72,16 @@ class GiveRoleCommand extends SubCommand {
 						  if(!$role->isDefault()) {
 							  if(!$member->hasRole($role)) {
 								  $member->addRole($role);
-								  MessageStore::getMessage("cmd.give.success", [
+								  $sender->sendMessage(MessageStore::getMessage("cmd.give.success", [
 									  "role" => $role->getName()
-								  ]);
+								  ]));
 							  } else {
-								  MessageStore::getMessage("cmd.give.has_role", [
+								  $sender->sendMessage(MessageStore::getMessage("cmd.give.has_role", [
 									  "role" => $role->getName()
-								  ]);
+								  ]));
 							  }
 						  } else {
-							  MessageStore::getMessage("cmd.give.default");
+							  $sender->sendMessage(MessageStore::getMessage("cmd.give.default"));
 						  }
 					  });
 			}
