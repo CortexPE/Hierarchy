@@ -5,7 +5,7 @@ dataSource:
 
   # These settings will only apply when you chose json as dataSource type
   json:
-    # Save JSON data files in a human-readable way... Excluding JSON configuration files.
+    # Save JSON data files in a human-readable way
     prettyPrint: true
 
   # These settings will only apply when you chose sqlite3 as dataSource type
