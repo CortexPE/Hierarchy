@@ -70,7 +70,7 @@ abstract class IndexedDataSource extends DataSource {
 				])));
 			}
 			foreach($this->roles as $id => $role) {
-				$this->roles[$id]["ID"] = $id; // derive ID from the index, this way, an ID field is not needed
+				$this->roles[$id]["ID"] = $id + 1; // derive ID from the index, this way, an ID field is not needed
 			}
 			$this->getPlugin()->getRoleManager()->loadRoles($this->roles);
 
