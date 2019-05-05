@@ -41,54 +41,71 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 class ListPermissionsCommand extends SubCommand {
-    public function __construct(Hierarchy $hierarchy, Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage) {
-        parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-        $this->setPermission("hierarchy.role.list_permissions");
-    }
+	public function __construct(
+		Hierarchy $hierarchy,
+		Command $parent,
+		string $name,
+		array $aliases,
+		string $usageMessage,
+		string $descriptionMessage
+	) {
+		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
+		$this->setPermission("hierarchy.role.list_permissions");
+	}
 
-    public function execute(CommandSender $sender, array $args, bool $back = false, bool $previousBack = false): void {
-        if(isset($args[0])) {
-            $role = $this->resolveRole($sender, (int)$args[0]);
-            if($role !== null) {
-                $permissions = $role->getPermissions();
+	public function execute(CommandSender $sender, array $args, bool $back = false, bool $previousBack = false): void {
+		if(isset($args[0])) {
+			$role = $this->resolveRole($sender, (int)$args[0]);
+			if($role !== null) {
+				$permissions = $role->getPermissions();
 
-                $permissionKeys = array_keys($permissions);
+				$permissionKeys = array_keys($permissions);
 
-                if($sender instanceof Player) {
+				if($sender instanceof Player) {
 
-                    foreach ($permissionKeys as $permission)
-                        if($permissions[$permission])
-                            $options[] = new MenuOption(MessageStore::getMessage("cmd.permission.true", ["permission" => $permission]));
-                        else
-                            $options[] = new MenuOption(MessageStore::getMessage("cmd.permission.false", ["permission" => $permission]));
+					foreach($permissionKeys as $permission) {
+						if($permissions[$permission]) {
+							$options[] = new MenuOption(MessageStore::getMessage("cmd.permission.true",
+								["permission" => $permission]));
+						} else {
+							$options[] = new MenuOption(MessageStore::getMessage("cmd.permission.false",
+								["permission" => $permission]));
+						}
+					}
 
-                    $options = $options ?? [new MenuOption("err.no_permissions")];
+					$options = $options ?? [new MenuOption("err.no_permissions")];
 
-                    // Send the previous form if back is true, since there is no way to edit permissions I can't make a customform gui to do so..
+					// Send the previous form if back is true, since there is no way to edit permissions I can't make a customform gui to do so..
 
-                    $onClose = $back ? function (Player $player, int $selected) use ($role, $previousBack): void {
-                        /** @var RoleCommand $parent */
-                        $parent = $this->getParent();
-                        /** @var RoleOptionsCommand $optionsCommand */
-                        $optionsCommand = $parent->getCommand('options');
-                        $optionsCommand->execute($player, [$role->getId()], $previousBack);
-                    } : function(Player $player, int $selected): void{};
+					$onClose = $back ? function (Player $player, int $selected) use ($role, $previousBack): void {
+						/** @var RoleCommand $parent */
+						$parent = $this->getParent();
+						/** @var RoleOptionsCommand $optionsCommand */
+						$optionsCommand = $parent->getCommand('options');
+						$optionsCommand->execute($player, [$role->getId()], $previousBack);
+					} : function (Player $player, int $selected): void {
+					};
 
-                    $permissionForm = new MenuForm(MessageStore::getMessage("form.title"), MessageStore::getMessage("cmd.permission.header"), $options, $onClose);
+					$permissionForm = new MenuForm(MessageStore::getMessage("form.title"),
+						MessageStore::getMessage("cmd.permission.header"), $options, $onClose);
 
-                    $sender->sendForm($permissionForm);
+					$sender->sendForm($permissionForm);
 
-                } else {
-                    $sender->sendMessage(MessageStore::getMessage("cmd.permission.header"));
-                    foreach ($permissionKeys as $permission) {
-                        if($permissions[$permission])
-                            $sender->sendMessage(MessageStore::getMessage("cmd.permission.true", ["permission" => $permission]));
-                        else
-                            $sender->sendMessage(MessageStore::getMessage("cmd.permission.false", ["permission" => $permission]));
-                    }
-                }
-            }
-        } else
-            $this->sendUsage($sender);
-    }
+				} else {
+					$sender->sendMessage(MessageStore::getMessage("cmd.permission.header"));
+					foreach($permissionKeys as $permission) {
+						if($permissions[$permission]) {
+							$sender->sendMessage(MessageStore::getMessage("cmd.permission.true",
+								["permission" => $permission]));
+						} else {
+							$sender->sendMessage(MessageStore::getMessage("cmd.permission.false",
+								["permission" => $permission]));
+						}
+					}
+				}
+			}
+		} else {
+			$this->sendUsage($sender);
+		}
+	}
 }

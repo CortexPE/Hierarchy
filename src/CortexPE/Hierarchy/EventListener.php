@@ -38,7 +38,7 @@ class EventListener implements Listener {
 	/** @var Hierarchy */
 	protected $plugin;
 
-	public function __construct(Hierarchy $plugin){
+	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
 	}
 
@@ -47,7 +47,7 @@ class EventListener implements Listener {
 	 *
 	 * @priority LOWEST
 	 */
-	public function onJoin(PlayerJoinEvent $ev){
+	public function onJoin(PlayerJoinEvent $ev) {
 		$this->plugin->getMemberFactory()->createSession($ev->getPlayer());
 	}
 
@@ -56,7 +56,7 @@ class EventListener implements Listener {
 	 *
 	 * @priority LOWEST
 	 */
-	public function onLeave(PlayerQuitEvent $ev){
+	public function onLeave(PlayerQuitEvent $ev) {
 		$this->plugin->getMemberFactory()->destroySession($ev->getPlayer());
 	}
 }

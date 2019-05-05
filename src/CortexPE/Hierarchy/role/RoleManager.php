@@ -42,24 +42,25 @@ class RoleManager {
 	/** @var Role */
 	protected $defaultRole = null;
 
-	public function __construct(Hierarchy $plugin){
+	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
 	}
 
 	/**
+	 * @param array $roles
+	 *
+	 * @throws RoleCollissionError
 	 * @internal Used to load role data from a data source
 	 *
-	 * @param array $roles
-	 * @throws RoleCollissionError
 	 */
 	public function loadRoles(array $roles) {
-		foreach($roles as $roleData){
+		foreach($roles as $roleData) {
 			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
 				"position" => $roleData["Position"],
 				"isDefault" => $roleData["isDefault"]
 			]);
-			if(!isset($this->roles[$roleData["ID"]])){
+			if(!isset($this->roles[$roleData["ID"]])) {
 				$this->roles[$roleData["ID"]] = $role;
 			} else {
 				throw new RoleCollissionError("Role '{$role->getName()}'({$role->getId()}) has a colliding ID");
@@ -72,13 +73,13 @@ class RoleManager {
 				}
 			}
 		}
-		if(!($this->defaultRole instanceof Role)){
+		if(!($this->defaultRole instanceof Role)) {
 			throw new RuntimeException("No default role is set");
 		}
 		$this->plugin->getLogger()->info("Loaded " . count($this->roles) . " roles");
 	}
 
-	public function getRole(int $id):?Role{
+	public function getRole(int $id): ?Role {
 		return $this->roles[$id] ?? null;
 	}
 

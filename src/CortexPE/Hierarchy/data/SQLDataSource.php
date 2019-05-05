@@ -40,11 +40,10 @@ use SOFe\AwaitGenerator\Await;
 use Throwable;
 
 abstract class SQLDataSource extends DataSource {
-	/** @var DataConnector */
-	protected $db;
-
 	protected const STMTS_FILE = null;
 	protected const DIALECT = null;
+	/** @var DataConnector */
+	protected $db;
 
 	public function __construct(Hierarchy $plugin, array $config) {
 		parent::__construct($plugin);
@@ -75,9 +74,9 @@ abstract class SQLDataSource extends DataSource {
 					"name" => "Member"
 				]);
 				$roles = yield $this->asyncSelect("hierarchy.role.list");
-				foreach($roles as $role){
+				foreach($roles as $role) {
 					$defaults = PermissionManager::getInstance()->getDefaultPermissions(false);
-					foreach($defaults as $permission){
+					foreach($defaults as $permission) {
 						yield $this->asyncInsert("hierarchy.role.permissions.add", [
 							"role_id" => $role["ID"],
 							"permission" => $permission->getName()
@@ -94,12 +93,31 @@ abstract class SQLDataSource extends DataSource {
 				}
 			}
 			$this->getPlugin()->getRoleManager()->loadRoles($roles);
-		}, function(){}, function (Throwable $err){
+		}, function () {
+		}, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
 		});
 	}
 
 	abstract function getExtraDBSettings(Hierarchy $plugin, array $config): array;
+
+	protected function asyncGenericQuery(string $query, array $args = []): Generator {
+		$this->db->executeGeneric($query, $args, yield, yield Await::REJECT);
+
+		return yield Await::ONCE;
+	}
+
+	protected function asyncSelect(string $query, array $args = []): Generator {
+		$this->db->executeSelect($query, $args, yield, yield Await::REJECT);
+
+		return yield Await::ONCE;
+	}
+
+	protected function asyncInsert(string $query, array $args = []): Generator {
+		$this->db->executeInsert($query, $args, yield, yield Await::REJECT);
+
+		return yield Await::ONCE;
+	}
 
 	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
 		Await::f2c(function () use ($member, $onLoad) {
@@ -111,20 +129,21 @@ abstract class SQLDataSource extends DataSource {
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);
-			foreach($rows as $row){
+			foreach($rows as $row) {
 				$data["roles"][] = $row["RoleID"];
 			}
 			$member->loadData($data);
-			if($onLoad !== null){
+			if($onLoad !== null) {
 				$onLoad($member);
 			}
-		}, function(){}, function (Throwable $err){
+		}, function () {
+		}, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
 		});
 	}
 
 	public function updateMemberData(BaseMember $member, string $action, $data): void {
-		switch($action){
+		switch($action) {
 			case self::ACTION_ROLE_ADD:
 				$this->db->executeChange("hierarchy.member.roles.add", [
 					"username" => $member->getName(),
@@ -144,23 +163,5 @@ abstract class SQLDataSource extends DataSource {
 		if($this->db instanceof DataConnector) {
 			$this->db->close();
 		}
-	}
-
-	protected function asyncSelect(string $query, array $args = []): Generator {
-		$this->db->executeSelect($query, $args, yield, yield Await::REJECT);
-
-		return yield Await::ONCE;
-	}
-
-	protected function asyncInsert(string $query, array $args = []): Generator {
-		$this->db->executeInsert($query, $args, yield, yield Await::REJECT);
-
-		return yield Await::ONCE;
-	}
-
-	protected function asyncGenericQuery(string $query, array $args = []): Generator {
-		$this->db->executeGeneric($query, $args, yield, yield Await::REJECT);
-
-		return yield Await::ONCE;
 	}
 }

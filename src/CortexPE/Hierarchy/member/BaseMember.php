@@ -95,6 +95,26 @@ abstract class BaseMember {
 		return isset($this->roles[$role->getId()]);
 	}
 
+	public function recalculatePermissions(): void {
+		$this->permissions = [];
+		$perms = []; // default
+		foreach($this->roles as $role) {
+			$perms[$role->getPosition()] = $role->getPermissions();
+		}
+		krsort($perms);
+		$this->permissions = array_replace_recursive(...$perms);
+	}
+
+	public function clearRoles(bool $recalculate = true): void {
+		foreach($this->roles as $role) {
+			$this->removeRole($role, false);
+		}
+		$this->roles = [];
+		if($recalculate) {
+			$this->recalculatePermissions();
+		}
+	}
+
 	public function removeRole(Role $role, bool $recalculate = true): void {
 		if($this->hasRole($role)) {
 			$ev = new MemberRoleRemoveEvent($this, $role);
@@ -110,26 +130,6 @@ abstract class BaseMember {
 		}
 	}
 
-	public function clearRoles(bool $recalculate = true): void {
-		foreach($this->roles as $role) {
-			$this->removeRole($role, false);
-		}
-		$this->roles = [];
-		if($recalculate) {
-			$this->recalculatePermissions();
-		}
-	}
-
-	public function recalculatePermissions(): void {
-		$this->permissions = [];
-		$perms = []; // default
-		foreach($this->roles as $role) {
-			$perms[$role->getPosition()] = $role->getPermissions();
-		}
-		krsort($perms);
-		$this->permissions = array_replace_recursive(...$perms);
-	}
-
 	public function getTopRole(): Role {
 		return $this->roles[max(array_keys($this->roles))];
 	}
@@ -139,6 +139,29 @@ abstract class BaseMember {
 	 */
 	public function getPermissions(): array {
 		return $this->permissions;
+	}
+
+	/**
+	 * @param Permission|string $permissionNode
+	 * @param BaseMember        $target
+	 *
+	 * @return bool
+	 */
+	public function hasHigherPermissionHierarchy($permissionNode, BaseMember $target): bool {
+		if($permissionNode instanceof Permission) {
+			$permissionNode = $permissionNode->getName();
+		}
+		$myTopRole = $this->getTopRoleWithPermission($permissionNode);
+		if($myTopRole instanceof Role) {
+			$targetTopRole = $target->getTopRoleWithPermission($permissionNode);
+			if($targetTopRole instanceof Role) {
+				return $myTopRole->getPosition() > $targetTopRole->getPosition();
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -163,29 +186,6 @@ abstract class BaseMember {
 		}
 
 		return $topRoleWithPerm;
-	}
-
-	/**
-	 * @param Permission|string $permissionNode
-	 * @param BaseMember        $target
-	 *
-	 * @return bool
-	 */
-	public function hasHigherPermissionHierarchy($permissionNode, BaseMember $target): bool {
-		if($permissionNode instanceof Permission) {
-			$permissionNode = $permissionNode->getName();
-		}
-		$myTopRole = $this->getTopRoleWithPermission($permissionNode);
-		if($myTopRole instanceof Role) {
-			$targetTopRole = $target->getTopRoleWithPermission($permissionNode);
-			if($targetTopRole instanceof Role) {
-				return $myTopRole->getPosition() > $targetTopRole->getPosition();
-			}
-
-			return true;
-		}
-
-		return false;
 	}
 
 	abstract public function getAttachment(): ?PermissionAttachment;

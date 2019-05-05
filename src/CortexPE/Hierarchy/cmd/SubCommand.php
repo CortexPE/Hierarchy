@@ -30,10 +30,10 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd;
 
 
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\command\Command;
-use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
 abstract class SubCommand {
@@ -63,15 +63,22 @@ abstract class SubCommand {
 	 * SubCommand constructor.
 	 *
 	 * @param Hierarchy $plugin
-   * @param Command   $parent
+	 * @param Command   $parent
 	 * @param string    $name
 	 * @param array     $aliases
 	 * @param string    $usageMessage
 	 * @param string    $descriptionMessage
 	 */
-	public function __construct(Hierarchy $plugin, Command $parent, string $name, array $aliases, string $usageMessage, string $descriptionMessage){
+	public function __construct(
+		Hierarchy $plugin,
+		Command $parent,
+		string $name,
+		array $aliases,
+		string $usageMessage,
+		string $descriptionMessage
+	) {
 		$this->plugin = $plugin;
-    $this->parent = $parent;
+		$this->parent = $parent;
 		$this->aliases = array_map("strtolower", $aliases);
 		$this->name = strtolower($name);
 		$this->usageMessage = $usageMessage;
@@ -79,76 +86,79 @@ abstract class SubCommand {
 	}
 
 	/**
-	 * @return Command
-	 */
-	protected function getParent(): Command{
-	    return $this->parent;
-	}
-
-	/**
 	 * @return string
 	 */
-	public function getName(): string{
+	public function getName(): string {
 		return $this->name;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getAliases(): array{
+	public function getAliases(): array {
 		return $this->aliases;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getUsage(): string{
-		return $this->usageMessage;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDescription(): string{
+	public function getDescription(): string {
 		return $this->descriptionMessage;
 	}
 
 	/**
 	 * @param CommandSender $sender
-	 * @param array $args
+	 * @param array         $args
 	 */
 	abstract public function execute(CommandSender $sender, array $args): void;
 
 	/**
 	 * @return string
 	 */
-	public function getPermission(): ?string{
+	public function getPermission(): ?string {
 		return $this->permission;
 	}
 
 	/**
 	 * @param string $permission
 	 */
-	public function setPermission(string $permission): void{
+	public function setPermission(string $permission): void {
 		$this->permission = $permission;
 	}
 
-	public function sendUsage(CommandSender $sender): void{
+	public function sendUsage(CommandSender $sender): void {
 		$sender->sendMessage("Usage: " . $this->getUsage());
 	}
 
-    /**
-     * @param CommandSender $sender
-     * @param int $roleID
-     * @param bool $silent
-     * @return Role|null
-     */
-    protected function resolveRole(CommandSender $sender, int $roleID, bool $silent = false): ?Role{
-        $role = $this->plugin->getRoleManager()->getRole($roleID);
-        if($role instanceof Role) {
-            return $role;
-        } elseif(!$silent)
-            $sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
-        return null;
-    }
+	/**
+	 * @return string
+	 */
+	public function getUsage(): string {
+		return $this->usageMessage;
+	}
+
+	/**
+	 * @return Command
+	 */
+	protected function getParent(): Command {
+		return $this->parent;
+	}
+
+	/**
+	 * @param CommandSender $sender
+	 * @param int           $roleID
+	 * @param bool          $silent
+	 *
+	 * @return Role|null
+	 */
+	protected function resolveRole(CommandSender $sender, int $roleID, bool $silent = false): ?Role {
+		$role = $this->plugin->getRoleManager()->getRole($roleID);
+		if($role instanceof Role) {
+			return $role;
+		} elseif(!$silent) {
+			$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
+		}
+
+		return null;
+	}
 }

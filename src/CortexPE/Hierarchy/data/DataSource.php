@@ -52,19 +52,21 @@ abstract class DataSource {
 	}
 
 	/**
+	 * @param BaseMember $member
+	 * @param callable   $onLoad
+	 *
 	 * @internal Get member data from the data source then pass to member object
 	 *
-	 * @param BaseMember $member
-	 * @param callable $onLoad
 	 */
 	abstract public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void;
 
 	/**
+	 * @param BaseMember $member
+	 * @param string     $action
+	 * @param mixed      $data
+	 *
 	 * @internal Update member data on data source
 	 *
-	 * @param BaseMember $member
-	 * @param string $action
-	 * @param mixed  $data
 	 */
 	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
 

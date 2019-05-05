@@ -54,49 +54,54 @@ class MessageStore {
 		"cmd.usr_info.role_format" => " - {role}",
 		"cmd.usr_info.perm_header" => "Permission(s):",
 		"cmd.usr_info.perm_format" => " - {permission}",
-        "cmd.permission.header" => "Permission(s):",
-        "cmd.permission.true" => "&a{permission}",
-        "cmd.permission.false" => "&c{permission}",
+		"cmd.permission.header" => "Permission(s):",
+		"cmd.permission.true" => "&a{permission}",
+		"cmd.permission.false" => "&c{permission}",
 
-        "form.title" => "Hierarchy",
-        "form.player" => "{player}",
+		"form.title" => "Hierarchy",
+		"form.player" => "{player}",
 
 		"err.target_higher_hrk" => "&cYou cannot use this command on {target} due to higher role hierarchy",
 		"err.insufficient_permissions" => "&cYou do not have enough permissions to use this command.",
 		"err.unknown_role" => "&cRole not found. For a complete list of roles, please use '/role list'",
-        "err.no_players" => "&cNo one is assigned this role",
-        "err.no_permissions" => "&cThis role is not assigned any permissions",
-        "err.no_roles" => "&cThere are no roles setup",
-        "err.console_only" => "&cThis command is console only",
-        "err.player_only" => "&cThis command is player only",
+		"err.no_players" => "&cNo one is assigned this role",
+		"err.no_permissions" => "&cThis role is not assigned any permissions",
+		"err.no_roles" => "&cThere are no roles setup",
+		"err.console_only" => "&cThis command is console only",
+		"err.player_only" => "&cThis command is player only",
 	];
 
 	public function __construct(string $filePath, int $type = Config::YAML, ?array $defaults = null) {
 		if($defaults !== null) {
 			static::$defaults = $defaults;
 		}
-		if(empty(static::$defaults)){
+		if(empty(static::$defaults)) {
 			throw new RuntimeException("No defaults given to message store instance for " . get_class($this));
 		}
 		static::$config = new Config($filePath, $type, static::$defaults);
 	}
 
-	public static function getMessage(string $dataKey, array $args = [], string $prefix = "{", string $suffix = "}"): string{
+	public static function getMessage(
+		string $dataKey,
+		array $args = [],
+		string $prefix = "{",
+		string $suffix = "}"
+	): string {
 		return TextFormat::colorize(
 			self::substituteString(static::getMessageRaw($dataKey), $args, $prefix, $suffix),
 			"&"
 		);
 	}
 
-	protected static function substituteString(string $str, array $args, string $prefix, string $suffix): string{
-		foreach($args as $item => $value){
+	protected static function substituteString(string $str, array $args, string $prefix, string $suffix): string {
+		foreach($args as $item => $value) {
 			$str = str_ireplace($prefix . $item . $suffix, $value, $str);
 		}
 
 		return $str;
 	}
 
-	public static function getMessageRaw(string $dataKey): string{
+	public static function getMessageRaw(string $dataKey): string {
 		return (string)static::$config->get($dataKey, static::$defaults[$dataKey]);
 	}
 }

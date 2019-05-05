@@ -93,7 +93,7 @@ class Hierarchy extends PluginBase {
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-		$cmd = new RoleCommand($this,"role", "Hierarchy main command");
+		$cmd = new RoleCommand($this, "role", "Hierarchy main command");
 
 		$this->getServer()->getCommandMap()->register("hierarchy", $cmd);
 	}

@@ -54,17 +54,16 @@ class Role {
 	/** @var BaseMember[] */
 	protected $members = [];
 
-	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData){
+	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
 		$this->id = $id;
 		$this->name = $name;
 		$this->position = $roleData["position"];
 		$this->isDefault = (bool)$roleData["isDefault"];
 
 		$pMgr = PermissionManager::getInstance();
-		foreach($roleData["permissions"] ?? [] as $permission){
-			if($permission == "*"){
-				foreach($pMgr->getPermissions() as $perm)
-				{
+		foreach($roleData["permissions"] ?? [] as $permission) {
+			if($permission == "*") {
+				foreach($pMgr->getPermissions() as $perm) {
 					$this->permissions[$perm->getName()] = true;
 				}
 				continue;
@@ -72,7 +71,7 @@ class Role {
 
 			$invert = ($permission{0} == "-");
 			$perm = $pMgr->getPermission(!$invert ? $permission : substr($permission, 1));
-			if($perm instanceof Permission){
+			if($perm instanceof Permission) {
 				$this->permissions[$perm->getName()] = !$invert;
 			} else {
 				$plugin->getLogger()->warning("Unknown permission node '" . $permission . "' on " . $name . " role");
@@ -84,14 +83,14 @@ class Role {
 	/**
 	 * @return int
 	 */
-	public function getId(): int{
+	public function getId(): int {
 		return $this->id;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getName(): string{
+	public function getName(): string {
 		return $this->name;
 	}
 
@@ -105,22 +104,22 @@ class Role {
 	/**
 	 * @return bool[]
 	 */
-	public function getPermissions(): array{
+	public function getPermissions(): array {
 		return $this->permissions;
 	}
 
-	public function bind(BaseMember $member):void{
+	public function bind(BaseMember $member): void {
 		$this->members[$member->getName()] = $member;
 	}
 
-	public function unbind(BaseMember $member):void{
+	public function unbind(BaseMember $member): void {
 		unset($this->members[$member->getName()]);
 	}
 
 	/**
 	 * @return BaseMember[]
 	 */
-	public function getMembers(): array{
+	public function getMembers(): array {
 		return $this->members;
 	}
 
