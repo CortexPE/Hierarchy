@@ -31,6 +31,8 @@ namespace CortexPE\Hierarchy\data;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
+use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use pocketmine\scheduler\ClosureTask;
 
@@ -128,6 +130,29 @@ abstract class IndexedDataSource extends DataSource {
 		}
 
 		file_put_contents($this->getFileName($member), $this->encode($existingData));
+	}
+
+	public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void {
+		$permission = ($inverted ? "-" : "") . $permission->getName();
+		if(!in_array($permission, $this->roles[$role->getId()]["Permissions"])) {
+			$this->roles[$role->getId()]["Permissions"][] = $permission;
+		}
+	}
+
+	public function removeRolePermission(Role $role, $permission): void {
+		if($permission instanceof Permission) {
+			$permission = $permission->getName();
+		}
+		// todo: find a better way to do this
+		if(
+			in_array($permission, ($a = $this->roles[$role->getId()]["Permissions"])) ||
+			in_array("-" . $permission, $a)
+		) {
+			unset(
+				$this->roles[$role->getId()]["Permissions"][array_search($permission, $a)],
+				$this->roles[$role->getId()]["Permissions"][array_search("-" . $permission, $a)]
+			);
+		}
 	}
 
 	public function shutdown(): void {

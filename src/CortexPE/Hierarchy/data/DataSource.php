@@ -32,6 +32,8 @@ namespace CortexPE\Hierarchy\data;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
+use pocketmine\permission\Permission;
 
 abstract class DataSource {
 	public const ACTION_ROLE_ADD = "role.add";
@@ -69,6 +71,25 @@ abstract class DataSource {
 	 *
 	 */
 	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
+
+	/**
+	 * @param Role       $role
+	 * @param Permission $permission
+	 * @param bool       $inverted
+	 *
+	 * @internal Add role permission
+	 *
+	 */
+	abstract public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void;
+
+	/**
+	 * @param Role              $role
+	 * @param Permission|string $permission
+	 *
+	 * @internal Remove role permission
+	 *
+	 */
+	abstract public function removeRolePermission(Role $role, $permission): void;
 
 	/**
 	 * Gracefully shutdown the data source

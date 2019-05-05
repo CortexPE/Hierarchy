@@ -39,6 +39,9 @@ class Role {
 	public const PERM_TYPE_ADD = 0;
 	public const PERM_TYPE_REMOVE = 1;
 
+	/** @var Hierarchy */
+	protected $plugin;
+
 	/** @var int */
 	protected $id;
 	/** @var string */
@@ -55,6 +58,7 @@ class Role {
 	protected $members = [];
 
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
+		$this->plugin = $plugin;
 		$this->id = $id;
 		$this->name = $name;
 		$this->position = $roleData["position"];
@@ -128,5 +132,38 @@ class Role {
 	 */
 	public function isDefault(): bool {
 		return $this->isDefault;
+	}
+
+	/**
+	 * @param Permission $permission
+	 * @param bool       $inverted
+	 * @param bool       $update
+	 */
+	public function addPermission(Permission $permission, bool $inverted = false, bool $update = true): void {
+		$this->permissions[$permission->getName()] = !$inverted;
+		$this->plugin->getDataSource()->addRolePermission($this, $permission, $inverted);
+		if($update) {
+			$this->updateMemberPermissions();
+		}
+	}
+
+	/**
+	 * @param Permission|string $permission
+	 * @param bool              $update
+	 */
+	public function removePermission($permission, bool $update = true): void {
+		if($permission instanceof Permission) {
+			$permission = $permission->getName();
+		}
+		$this->plugin->getDataSource()->removeRolePermission($this, $permission);
+		if($update) {
+			$this->updateMemberPermissions();
+		}
+	}
+
+	public function updateMemberPermissions(): void {
+		foreach($this->members as $member) {
+			$member->recalculatePermissions();
+		}
 	}
 }

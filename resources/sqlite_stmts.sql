@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS Roles
 CREATE TABLE IF NOT EXISTS RolePermissions
 (
     RoleID     INTEGER NOT NULL,
-    Permission TEXT    NOT NULL
+    Permission TEXT    NOT NULL,
+    PRIMARY KEY (RoleID, Permission)
 );
 -- #    }
 -- #    { memberRolesTable
@@ -100,7 +101,7 @@ VALUES (:role_id, :permission);
 DELETE
 FROM RolePermissions
 WHERE RoleID = :role_id
-  AND Permission = :permission;
+  AND Permission LIKE '%' || :permission;
 -- #      }
 -- #    }
 -- #  }

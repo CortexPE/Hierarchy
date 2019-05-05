@@ -32,7 +32,9 @@ namespace CortexPE\Hierarchy\data;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
 use Generator;
+use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
@@ -157,6 +159,24 @@ abstract class SQLDataSource extends DataSource {
 				]);
 				break;
 		}
+	}
+
+	public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void {
+		$permission = ($inverted ? "-" : "") . $permission->getName();
+		$this->db->executeInsert("hierarchy.role.permissions.add", [
+			"role_id" => $role->getId(),
+			"permission" => $permission
+		]);
+	}
+
+	public function removeRolePermission(Role $role, $permission): void {
+		if($permission instanceof Permission) {
+			$permission = $permission->getName();
+		}
+		$this->db->executeInsert("hierarchy.role.permissions.remove", [
+			"role_id" => $role->getId(),
+			"permission" => $permission
+		]);
 	}
 
 	public function shutdown(): void {
