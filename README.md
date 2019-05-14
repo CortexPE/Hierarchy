@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/CortexPE/Hierarchy/master/media/hierarchy_banner.png" style="width: 100%"/>
 
+[![Poggit](https://poggit.pmmp.io/ci.shield/CortexPE/Hierarchy/~)](https://poggit.pmmp.io/ci/CortexPE/Hierarchy/~)
 
 ## Advantages:
 | Feature | Hierarchy | PurePerms |
