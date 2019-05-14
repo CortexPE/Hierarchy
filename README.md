@@ -1,5 +1,5 @@
-# Hierarchy (Work-In-Progress)
-Role-based permission management system
+<img src="https://raw.githubusercontent.com/CortexPE/Hierarchy/master/media/hierarchy_banner.png" style="width: 100%"/>
+
 
 ## Advantages:
 | Feature | Hierarchy | PurePerms |
