@@ -30,6 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\role;
 
 
+use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
@@ -41,9 +42,16 @@ class RoleManager {
 	protected $roles = [];
 	/** @var Role */
 	protected $defaultRole = null;
+	/** @var DataSource */
+	protected $dataSource;
+	/** @var int */
+	protected $lastID = PHP_INT_MIN;
+	/** @var int */
+	protected $lastPosition = PHP_INT_MIN;
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
+		$this->dataSource = $plugin->getDataSource();
 	}
 
 	/**
@@ -60,10 +68,21 @@ class RoleManager {
 				"position" => $roleData["Position"],
 				"isDefault" => $roleData["isDefault"]
 			]);
+			foreach($this->roles as $i_role) {
+				if($i_role->getPosition() == $roleData["Position"]) {
+					throw new RoleCollissionError("Role '{$i_role->getName()}'({$i_role->getId()}) has a colliding Position");
+				}
+			}
 			if(!isset($this->roles[$roleData["ID"]])) {
 				$this->roles[$roleData["ID"]] = $role;
 			} else {
 				throw new RoleCollissionError("Role '{$role->getName()}'({$role->getId()}) has a colliding ID");
+			}
+			if($roleData["ID"] > $this->lastID) {
+				$this->lastID = $roleData["ID"];
+			}
+			if($roleData["Position"] > $this->lastPosition) {
+				$this->lastPosition = $roleData["Position"];
 			}
 			if($roleData["isDefault"]) {
 				if($this->defaultRole === null) {
@@ -95,5 +114,40 @@ class RoleManager {
 	 */
 	public function getRoles(): array {
 		return $this->roles;
+	}
+
+	/**
+	 * Creates a new role
+	 *
+	 * @param string $name
+	 *
+	 * @return Role
+	 */
+	public function createRole(string $name = "new role"): Role {
+		$newRolePos = ($defRolePos = $this->defaultRole->getPosition()) + 1;
+		$this->dataSource->createRoleOnStorage($name, $this->lastID += 1, $newRolePos);
+		$role = $this->roles[$this->lastID] = new Role($this->plugin, $this->lastID, $name, [
+			"position" => $this->lastPosition
+		]);
+		foreach($this->roles as $role) {
+			if($role->getPosition() > $defRolePos) {
+				$role->bumpPosition();
+			}
+		}
+		$this->lastPosition++;
+
+		return $role;
+	}
+
+	public function deleteRole(Role $role): void {
+		if($role->isDefault()) {
+			throw new RuntimeException("Default role cannot be deleted while at runtime");
+		}
+		$members = $role->getMembers();
+		foreach($members as $member) {
+			$member->removeRole($role);
+		}
+		unset($this->roles[$role->getId()]);
+		$this->dataSource->deleteRoleFromStorage($role);
 	}
 }

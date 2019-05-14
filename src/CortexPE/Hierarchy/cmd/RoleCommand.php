@@ -30,6 +30,9 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd;
 
 
+use CortexPE\Hierarchy\cmd\subcommand\CreateRoleCommand;
+use CortexPE\Hierarchy\cmd\subcommand\DeleteRoleCommand;
+use CortexPE\Hierarchy\cmd\subcommand\FlushCommand;
 use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListPermissionsCommand;
@@ -62,6 +65,12 @@ class RoleCommand extends Command {
 			"Get the players in a group"));
 		$this->registerCommand(new RoleOptionsCommand($plugin, $this, "options", [], "/role options <roleID>",
 			"Menu for selecting either players or permissions"));
+		$this->registerCommand(new CreateRoleCommand($plugin, $this, "create", [], "/role create <roleName>",
+			"Creates a new role"));
+		$this->registerCommand(new DeleteRoleCommand($plugin, $this, "delete", [], "/role delete <roleID>",
+			"Delete role"));
+		$this->registerCommand(new FlushCommand($plugin, $this, "flush", [], "/role flush",
+			"Save roles to disk"));
 	}
 
 	/**

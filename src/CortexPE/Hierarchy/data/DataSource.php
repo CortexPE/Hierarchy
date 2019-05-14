@@ -35,6 +35,11 @@ use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 
+/**
+ * Class DataSource
+ * @package  CortexPE\Hierarchy\data
+ * @internal This class (and its subclasses) are only used for the plugin's internal data storage. DO NOT TOUCH!
+ */
 abstract class DataSource {
 	public const ACTION_ROLE_ADD = "role.add";
 	public const ACTION_ROLE_REMOVE = "role.remove";
@@ -92,7 +97,28 @@ abstract class DataSource {
 	abstract public function removeRolePermission(Role $role, $permission): void;
 
 	/**
+	 * @param string $name
+	 * @param int    $id
+	 * @param int    $position
+	 *
+	 * @internal Create role on storage
+	 */
+	abstract public function createRoleOnStorage(string $name, int $id, int $position): void;
+
+	/**
+	 * @param Role $role
+	 *
+	 * @internal Delete role from storage
+	 */
+	abstract public function deleteRoleFromStorage(Role $role): void;
+
+	/**
 	 * Gracefully shutdown the data source
 	 */
 	abstract public function shutdown(): void;
+
+	/**
+	 * Save current state to disk (if applicable)
+	 */
+	abstract public function flush(): void;
 }

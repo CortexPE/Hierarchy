@@ -22,6 +22,12 @@ permissions:
         default: "false"
         description: "Allows role commands"
         children:
+          hierarchy.role.create:
+            default: "op"
+            description: "Allows the creation of roles"
+          hierarchy.role.delete:
+            default: "op"
+            description: "Allows the deletion of roles"
           hierarchy.role.give:
             default: "op"
             description: "Allows the giving of roles"

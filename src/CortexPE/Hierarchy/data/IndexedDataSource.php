@@ -29,12 +29,14 @@ declare(strict_types=1);
 
 namespace CortexPE\Hierarchy\data;
 
+use CortexPE\Hierarchy\exception\UnresolvedRoleException;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use pocketmine\scheduler\ClosureTask;
+use function file_put_contents;
 
 abstract class IndexedDataSource extends DataSource {
 	/** @var string */
@@ -132,8 +134,9 @@ abstract class IndexedDataSource extends DataSource {
 
 	public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void {
 		$permission = ($inverted ? "-" : "") . $permission->getName();
-		if(!in_array($permission, $this->roles[$role->getId()]["Permissions"])) {
-			$this->roles[$role->getId()]["Permissions"][] = $permission;
+		$k = $this->resolveRoleIndex($role->getId());
+		if(!in_array($permission, $this->roles[$k]["Permissions"])) {
+			$this->roles[$k]["Permissions"][] = $permission;
 		}
 	}
 
@@ -142,18 +145,52 @@ abstract class IndexedDataSource extends DataSource {
 			$permission = $permission->getName();
 		}
 		// todo: find a better way to do this
+		$k = $this->resolveRoleIndex($role->getId());
 		if(
-			in_array($permission, ($a = $this->roles[$role->getId()]["Permissions"])) ||
+			in_array($permission, ($a = $this->roles[$k]["Permissions"])) ||
 			in_array("-" . $permission, $a)
 		) {
 			unset(
-				$this->roles[$role->getId()]["Permissions"][array_search($permission, $a)],
-				$this->roles[$role->getId()]["Permissions"][array_search("-" . $permission, $a)]
+				$this->roles[$k]["Permissions"][array_search($permission, $a)],
+				$this->roles[$k]["Permissions"][array_search("-" . $permission, $a)]
 			);
 		}
 	}
 
+	public function createRoleOnStorage(string $name, int $id, int $position): void {
+		$this->roles[] = [ // we dont need to find index, it's a new role.
+			"ID" => $id,
+			"Position" => $position,
+			"Name" => $name,
+			"isDefault" => false,
+			"Permissions" => []
+		];
+	}
+
+	public function deleteRoleFromStorage(Role $role): void {
+		unset($this->roles[$this->resolveRoleIndex($role->getId())]);
+	}
+
+	/**
+	 * @param int $roleID
+	 *
+	 * @return int
+	 * @throws UnresolvedRoleException
+	 */
+	private function resolveRoleIndex(int $roleID): int {
+		foreach($this->roles as $i => $role) {
+			if($role["ID"] == $roleID) {
+				return $i;
+			}
+		}
+		throw new UnresolvedRoleException("Unable to resolve unknown role with ID {$roleID}");
+	}
+
 	public function shutdown(): void {
+		$this->flush();
+	}
+
+	public function flush(): void {
 		file_put_contents($this->rolesFile, $this->encode($this->roles));
 	}
 }

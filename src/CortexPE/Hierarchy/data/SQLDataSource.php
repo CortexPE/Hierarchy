@@ -179,9 +179,25 @@ abstract class SQLDataSource extends DataSource {
 		]);
 	}
 
+	public function createRoleOnStorage(string $name, int $id, int $position): void {
+		$this->db->executeInsert("hierarchy.role.create", [
+			"name" => $name
+		]);
+	}
+
+	public function deleteRoleFromStorage(Role $role): void {
+		$this->db->executeInsert("hierarchy.role.delete", [
+			"role_id" => $role->getId()
+		]);
+	}
+
 	public function shutdown(): void {
 		if($this->db instanceof DataConnector) {
 			$this->db->close();
 		}
+	}
+
+	public function flush(): void {
+		// noop
 	}
 }

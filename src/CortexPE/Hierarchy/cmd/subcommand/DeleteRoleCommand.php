@@ -33,12 +33,10 @@ namespace CortexPE\Hierarchy\cmd\subcommand;
 use CortexPE\Hierarchy\cmd\SubCommand;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\lang\MessageStore;
-use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 
-class GiveRoleCommand extends SubCommand {
+class DeleteRoleCommand extends SubCommand {
 	public function __construct(
 		Hierarchy $hierarchy,
 		Command $parent,
@@ -48,50 +46,22 @@ class GiveRoleCommand extends SubCommand {
 		string $descriptionMessage
 	) {
 		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.give");
+		$this->setPermission("hierarchy.role.delete");
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
-		if(count($args) === 2) {
-			$role = $this->resolveRole($sender, (int)$args[1]);
+		if(count($args) === 1) {
+			$role = $this->resolveRole($sender, (int)$args[0]);
 			if($role !== null) {
-				$target = $args[0];
-				$tmp = $sender->getServer()->getPlayer($target);
-				if($tmp instanceof Player) {
-					$target = $tmp;
+				if(!$role->isDefault()) {
+					$sender->sendMessage(MessageStore::getMessage("cmd.delete.success", [
+						"role" => $role->getName(),
+						"role_id" => $role->getId()
+					]));
+					$this->plugin->getRoleManager()->deleteRole($role);
+				} else {
+					$sender->sendMessage(MessageStore::getMessage("cmd.delete.fail_role_default"));
 				}
-
-				$memberFactory = $this->plugin->getMemberFactory();
-
-				$memberFactory
-					->getMember($target, true,
-						function (BaseMember $member) use ($memberFactory, $role, $sender): void {
-							if($sender instanceof Player) {
-								if(!$memberFactory
-									->getMember($sender)
-									->hasHigherPermissionHierarchy($this->getPermission(), $member)) {
-									$sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
-										"target" => $member->getName()
-									]));
-
-									return;
-								}
-							}
-							if(!$role->isDefault()) {
-								if(!$member->hasRole($role)) {
-									$member->addRole($role);
-									$sender->sendMessage(MessageStore::getMessage("cmd.give.success", [
-										"role" => $role->getName()
-									]));
-								} else {
-									$sender->sendMessage(MessageStore::getMessage("cmd.give.has_role", [
-										"role" => $role->getName()
-									]));
-								}
-							} else {
-								$sender->sendMessage(MessageStore::getMessage("cmd.give.default"));
-							}
-						});
 			} else {
 				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
 			}

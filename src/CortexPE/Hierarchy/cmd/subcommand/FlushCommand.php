@@ -27,24 +27,34 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\event;
+namespace CortexPE\Hierarchy\cmd\subcommand;
 
 
-use CortexPE\Hierarchy\member\BaseMember;
-use pocketmine\event\Event;
+use CortexPE\Hierarchy\cmd\SubCommand;
+use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\lang\MessageStore;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 
-class MemberRoleUpdateEvent extends Event {
-	/** @var BaseMember */
-	protected $member;
-
-	public function __construct(BaseMember $member) {
-		$this->member = $member;
+class FlushCommand extends SubCommand {
+	public function __construct(
+		Hierarchy $hierarchy,
+		Command $parent,
+		string $name,
+		array $aliases,
+		string $usageMessage,
+		string $descriptionMessage
+	) {
+		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
+		$this->setPermission("hierarchy.role.create");
 	}
 
-	/**
-	 * @return BaseMember
-	 */
-	public function getMember(): BaseMember {
-		return $this->member;
+	public function execute(CommandSender $sender, array $args): void {
+		if(count($args) === 1) {
+			$this->plugin->getDataSource()->flush();
+			$sender->sendMessage(MessageStore::getMessage("cmd.flush.success"));
+		} else {
+			$this->sendUsage($sender);
+		}
 	}
 }

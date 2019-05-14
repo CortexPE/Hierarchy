@@ -54,9 +54,6 @@ class Hierarchy extends PluginBase {
 		(new MessageStore($this->getDataFolder() . "messages.yml"));
 		$conf = new Config($this->getDataFolder() . "config.yml", Config::YAML);
 
-		$this->roleManager = new RoleManager($this);
-		$this->memberFactory = new MemberFactory($this);
-
 		switch($conf->getNested("dataSource.type", "sqlite3")) {
 			case "json":
 				$this->dataSource = new JSONDataSource($this, $conf->getNested("dataSource.json"));
@@ -91,6 +88,9 @@ class Hierarchy extends PluginBase {
 
 				return;
 		}
+
+		$this->roleManager = new RoleManager($this);
+		$this->memberFactory = new MemberFactory($this);
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$cmd = new RoleCommand($this, "role", "Hierarchy main command");

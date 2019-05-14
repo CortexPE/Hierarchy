@@ -62,7 +62,7 @@ class Role {
 		$this->id = $id;
 		$this->name = $name;
 		$this->position = $roleData["position"];
-		$this->isDefault = (bool)$roleData["isDefault"];
+		$this->isDefault = (bool)$roleData["isDefault"] ?? false;
 
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission) {
@@ -165,5 +165,13 @@ class Role {
 		foreach($this->members as $member) {
 			$member->recalculatePermissions();
 		}
+	}
+
+	/**
+	 * @internal Adds 1 to the role position to make way for a newly created role
+	 */
+	public function bumpPosition(): void {
+		$this->position++;
+		$this->updateMemberPermissions();
 	}
 }

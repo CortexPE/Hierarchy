@@ -39,6 +39,10 @@ class MessageStore {
 	protected static $config;
 	/** @var array */
 	protected static $defaults = [
+		"cmd.create.success" => "&aSuccessfully created role with name '{role}' with the ID: {role_id}",
+		"cmd.delete.fail_role_default" => "&eSuccessfully deleted {role} ({role_id}) role",
+		"cmd.delete.success" => "&eSuccessfully deleted {role} ({role_id}) role",
+		"cmd.flush.success" => "&aSuccessfully flushed role data to disk",
 		"cmd.help_header" => "&6Available Hierarchy Role Commands:",
 		"cmd.help_format" => "&b{usage} &7- &a{description}",
 		"cmd.give.success" => "&aGiven '{role}' role to member",
