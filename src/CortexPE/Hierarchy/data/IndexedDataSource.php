@@ -64,15 +64,13 @@ abstract class IndexedDataSource extends DataSource {
 				}
 				file_put_contents($this->rolesFile, $this->encode(($this->roles = [
 					[
+						"ID" => 1,
 						"Position" => 0,
 						"Name" => "Member",
 						"isDefault" => true,
 						"Permissions" => $def
 					]
 				])));
-			}
-			foreach($this->roles as $id => $role) {
-				$this->roles[$id]["ID"] = $id + 1; // derive ID from the index, this way, an ID field is not needed
 			}
 			$this->getPlugin()->getRoleManager()->loadRoles($this->roles);
 
