@@ -6,7 +6,6 @@ Role-based permission management system
 | :-----: | :-------: | :-------: |
 | Multiple roles/groups per user | ✔️ | ❌ |
 | Allows same role/group names | ✔️ | ❌ |
-| Multiworld (TO-DO w/ extension) | ✔️ | ✔️ |
 | Asynchronous I/O | ✔️ | ❌ |
 | MySQL DB Support | ✔️ | ✔️ |
 | SQLite3 DB Support | ✔️ | ✔️ |
