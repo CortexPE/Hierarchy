@@ -79,6 +79,12 @@ DELETE
 FROM Roles
 WHERE ID = :role_id;
 -- #    }
+-- #    { bumpPosition
+-- #      :role_id int
+UPDATE Roles
+SET Position = Position + 1
+WHERE ID = :role_id;
+-- #    }
 -- #    { permissions
 -- #      { get
 -- #        :role_id int

@@ -186,6 +186,10 @@ abstract class IndexedDataSource extends DataSource {
 		throw new UnresolvedRoleException("Unable to resolve unknown role with ID {$roleID}");
 	}
 
+	public function bumpPosition(Role $role): void {
+		$this->roles[$this->resolveRoleIndex($role->getId())]["Position"] += 1;
+	}
+
 	public function shutdown(): void {
 		$this->flush();
 	}

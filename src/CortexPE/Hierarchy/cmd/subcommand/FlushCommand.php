@@ -50,7 +50,7 @@ class FlushCommand extends SubCommand {
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
-		if(count($args) === 1) {
+		if(count($args) === 0) {
 			$this->plugin->getDataSource()->flush();
 			$sender->sendMessage(MessageStore::getMessage("cmd.flush.success"));
 		} else {

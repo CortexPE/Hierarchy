@@ -34,6 +34,7 @@ use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
+use function usort;
 
 class RoleManager {
 	/** @var Hierarchy */
@@ -46,8 +47,6 @@ class RoleManager {
 	protected $dataSource;
 	/** @var int */
 	protected $lastID = PHP_INT_MIN;
-	/** @var int */
-	protected $lastPosition = PHP_INT_MIN;
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
@@ -81,9 +80,6 @@ class RoleManager {
 			if($roleData["ID"] > $this->lastID) {
 				$this->lastID = $roleData["ID"];
 			}
-			if($roleData["Position"] > $this->lastPosition) {
-				$this->lastPosition = $roleData["Position"];
-			}
 			if($roleData["isDefault"]) {
 				if($this->defaultRole === null) {
 					$this->defaultRole = $role;
@@ -95,6 +91,7 @@ class RoleManager {
 		if(!($this->defaultRole instanceof Role)) {
 			throw new RuntimeException("No default role is set");
 		}
+		$this->sortRoles();
 		$this->plugin->getLogger()->info("Loaded " . count($this->roles) . " roles");
 	}
 
@@ -126,17 +123,24 @@ class RoleManager {
 	public function createRole(string $name = "new role"): Role {
 		$newRolePos = ($defRolePos = $this->defaultRole->getPosition()) + 1;
 		$this->dataSource->createRoleOnStorage($name, $this->lastID += 1, $newRolePos);
-		$role = $this->roles[$this->lastID] = new Role($this->plugin, $this->lastID, $name, [
-			"position" => $this->lastPosition
-		]);
 		foreach($this->roles as $role) {
 			if($role->getPosition() > $defRolePos) {
 				$role->bumpPosition();
+				$this->dataSource->bumpPosition($role);
 			}
 		}
-		$this->lastPosition++;
+		$role = $this->roles[$this->lastID] = new Role($this->plugin, $this->lastID, $name, [
+			"position" => $newRolePos
+		]);
+		$this->sortRoles();
 
 		return $role;
+	}
+
+	private function sortRoles(): void {
+		usort($this->roles, function (Role $a, Role $b) {
+			return $a->getPosition() > $b->getPosition();
+		});
 	}
 
 	public function deleteRole(Role $role): void {

@@ -62,7 +62,7 @@ class Role {
 		$this->id = $id;
 		$this->name = $name;
 		$this->position = $roleData["position"];
-		$this->isDefault = (bool)$roleData["isDefault"] ?? false;
+		$this->isDefault = (bool)($roleData["isDefault"] ?? false);
 
 		$pMgr = PermissionManager::getInstance();
 		foreach($roleData["permissions"] ?? [] as $permission) {

@@ -191,6 +191,12 @@ abstract class SQLDataSource extends DataSource {
 		]);
 	}
 
+	public function bumpPosition(Role $role): void {
+		$this->db->executeChange("hierarchy.role.bumpPosition", [
+			"role_id" => $role->getId()
+		]);
+	}
+
 	public function shutdown(): void {
 		if($this->db instanceof DataConnector) {
 			$this->db->close();
