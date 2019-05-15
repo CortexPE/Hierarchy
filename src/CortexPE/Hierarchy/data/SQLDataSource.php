@@ -57,7 +57,9 @@ abstract class SQLDataSource extends DataSource {
 		], [
 			static::DIALECT => static::STMTS_FILE
 		]);
+	}
 
+	public function initialize(): void {
 		Await::f2c(function () {
 			foreach(
 				[
@@ -75,16 +77,29 @@ abstract class SQLDataSource extends DataSource {
 				yield $this->asyncInsert("hierarchy.role.createDefault", [
 					"name" => "Member"
 				]);
+				yield $this->asyncInsert("hierarchy.role.create", [
+					"name" => "Operator"
+				]);
 				$roles = yield $this->asyncSelect("hierarchy.role.list");
+				$pMgr = PermissionManager::getInstance();
 				foreach($roles as $role) {
-					$defaults = PermissionManager::getInstance()->getDefaultPermissions(false);
-					foreach($defaults as $permission) {
-						yield $this->asyncInsert("hierarchy.role.permissions.add", [
-							"role_id" => $role["ID"],
-							"permission" => $permission->getName()
-						]);
+					if($role["Name"] === "Member") {
+						foreach($pMgr->getDefaultPermissions(false) as $permission) {
+							yield $this->asyncInsert("hierarchy.role.permissions.add", [
+								"role_id" => $role["ID"],
+								"permission" => $permission->getName()
+							]);
+						}
+					} elseif($role["Name"] === "Operator") {
+						foreach($pMgr->getDefaultPermissions(true) as $permission) {
+							yield $this->asyncInsert("hierarchy.role.permissions.add", [
+								"role_id" => $role["ID"],
+								"permission" => $permission->getName()
+							]);
+						}
 					}
 				}
+				$roles = yield $this->asyncSelect("hierarchy.role.list");
 			}
 			foreach($roles as $k => $role) {
 				$permissions = yield $this->asyncSelect("hierarchy.role.permissions.get", [
@@ -94,11 +109,12 @@ abstract class SQLDataSource extends DataSource {
 					$roles[$k]["Permissions"][] = $permission_row["Permission"];
 				}
 			}
-			$this->getPlugin()->getRoleManager()->loadRoles($roles);
+			$this->postInitialize(yield $this->asyncSelect("hierarchy.role.list"));
 		}, function () {
 		}, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
 		});
+		$this->db->waitAll();
 	}
 
 	abstract function getExtraDBSettings(Hierarchy $plugin, array $config): array;
@@ -146,13 +162,13 @@ abstract class SQLDataSource extends DataSource {
 
 	public function updateMemberData(BaseMember $member, string $action, $data): void {
 		switch($action) {
-			case self::ACTION_ROLE_ADD:
+			case self::ACTION_MEMBER_ROLE_ADD:
 				$this->db->executeChange("hierarchy.member.roles.add", [
 					"username" => $member->getName(),
 					"role_id" => (int)$data
 				]);
 				break;
-			case self::ACTION_ROLE_REMOVE:
+			case self::ACTION_MEMBER_ROLE_REMOVE:
 				$this->db->executeChange("hierarchy.member.roles.remove", [
 					"username" => $member->getName(),
 					"role_id" => (int)$data
@@ -162,6 +178,7 @@ abstract class SQLDataSource extends DataSource {
 	}
 
 	public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void {
+		$this->removeRolePermission($role, $permission);
 		$permission = ($inverted ? "-" : "") . $permission->getName();
 		$this->db->executeInsert("hierarchy.role.permissions.add", [
 			"role_id" => $role->getId(),

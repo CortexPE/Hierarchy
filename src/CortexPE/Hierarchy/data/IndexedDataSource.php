@@ -30,13 +30,16 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\data;
 
 use CortexPE\Hierarchy\exception\UnresolvedRoleException;
-use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use pocketmine\scheduler\ClosureTask;
+use function array_map;
+use function array_values;
+use function file_exists;
+use function file_get_contents;
 use function file_put_contents;
+use function mkdir;
 
 abstract class IndexedDataSource extends DataSource {
 	/** @var string */
@@ -50,34 +53,37 @@ abstract class IndexedDataSource extends DataSource {
 	/** @var string */
 	protected $membersDir;
 
-	public function __construct(Hierarchy $plugin) {
-		parent::__construct($plugin);
-
+	public function initialize(): void {
 		// just to make it work like the SQL ones... and, we need this to be able to get the default perms correctly
-		$plugin->getScheduler()->scheduleTask(new ClosureTask(function (int $_) use ($plugin): void {
-			if(file_exists(($this->rolesFile = $plugin->getDataFolder() . "roles." . static::FILE_EXTENSION))) {
-				$this->roles = $this->decode(file_get_contents($this->rolesFile));
-			} else {
-				// create default role & add default permissions
-				$defaults = PermissionManager::getInstance()->getDefaultPermissions(false);
-				$def = [];
-				foreach($defaults as $permission) {
-					$def[] = $permission->getName();
-				}
-				file_put_contents($this->rolesFile, $this->encode(($this->roles = [
-					[
-						"ID" => 1,
-						"Position" => 0,
-						"Name" => "Member",
-						"isDefault" => true,
-						"Permissions" => $def
-					]
-				])));
-			}
-			$this->getPlugin()->getRoleManager()->loadRoles($this->roles);
+		if(file_exists(($this->rolesFile = $this->plugin->getDataFolder() . "roles." . static::FILE_EXTENSION))) {
+			$this->roles = $this->decode(file_get_contents($this->rolesFile));
+		} else {
+			// create default role & add default permissions
+			$pMgr = PermissionManager::getInstance();
+			file_put_contents($this->rolesFile, $this->encode(($this->roles = [
+				[
+					"ID" => 1,
+					"Position" => 0,
+					"Name" => "Member",
+					"isDefault" => true,
+					"Permissions" => array_map(function (Permission $perm) {
+						return $perm->getName();
+					}, array_values($pMgr->getDefaultPermissions(false)))
+				],
+				[
+					"ID" => 2,
+					"Position" => 1,
+					"Name" => "Operator",
+					"isDefault" => false,
+					"Permissions" => array_map(function (Permission $perm) {
+						return $perm->getName();
+					}, array_values($pMgr->getDefaultPermissions(true)))
+				],
+			])));
+		}
+		@mkdir(($this->membersDir = $this->plugin->getDataFolder() . "members/"));
 
-			@mkdir(($this->membersDir = $plugin->getDataFolder() . "members/"));
-		}));
+		$this->postInitialize($this->roles);
 	}
 
 	abstract function decode(string $string): array;
@@ -115,10 +121,10 @@ abstract class IndexedDataSource extends DataSource {
 		$existingData = $this->readMemberData($member);
 
 		switch($action) {
-			case self::ACTION_ROLE_ADD:
+			case self::ACTION_MEMBER_ROLE_ADD:
 				$existingData["roles"][] = (int)$data;
 				break;
-			case self::ACTION_ROLE_REMOVE:
+			case self::ACTION_MEMBER_ROLE_REMOVE:
 				$i = array_search(($data = (int)$data), $existingData["roles"]);
 				if($i !== false) {
 					unset($existingData["roles"][$i]);
@@ -133,11 +139,13 @@ abstract class IndexedDataSource extends DataSource {
 	}
 
 	public function addRolePermission(Role $role, Permission $permission, bool $inverted = false): void {
+		$this->removeRolePermission($role, $permission);
 		$permission = ($inverted ? "-" : "") . $permission->getName();
 		$k = $this->resolveRoleIndex($role->getId());
 		if(!in_array($permission, $this->roles[$k]["Permissions"])) {
 			$this->roles[$k]["Permissions"][] = $permission;
 		}
+		$this->reIndex($this->roles[$k]["Permissions"]);
 	}
 
 	public function removeRolePermission(Role $role, $permission): void {
@@ -155,6 +163,11 @@ abstract class IndexedDataSource extends DataSource {
 				$this->roles[$k]["Permissions"][array_search("-" . $permission, $a)]
 			);
 		}
+		$this->reIndex($this->roles[$k]["Permissions"]);
+	}
+
+	private function reIndex(array &$array): void {
+		$array = array_values($array);
 	}
 
 	public function createRoleOnStorage(string $name, int $id, int $position): void {

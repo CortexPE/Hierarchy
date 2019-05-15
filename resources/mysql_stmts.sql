@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Roles
     ID        INTEGER PRIMARY KEY AUTO_INCREMENT UNIQUE,
     Position  INTEGER      NOT NULL UNIQUE,
     Name      VARCHAR(100) NOT NULL DEFAULT 'new role',
-    isDefault BOOLEAN      NOT NULL DEFAULT FALSE
+    isDefault BOOLEAN      NOT NULL DEFAULT 0
 );
 -- #    }
 -- #    { rolePermissionTable

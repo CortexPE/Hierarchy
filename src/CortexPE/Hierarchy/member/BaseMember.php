@@ -78,7 +78,7 @@ abstract class BaseMember {
 		if(!$this->hasRole($role)) {
 			$ev = new MemberRoleAddEvent($this, $role);
 			$ev->call();
-			$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_ADD, $role->getId());
+			$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			$this->roles[$role->getId()] = $role;
 			$role->bind($this);
 			if($recalculate) {
@@ -116,7 +116,8 @@ abstract class BaseMember {
 			$ev = new MemberRoleRemoveEvent($this, $role);
 			$ev->call();
 			unset($this->roles[$role->getId()]);
-			$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_ROLE_REMOVE, $role->getId());
+			$this->plugin->getDataSource()
+						 ->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			$role->unbind($this);
 			if($recalculate) {
 				$this->recalculatePermissions();

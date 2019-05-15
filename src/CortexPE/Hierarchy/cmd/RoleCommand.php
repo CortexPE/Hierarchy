@@ -30,13 +30,16 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\cmd;
 
 
+use CortexPE\Hierarchy\cmd\subcommand\AddPermissionCommand;
 use CortexPE\Hierarchy\cmd\subcommand\CreateRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\DeleteRoleCommand;
+use CortexPE\Hierarchy\cmd\subcommand\DenyPermissionCommand;
 use CortexPE\Hierarchy\cmd\subcommand\FlushCommand;
 use CortexPE\Hierarchy\cmd\subcommand\GiveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListCommand;
 use CortexPE\Hierarchy\cmd\subcommand\ListPermissionsCommand;
 use CortexPE\Hierarchy\cmd\subcommand\PlayersCommand;
+use CortexPE\Hierarchy\cmd\subcommand\RemovePermissionCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RemoveRoleCommand;
 use CortexPE\Hierarchy\cmd\subcommand\RoleOptionsCommand;
 use CortexPE\Hierarchy\cmd\subcommand\UserInfoCommand;
@@ -71,6 +74,15 @@ class RoleCommand extends Command {
 			"Delete role"));
 		$this->registerCommand(new FlushCommand($plugin, $this, "flush", [], "/role flush",
 			"Save roles to disk"));
+		$this->registerCommand(new AddPermissionCommand($plugin, $this, "addperm", [],
+			"/role addperm <roleID> <permission>",
+			"Add permission to role"));
+		$this->registerCommand(new DenyPermissionCommand($plugin, $this, "denyperm", [],
+			"/role denyperm <roleID> <permission>",
+			"Deny permission from role"));
+		$this->registerCommand(new RemovePermissionCommand($plugin, $this, "removeperm", [],
+			"/role removeperm <roleID> <permission>",
+			"Remove permission from role"));
 	}
 
 	/**

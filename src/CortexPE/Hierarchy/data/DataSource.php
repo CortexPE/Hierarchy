@@ -41,14 +41,21 @@ use pocketmine\permission\Permission;
  * @internal This class (and its subclasses) are only used for the plugin's internal data storage. DO NOT TOUCH!
  */
 abstract class DataSource {
-	public const ACTION_ROLE_ADD = "role.add";
-	public const ACTION_ROLE_REMOVE = "role.remove";
+	public const ACTION_MEMBER_ROLE_ADD = "member.role.add";
+	public const ACTION_MEMBER_ROLE_REMOVE = "member.role.remove";
 
 	/** @var Hierarchy */
 	protected $plugin;
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
+	}
+
+	abstract public function initialize(): void;
+
+	protected function postInitialize(array $roles): void {
+		$this->plugin->continueStartup();
+		$this->plugin->getRoleManager()->loadRoles($roles);
 	}
 
 	/**

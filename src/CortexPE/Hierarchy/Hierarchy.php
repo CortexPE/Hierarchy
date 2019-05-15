@@ -38,8 +38,8 @@ use CortexPE\Hierarchy\data\YAMLDataSource;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\Config;
 
 class Hierarchy extends PluginBase {
 	/** @var DataSource */
@@ -52,8 +52,7 @@ class Hierarchy extends PluginBase {
 	public function onEnable(): void {
 		$this->saveResource("config.yml");
 		(new MessageStore($this->getDataFolder() . "messages.yml"));
-		$conf = new Config($this->getDataFolder() . "config.yml", Config::YAML);
-
+		$conf = $this->getConfig();
 		switch($conf->getNested("dataSource.type", "sqlite3")) {
 			case "json":
 				$this->dataSource = new JSONDataSource($this, $conf->getNested("dataSource.json"));
@@ -89,6 +88,14 @@ class Hierarchy extends PluginBase {
 				return;
 		}
 
+		DefaultPermissions::registerCorePermissions();
+		$this->dataSource->initialize();
+	}
+
+	/**
+	 * @internal used to continue startup after the data source has finished initialization
+	 */
+	public function continueStartup(): void {
 		$this->roleManager = new RoleManager($this);
 		$this->memberFactory = new MemberFactory($this);
 

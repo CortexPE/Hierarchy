@@ -1,4 +1,5 @@
 ---
+# Hierarchy DataSource options & settings
 dataSource:
   # Available Types: json, sqlite3, mysql, yaml
   type: "sqlite3"

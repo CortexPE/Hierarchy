@@ -34,7 +34,7 @@ use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
-use function usort;
+use function uasort;
 
 class RoleManager {
 	/** @var Hierarchy */
@@ -138,7 +138,7 @@ class RoleManager {
 	}
 
 	private function sortRoles(): void {
-		usort($this->roles, function (Role $a, Role $b) {
+		uasort($this->roles, function (Role $a, Role $b) {
 			return $a->getPosition() > $b->getPosition();
 		});
 	}
