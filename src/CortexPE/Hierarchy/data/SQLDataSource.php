@@ -109,7 +109,7 @@ abstract class SQLDataSource extends DataSource {
 					$roles[$k]["Permissions"][] = $permission_row["Permission"];
 				}
 			}
-			$this->postInitialize(yield $this->asyncSelect("hierarchy.role.list"));
+			$this->postInitialize($roles);
 		}, function () {
 		}, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
