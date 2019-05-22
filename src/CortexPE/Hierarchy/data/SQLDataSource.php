@@ -65,7 +65,8 @@ abstract class SQLDataSource extends DataSource {
 				[
 					"hierarchy.init.rolesTable",
 					"hierarchy.init.rolePermissionTable",
-					"hierarchy.init.memberRolesTable"
+					"hierarchy.init.memberRolesTable",
+					"hierarchy.init.memberPermissionsTable",
 				] as $tableSchema
 			) {
 				yield $this->asyncGenericQuery($tableSchema);
@@ -150,6 +151,12 @@ abstract class SQLDataSource extends DataSource {
 			foreach($rows as $row) {
 				$data["roles"][] = $row["RoleID"];
 			}
+			$rows = yield $this->asyncSelect("hierarchy.member.permissions.get", [
+				"username" => $member->getName()
+			]);
+			foreach($rows as $row) {
+				$data["permissions"][] = $row["Permission"];
+			}
 			$member->loadData($data);
 			if($onLoad !== null) {
 				$onLoad($member);
@@ -172,6 +179,18 @@ abstract class SQLDataSource extends DataSource {
 				$this->db->executeChange("hierarchy.member.roles.remove", [
 					"username" => $member->getName(),
 					"role_id" => (int)$data
+				]);
+				break;
+			case self::ACTION_MEMBER_PERMS_ADD:
+				$this->db->executeChange("hierarchy.member.permissions.add", [
+					"username" => $member->getName(),
+					"permission" => $data
+				]);
+				break;
+			case self::ACTION_MEMBER_PERMS_REMOVE:
+				$this->db->executeChange("hierarchy.member.permissions.remove", [
+					"username" => $member->getName(),
+					"permission" => $data
 				]);
 				break;
 		}

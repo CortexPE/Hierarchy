@@ -22,8 +22,7 @@ dataSource:
     user: "hierarchy"
     password: "youShallNotPass"
     database: "hierarchy"
-    # Database schema to use, by default this is the plugin's name
     schema: "hierarchy"
     # The maximum number of simultaneous queries
-    workerLimit: 2 # Increase the value if you have slow connection to the MySQL server
+    workerLimit: 2 # Increase the value if you have a slow connection to the MySQL server
 ...

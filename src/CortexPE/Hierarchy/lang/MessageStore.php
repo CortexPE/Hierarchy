@@ -40,7 +40,9 @@ class MessageStore {
 	/** @var array */
 	protected static $defaults = [
 		"cmd.add_perm.success" => "&aSuccessfully added the permission '{permission}' to Role {role}({role_id})",
+		"cmd.add_m_perm.success" => "&aSuccessfully added the permission '{permission}' to {member}",
 		"cmd.deny_perm.success" => "&eSuccessfully denied the permission '{permission}' from Role {role}({role_id})",
+		"cmd.deny_m_perm.success" => "&eSuccessfully denied the permission '{permission}' from {member}",
 		"cmd.create.success" => "&aSuccessfully created role with name '{role}' with the ID: {role_id}",
 		"cmd.delete.fail_role_default" => "&eSuccessfully deleted {role} ({role_id}) role",
 		"cmd.delete.success" => "&eSuccessfully deleted {role} ({role_id}) role",
@@ -56,6 +58,7 @@ class MessageStore {
 		"cmd.remove.no_role" => "&cMember does not have the '{role}' role",
 		"cmd.remove.default" => "&cCannot remove default role",
 		"cmd.remove_perm.success" => "&eSuccessfully removed the permission '{permission}' from Role {role}({role_id})",
+		"cmd.remove_m_perm.success" => "&eSuccessfully removed the permission '{permission}' from {member}",
 		"cmd.usr_info.header" => "&6{member}'s Role(s) and Permissions:",
 		"cmd.usr_info.role_header" => "Role(s):",
 		"cmd.usr_info.role_format" => " - {role}",

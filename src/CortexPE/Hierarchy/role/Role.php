@@ -151,19 +151,22 @@ class Role {
 
 	/**
 	 * @param Permission $permission
-	 * @param bool       $inverted
 	 * @param bool       $update
 	 */
-	public function addPermission(Permission $permission, bool $inverted = false, bool $update = true): void {
-		$this->permissions[$permission->getName()] = !$inverted;
-		$this->plugin->getDataSource()->addRolePermission($this, $permission, $inverted);
+	public function addPermission(Permission $permission, bool $update = true): void {
+		$this->permissions[$permission->getName()] = true;
+		$this->plugin->getDataSource()->addRolePermission($this, $permission, false);
 		if($update) {
 			$this->updateMemberPermissions();
 		}
 	}
 
 	public function denyPermission(Permission $permission, bool $update = true): void {
-		$this->addPermission($permission, true, $update);
+		$this->permissions[$permission->getName()] = false;
+		$this->plugin->getDataSource()->addRolePermission($this, $permission, true);
+		if($update) {
+			$this->updateMemberPermissions();
+		}
 	}
 
 	/**

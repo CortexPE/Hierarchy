@@ -36,8 +36,9 @@ use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\PermissionManager;
+use pocketmine\Player;
 
-class AddPermissionCommand extends SubCommand {
+class RemoveRolePermissionCommand extends SubCommand {
 	public function __construct(
 		Hierarchy $hierarchy,
 		Command $parent,
@@ -47,17 +48,26 @@ class AddPermissionCommand extends SubCommand {
 		string $descriptionMessage
 	) {
 		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.add_permission");
+		$this->setPermission("hierarchy.role.remove_permission");
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
 		if(count($args) === 2) {
 			$role = $this->resolveRole($sender, (int)$args[0]);
 			if($role !== null) {
+				if(!$sender->isOp() && $sender instanceof Player && ($myPerm = $this->getPermission()) !== null){
+					$m = $this->plugin->getMemberFactory()->getMember($sender);
+					if($m->getTopRoleWithPermission($myPerm)->getPosition() <= $role->getPosition()){
+						$sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
+							"target" => $role->getName()
+						]));
+						return;
+					}
+				}
 				$permission = PermissionManager::getInstance()->getPermission($args[1]);
 				if($permission !== null) {
-					$role->addPermission($permission);
-					$sender->sendMessage(MessageStore::getMessage("cmd.add_perm.success", [
+					$role->removePermission($permission);
+					$sender->sendMessage(MessageStore::getMessage("cmd.remove_perm.success", [
 						"role" => $role->getName(),
 						"role_id" => $role->getId(),
 						"permission" => $permission->getName()

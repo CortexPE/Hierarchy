@@ -36,15 +36,21 @@ use CortexPE\Hierarchy\event\MemberRoleRemoveEvent;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
-use pocketmine\permission\PermissionAttachment;
+use pocketmine\permission\PermissionManager;
 use pocketmine\Player;
 use pocketmine\Server;
+use function in_array;
+use function substr;
 
 abstract class BaseMember {
 	/** @var Hierarchy */
 	protected $plugin;
+	/** @var DataSource */
+	protected $dataSource;
+	/** @var PermissionManager */
+	protected $permMgr;
 	/** @var bool[] */
-	protected $permissions = [];
+	protected $permissions = [], $memberPermissions = []; // (string) PermissionNode => (bool) ALLOW/DISALLOW
 	/** @var Role[] */
 	protected $roles = [];
 	/** @var Server */
@@ -52,6 +58,8 @@ abstract class BaseMember {
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
+		$this->dataSource = $plugin->getDataSource();
+		$this->permMgr = PermissionManager::getInstance();
 		$this->server = $plugin->getServer();
 	}
 
@@ -64,23 +72,66 @@ abstract class BaseMember {
 
 	public function loadData(array $memberData): void {
 		foreach($memberData["roles"] ?? [] as $roleId) {
-			$this->addRoleById($roleId, false);
+			$role = $this->plugin->getRoleManager()->getRole($roleId);
+			if($role instanceof Role) {
+				$this->roles[$roleId] = $role;
+			}
+		}
+		foreach($memberData["permissions"] ?? [] as $perm) {
+			$inverted = false;
+			if($perm{0} === "-") {
+				$inverted = true;
+				$perm = substr($perm, 1);
+			}
+			$permission = $this->permMgr->getPermission($perm);
+			if($permission instanceof Permission) {
+				$this->memberPermissions[$permission->getName()] = !$inverted;
+			} // ignore missing permissions
 		}
 		$this->recalculatePermissions();
 	}
 
-	public function addRoleById(int $roleId, bool $recalculate = true): void {
-		$role = $this->plugin->getRoleManager()->getRole($roleId);
-		$this->addRole($role, $recalculate);
+	public function addMemberPermission(Permission $permission, bool $recalculate = true): void {
+		$permission = $permission->getName();
+		$this->memberPermissions[$permission] = true;
+		if($recalculate) {
+			$this->recalculatePermissions();
+		}
+		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, $permission);
+	}
+
+	public function denyMemberPermission(Permission $permission, bool $recalculate = true): void {
+		$permission = $permission->getName();
+		$this->memberPermissions[$permission] = false;
+		if($recalculate) {
+			$this->recalculatePermissions();
+		}
+		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, "-" . $permission);
+	}
+
+	/**
+	 * @param Permission|string $permission
+	 * @param bool              $recalculate
+	 */
+	public function removeMemberPermission($permission, bool $recalculate = true): void {
+		if($permission instanceof Permission) {
+			$permission = $permission->getName();
+		}
+		unset($this->memberPermissions[$permission]);
+		if($recalculate) {
+			$this->recalculatePermissions();
+		}
+		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_REMOVE, $permission);
 	}
 
 	public function addRole(Role $role, bool $recalculate = true): void {
 		if(!$this->hasRole($role)) {
 			$ev = new MemberRoleAddEvent($this, $role);
 			$ev->call();
-			$this->plugin->getDataSource()->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			$this->roles[$role->getId()] = $role;
 			$role->bind($this);
+			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
+
 			if($recalculate) {
 				$this->recalculatePermissions();
 			}
@@ -88,7 +139,7 @@ abstract class BaseMember {
 	}
 
 	public function hasRole(Role $role): bool {
-		return isset($this->roles[$role->getId()]);
+		return in_array($role, $this->roles, true);
 	}
 
 	public function recalculatePermissions(): void {
@@ -97,6 +148,7 @@ abstract class BaseMember {
 		foreach($this->roles as $role) {
 			$perms[$role->getPosition()] = $role->getPermissions();
 		}
+		$perms[PHP_INT_MAX] = $this->memberPermissions; // this overrides other permissions
 		krsort($perms);
 		$this->permissions = array_replace_recursive(...$perms);
 	}
@@ -116,9 +168,8 @@ abstract class BaseMember {
 			$ev = new MemberRoleRemoveEvent($this, $role);
 			$ev->call();
 			unset($this->roles[$role->getId()]);
-			$this->plugin->getDataSource()
-						 ->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			$role->unbind($this);
+			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			if($recalculate) {
 				$this->recalculatePermissions();
 			}
@@ -182,8 +233,6 @@ abstract class BaseMember {
 
 		return $topRoleWithPerm;
 	}
-
-	abstract public function getAttachment(): ?PermissionAttachment;
 
 	abstract public function getPlayer(): ?Player;
 

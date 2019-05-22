@@ -55,9 +55,9 @@ class MemberFactory {
 	 * @param bool          $loadData
 	 * @param callable|null $onLoad
 	 *
-	 * @return OfflineMember|Member
+	 * @return BaseMember
 	 */
-	public function getMember($player, bool $loadData = true, ?callable $onLoad = null) {
+	public function getMember($player, bool $loadData = true, ?callable $onLoad = null): BaseMember {
 		$newMember = false;
 		if(!($player instanceof Player)) {
 			if(($p = Server::getInstance()->getPlayerExact($player)) instanceof Player) {

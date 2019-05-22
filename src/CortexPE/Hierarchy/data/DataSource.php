@@ -43,6 +43,8 @@ use pocketmine\permission\Permission;
 abstract class DataSource {
 	public const ACTION_MEMBER_ROLE_ADD = "member.role.add";
 	public const ACTION_MEMBER_ROLE_REMOVE = "member.role.remove";
+	public const ACTION_MEMBER_PERMS_ADD = "member.perm.add";
+	public const ACTION_MEMBER_PERMS_REMOVE = "member.perm.remove";
 
 	/** @var Hierarchy */
 	protected $plugin;

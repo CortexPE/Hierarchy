@@ -35,10 +35,13 @@ use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use function array_map;
+use function array_search;
 use function array_values;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function in_array;
+use function ltrim;
 use function mkdir;
 
 abstract class IndexedDataSource extends DataSource {
@@ -54,7 +57,6 @@ abstract class IndexedDataSource extends DataSource {
 	protected $membersDir;
 
 	public function initialize(): void {
-		// just to make it work like the SQL ones... and, we need this to be able to get the default perms correctly
 		if(file_exists(($this->rolesFile = $this->plugin->getDataFolder() . "roles." . static::FILE_EXTENSION))) {
 			$this->roles = $this->decode(file_get_contents($this->rolesFile));
 		} else {
@@ -108,6 +110,7 @@ abstract class IndexedDataSource extends DataSource {
 			if(isset($dat["roles"])) {
 				$data["roles"] = array_merge($data["roles"], $dat["roles"]);
 			}
+			$data["permissions"] = $dat["permissions"] ?? [];
 		}
 
 		return $data;
@@ -130,9 +133,22 @@ abstract class IndexedDataSource extends DataSource {
 					unset($existingData["roles"][$i]);
 				}
 				break;
+			case self::ACTION_MEMBER_PERMS_ADD:
+				$perms = $existingData["permissions"] ?? [];
+				self::removePermissionFromArray(ltrim($data, "-"), $perms);
+				$perms[] = $data;
+				$existingData["permissions"] = $perms;
+				break;
+			case self::ACTION_MEMBER_PERMS_REMOVE:
+				$perms = $existingData["permissions"] ?? [];
+				self::removePermissionFromArray(ltrim($data, "-"), $perms);
+				$existingData["permissions"] = $perms;
+				break;
 		}
-		if(isset($existingData["roles"])) {
-			$existingData["roles"] = array_values(array_unique($existingData["roles"]));
+		foreach(["roles", "permissions"] as $i) {
+			if(isset($existingData[$i])) {
+				self::reIndex($existingData[$i]);
+			}
 		}
 
 		file_put_contents($this->getFileName($member), $this->encode($existingData));
@@ -142,7 +158,7 @@ abstract class IndexedDataSource extends DataSource {
 		$this->removeRolePermission($role, $permission);
 		$permission = ($inverted ? "-" : "") . $permission->getName();
 		$k = $this->resolveRoleIndex($role->getId());
-		if(!in_array($permission, $this->roles[$k]["Permissions"])) {
+		if(!self::permissionInArray($permission, $this->roles[$k]["Permissions"])) {
 			$this->roles[$k]["Permissions"][] = $permission;
 		}
 		$this->reIndex($this->roles[$k]["Permissions"]);
@@ -152,22 +168,26 @@ abstract class IndexedDataSource extends DataSource {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
-		// todo: find a better way to do this
 		$k = $this->resolveRoleIndex($role->getId());
-		if(
-			in_array($permission, ($a = $this->roles[$k]["Permissions"])) ||
-			in_array("-" . $permission, $a)
-		) {
-			unset(
-				$this->roles[$k]["Permissions"][array_search($permission, $a)],
-				$this->roles[$k]["Permissions"][array_search("-" . $permission, $a)]
-			);
-		}
+		self::removePermissionFromArray($permission, $this->roles[$k]["Permissions"]);
 		$this->reIndex($this->roles[$k]["Permissions"]);
 	}
 
+	private static function permissionInArray(string $permission, array $array): bool {
+		return in_array($permission, $array) || in_array("-" . $permission, $array);
+	}
+
+	private static function removePermissionFromArray(string $permission, array &$array): void {
+		if(self::permissionInArray($permission, $array)) {
+			unset(
+				$array[array_search($permission, $array)],
+				$array[array_search("-" . $permission, $array)]
+			);
+		}
+	}
+
 	private function reIndex(array &$array): void {
-		$array = array_values($array);
+		$array = array_values(array_unique($array));
 	}
 
 	public function createRoleOnStorage(string $name, int $id, int $position): void {

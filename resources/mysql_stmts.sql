@@ -28,6 +28,14 @@ CREATE TABLE IF NOT EXISTS MemberRoles
     PRIMARY KEY (Player, RoleID)
 );
 -- #    }
+-- #    { memberPermissionsTable
+CREATE TABLE IF NOT EXISTS MemberPermissions
+(
+    Player     VARCHAR(16)  NOT NULL, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
+    Permission VARCHAR(128) NOT NULL, -- who tf has a permission node with 128 characters anyways?
+    PRIMARY KEY (Player, Permission)
+);
+-- #    }
 -- #  }
 
 -- # { member
@@ -52,6 +60,29 @@ DELETE
 FROM MemberRoles
 WHERE Player = :username
   AND RoleID = :role_id;
+-- #     }
+-- #   }
+-- #   { permissions
+-- #     { get
+-- #       :username string
+SELECT Permission
+FROM MemberPermissions
+WHERE Player = :username;
+-- #     }
+-- #     { add
+-- #       :username string
+-- #       :permission string
+REPLACE
+    INTO MemberPermissions (Player, Permission)
+VALUES (:username, :permission);
+-- #     }
+-- #     { remove
+-- #       :username string
+-- #       :permission string
+DELETE
+FROM MemberPermissions
+WHERE Player = :username
+  AND Permission LIKE CONCAT('%', :permission);
 -- #     }
 -- #   }
 -- # }

@@ -52,3 +52,16 @@ permissions:
           hierarchy.role.list_players:
             default: "op"
             description: "Allows to list the players with a role"
+      hierarchy.member:
+        default: "false"
+        description: "Allows member commands"
+        children:
+          hierarchy.member.add_permission:
+            default: "op"
+            description: "Allows the adding of permissions to a member"
+          hierarchy.member.deny_permission:
+            default: "op"
+            description: "Allows the denying of permissions from a member"
+          hierarchy.member.remove_permission:
+            default: "op"
+            description: "Allows the removal of permissions from a member"

@@ -36,8 +36,9 @@ use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\PermissionManager;
+use pocketmine\Player;
 
-class RemovePermissionCommand extends SubCommand {
+class DenyMemberPermissionCommand extends SubCommand {
 	public function __construct(
 		Hierarchy $hierarchy,
 		Command $parent,
@@ -47,26 +48,33 @@ class RemovePermissionCommand extends SubCommand {
 		string $descriptionMessage
 	) {
 		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.remove_permission");
+		$this->setPermission("hierarchy.member.deny_permission");
 	}
 
 	public function execute(CommandSender $sender, array $args): void {
 		if(count($args) === 2) {
-			$role = $this->resolveRole($sender, (int)$args[0]);
-			if($role !== null) {
-				$permission = PermissionManager::getInstance()->getPermission($args[1]);
-				if($permission !== null) {
-					$role->removePermission($permission);
-					$sender->sendMessage(MessageStore::getMessage("cmd.remove_perm.success", [
-						"role" => $role->getName(),
-						"role_id" => $role->getId(),
-						"permission" => $permission->getName()
+			if(($t = $sender->getServer()->getPlayer($args[0])) instanceof Player) {
+				$args[0] = $t;
+			}
+			$member = $this->plugin->getMemberFactory()->getMember($args[0]);
+			if(!$sender->isOp() && $sender instanceof Player && ($myPerm = $this->getPermission()) !== null){
+				$m = $this->plugin->getMemberFactory()->getMember($sender);
+				if($m->getTopRoleWithPermission($myPerm)->getPosition() <= $member->getTopRole()->getPosition()){
+					$sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
+						"target" => $member->getName()
 					]));
-				} else {
-					$sender->sendMessage(MessageStore::getMessage("err.unknown_permission"));
+					return;
 				}
+			}
+			$permission = PermissionManager::getInstance()->getPermission($args[1]);
+			if($permission !== null) {
+				$member->denyMemberPermission($permission);
+				$sender->sendMessage(MessageStore::getMessage("cmd.deny_m_perm.success", [
+					"member" => $member->getName(),
+					"permission" => $permission->getName()
+				]));
 			} else {
-				$sender->sendMessage(MessageStore::getMessage("err.unknown_role"));
+				$sender->sendMessage(MessageStore::getMessage("err.unknown_permission"));
 			}
 		} else {
 			$this->sendUsage($sender);

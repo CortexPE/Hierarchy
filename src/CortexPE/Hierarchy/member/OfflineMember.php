@@ -31,7 +31,6 @@ namespace CortexPE\Hierarchy\member;
 
 
 use CortexPE\Hierarchy\Hierarchy;
-use pocketmine\permission\PermissionAttachment;
 use pocketmine\Player;
 
 class OfflineMember extends BaseMember {
@@ -49,9 +48,5 @@ class OfflineMember extends BaseMember {
 
 	public function getName(): string {
 		return $this->username;
-	}
-
-	public function getAttachment(): ?PermissionAttachment {
-		return null;
 	}
 }

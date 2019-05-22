@@ -36,8 +36,9 @@ use CortexPE\Hierarchy\lang\MessageStore;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\PermissionManager;
+use pocketmine\Player;
 
-class DenyPermissionCommand extends SubCommand {
+class DenyRolePermissionCommand extends SubCommand {
 	public function __construct(
 		Hierarchy $hierarchy,
 		Command $parent,
@@ -54,6 +55,15 @@ class DenyPermissionCommand extends SubCommand {
 		if(count($args) === 2) {
 			$role = $this->resolveRole($sender, (int)$args[0]);
 			if($role !== null) {
+				if(!$sender->isOp() && $sender instanceof Player && ($myPerm = $this->getPermission()) !== null){
+					$m = $this->plugin->getMemberFactory()->getMember($sender);
+					if($m->getTopRoleWithPermission($myPerm)->getPosition() <= $role->getPosition()){
+						$sender->sendMessage(MessageStore::getMessage("err.target_higher_hrk", [
+							"target" => $role->getName()
+						]));
+						return;
+					}
+				}
 				$permission = PermissionManager::getInstance()->getPermission($args[1]);
 				if($permission !== null) {
 					$role->denyPermission($permission);
