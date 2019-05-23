@@ -100,6 +100,24 @@ class RoleManager {
 	}
 
 	/**
+	 * Tries to resolve a role by its name.
+	 *
+	 * WARNING: This has undefined behavior when it encounters duplicate role names
+	 *
+	 * @param string $roleName
+	 *
+	 * @return Role|null
+	 */
+	public function getRoleByName(string $roleName): ?Role {
+		foreach($this->roles as $role){
+			if($role->getName() == $roleName){
+				return $role;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @return Role
 	 */
 	public function getDefaultRole(): Role {
