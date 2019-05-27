@@ -91,22 +91,26 @@ abstract class BaseMember {
 		$this->recalculatePermissions();
 	}
 
-	public function addMemberPermission(Permission $permission, bool $recalculate = true): void {
+	public function addMemberPermission(Permission $permission, bool $recalculate = true, bool $save = true): void {
 		$permission = $permission->getName();
 		$this->memberPermissions[$permission] = true;
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
-		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, $permission);
+		if($save){
+			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, $permission);
+		}
 	}
 
-	public function denyMemberPermission(Permission $permission, bool $recalculate = true): void {
+	public function denyMemberPermission(Permission $permission, bool $recalculate = true, bool $save = true): void {
 		$permission = $permission->getName();
 		$this->memberPermissions[$permission] = false;
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
-		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, "-" . $permission);
+		if($save){
+			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, "-" . $permission);
+		}
 	}
 
 	/**
@@ -124,13 +128,15 @@ abstract class BaseMember {
 		$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_REMOVE, $permission);
 	}
 
-	public function addRole(Role $role, bool $recalculate = true): void {
+	public function addRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if(!$this->hasRole($role)) {
 			$ev = new MemberRoleAddEvent($this, $role);
 			$ev->call();
 			$this->roles[$role->getId()] = $role;
 			$role->bind($this);
-			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
+			if($save){
+				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
+			}
 
 			if($recalculate) {
 				$this->recalculatePermissions();
@@ -153,9 +159,9 @@ abstract class BaseMember {
 		$this->permissions = array_replace_recursive(...$perms);
 	}
 
-	public function clearRoles(bool $recalculate = true): void {
+	public function clearRoles(bool $recalculate = true, bool $save = true): void {
 		foreach($this->roles as $role) {
-			$this->removeRole($role, false);
+			$this->removeRole($role, false, $save);
 		}
 		$this->roles = [];
 		if($recalculate) {
@@ -163,13 +169,15 @@ abstract class BaseMember {
 		}
 	}
 
-	public function removeRole(Role $role, bool $recalculate = true): void {
+	public function removeRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if($this->hasRole($role)) {
 			$ev = new MemberRoleRemoveEvent($this, $role);
 			$ev->call();
 			unset($this->roles[$role->getId()]);
 			$role->unbind($this);
-			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
+			if($save){
+				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
+			}
 			if($recalculate) {
 				$this->recalculatePermissions();
 			}
