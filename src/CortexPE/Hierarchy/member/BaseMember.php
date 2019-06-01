@@ -75,6 +75,9 @@ abstract class BaseMember {
 			$role = $this->plugin->getRoleManager()->getRole($roleId);
 			if($role instanceof Role) {
 				$this->roles[$roleId] = $role;
+			} else {
+				// un-existent role
+				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $roleId);
 			}
 		}
 		foreach($memberData["permissions"] ?? [] as $perm) {
@@ -240,6 +243,13 @@ abstract class BaseMember {
 		}
 
 		return $topRoleWithPerm;
+	}
+
+	/**
+	 * @return bool[]
+	 */
+	public function getMemberPermissions(): array {
+		return $this->memberPermissions;
 	}
 
 	abstract public function getPlayer(): ?Player;

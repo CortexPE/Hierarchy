@@ -25,4 +25,7 @@ dataSource:
     schema: "hierarchy"
     # The maximum number of simultaneous queries
     workerLimit: 2 # Increase the value if you have a slow connection to the MySQL server
+
+# Allow OPs to bypass permission checks
+superAdminOPs: false
 ...

@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\role;
 
 
 use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\exception\HierarchyException;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
 use RuntimeException;
@@ -47,6 +48,8 @@ class RoleManager {
 	protected $dataSource;
 	/** @var int */
 	protected $lastID = PHP_INT_MIN;
+	/** @var array */
+	protected $lookupTable = []; // NAME => ID
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
@@ -56,7 +59,7 @@ class RoleManager {
 	/**
 	 * @param array $roles
 	 *
-	 * @throws RoleCollissionError
+	 * @throws HierarchyException
 	 * @internal Used to load role data from a data source
 	 *
 	 */
@@ -71,6 +74,9 @@ class RoleManager {
 				if($i_role->getPosition() == $roleData["Position"]) {
 					throw new RoleCollissionError("Role '{$i_role->getName()}'({$i_role->getId()}) has a colliding Position");
 				}
+			}
+			if($roleData["ID"] < 0){
+				throw new HierarchyException("Role '{$role->getName()}'({$role->getId()}) has a negative ID");
 			}
 			if(!isset($this->roles[$roleData["ID"]])) {
 				$this->roles[$roleData["ID"]] = $role;
@@ -92,6 +98,7 @@ class RoleManager {
 			throw new RuntimeException("No default role is set");
 		}
 		$this->sortRoles();
+		$this->indexLookupTable();
 		$this->plugin->getLogger()->info("Loaded " . count($this->roles) . " roles");
 	}
 
@@ -99,22 +106,39 @@ class RoleManager {
 		return $this->roles[$id] ?? null;
 	}
 
+	private function indexLookupTable():void {
+		$this->lookupTable = $hasDupes = [];
+		foreach($this->roles as $id => $role){
+			$name = $role->getName();
+			if(isset($this->lookupTable[$name])){
+				$hasDupes[$name] = true;
+
+				$_id = $this->lookupTable[$name];
+				unset($this->lookupTable[$name]);
+				$this->lookupTable["{$name}.{$_id}"] = $_id;
+			}
+
+			$id = $role->getId();
+			if(!isset($hasDupes[$name])){
+				$this->lookupTable[$name] = $id;
+			} else {
+				$this->lookupTable["{$name}.{$id}"] = $id;
+			}
+			$this->lookupTable[$id] = $id;
+		}
+	}
+
 	/**
 	 * Tries to resolve a role by its name.
 	 *
-	 * WARNING: This has undefined behavior when it encounters duplicate role names
+	 * WARNING: This uses the `roleName.ID` (MyRole.4) format for colliding role names
 	 *
 	 * @param string $roleName
 	 *
 	 * @return Role|null
 	 */
 	public function getRoleByName(string $roleName): ?Role {
-		foreach($this->roles as $role){
-			if($role->getName() == $roleName){
-				return $role;
-			}
-		}
-		return null;
+		return $this->getRole($this->lookupTable[$roleName] ?? -1);
 	}
 
 	/**
@@ -151,6 +175,7 @@ class RoleManager {
 			"position" => $newRolePos
 		]);
 		$this->sortRoles();
+		$this->indexLookupTable();
 
 		return $role;
 	}
@@ -170,6 +195,15 @@ class RoleManager {
 			$member->removeRole($role);
 		}
 		unset($this->roles[$role->getId()]);
+		$this->sortRoles();
+		$this->indexLookupTable();
 		$this->dataSource->deleteRoleFromStorage($role);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLookupTable(): array {
+		return $this->lookupTable;
 	}
 }

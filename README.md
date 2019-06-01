@@ -18,7 +18,5 @@
 | Form GUI | ✔️ | ❌ |
 
 ### TODO (sorted by priority):
- - [ ] Cleanup the mess on commands
- - [ ] More user-friendly commands
  - [ ] Minor `IndexedDataSource` & `SQLDataSource` cleanup
  - [ ] (Possibly) A WebGUI extension

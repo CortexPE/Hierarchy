@@ -11,4 +11,6 @@ projects:
         version: ^2.2.0
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^1.0.0
+      - src: CortexPE/Commando/Commando
+        version: ^0.3.1
 ...

@@ -29,7 +29,8 @@ declare(strict_types=1);
 
 namespace CortexPE\Hierarchy;
 
-use CortexPE\Hierarchy\cmd\RoleCommand;
+use CortexPE\Commando\PacketHooker;
+use CortexPE\Hierarchy\command\HierarchyCommand;
 use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\data\JSONDataSource;
 use CortexPE\Hierarchy\data\MySQLDataSource;
@@ -49,10 +50,16 @@ class Hierarchy extends PluginBase {
 	/** @var MemberFactory */
 	private $memberFactory;
 
+	/** @var bool */
+	private $superAdminOPs = false;
+
 	public function onEnable(): void {
 		$this->saveResource("config.yml");
 		(new MessageStore($this->getDataFolder() . "messages.yml"));
 		$conf = $this->getConfig();
+
+		$this->superAdminOPs = $conf->get("superAdminOPs", $this->superAdminOPs);
+
 		switch($conf->getNested("dataSource.type", "sqlite3")) {
 			case "json":
 				$this->dataSource = new JSONDataSource($this, $conf->getNested("dataSource.json"));
@@ -100,9 +107,13 @@ class Hierarchy extends PluginBase {
 		$this->memberFactory = new MemberFactory($this);
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-		$cmd = new RoleCommand($this, "role", "Hierarchy main command");
-
-		$this->getServer()->getCommandMap()->register("hierarchy", $cmd);
+		if(!PacketHooker::isRegistered()) {
+			PacketHooker::register($this);
+		}
+		$this->getServer()->getCommandMap()->register(
+			"hrk",
+			new HierarchyCommand($this, "hrk", "Hierarchy main command", ["role"])
+		);
 	}
 
 	public function onDisable(): void {
@@ -135,5 +146,12 @@ class Hierarchy extends PluginBase {
 	 */
 	public function getMemberFactory(): MemberFactory {
 		return $this->memberFactory;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSuperAdminOPs(): bool {
+		return $this->superAdminOPs;
 	}
 }

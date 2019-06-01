@@ -27,34 +27,19 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\cmd\subcommand;
+namespace CortexPE\Hierarchy\command\subcommand;
 
 
-use CortexPE\Hierarchy\cmd\SubCommand;
-use CortexPE\Hierarchy\Hierarchy;
-use CortexPE\Hierarchy\lang\MessageStore;
-use pocketmine\command\Command;
+use CortexPE\Hierarchy\command\HierarchySubCommand;
 use pocketmine\command\CommandSender;
 
-class FlushCommand extends SubCommand {
-	public function __construct(
-		Hierarchy $hierarchy,
-		Command $parent,
-		string $name,
-		array $aliases,
-		string $usageMessage,
-		string $descriptionMessage
-	) {
-		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.create");
+class FlushCommand extends HierarchySubCommand {
+	protected function prepare(): void {
+		$this->setPermission("hierarchy;hierarchy.flush");
 	}
 
-	public function execute(CommandSender $sender, array $args): void {
-		if(count($args) === 0) {
-			$this->plugin->getDataSource()->flush();
-			$sender->sendMessage(MessageStore::getMessage("cmd.flush.success"));
-		} else {
-			$this->sendUsage($sender);
-		}
+	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
+		$this->plugin->getDataSource()->flush();
+		$this->sendFormattedMessage("cmd.flush.success");
 	}
 }

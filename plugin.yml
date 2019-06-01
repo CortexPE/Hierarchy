@@ -12,12 +12,22 @@ permissions:
     default: "false"
     description: "Main Hierarchy root permission node"
     children:
-      hierarchy.list_roles:
+      hierarchy.flush:
         default: "op"
-        description: "Allows to check role list"
-      hierarchy.user_info:
-        default: "true"
-        description: "Allows to check role and permissions list"
+        description: "Allows to use the flush command to save role configuration to disk"
+      hierarchy.info:
+        default: "op"
+        description: "Allows to check hierarchy information"
+        children:
+          hierarchy.info.list_roles:
+            default: "op"
+            description: "Allows to check role listing"
+          hierarchy.info.member:
+            default: "true"
+            description: "Allows to check member information"
+          hierarchy.info.role:
+            default: "op"
+            description: "Allows to check role information"
       hierarchy.role:
         default: "false"
         description: "Allows role commands"
@@ -40,18 +50,9 @@ permissions:
           hierarchy.role.give:
             default: "op"
             description: "Allows the giving of roles"
-          hierarchy.role.remove:
+          hierarchy.role.take:
             default: "op"
-            description: "Allows the sender to remove roles"
-          hierarchy.role.options:
-            default: "op"
-            description: "Intermediate form for choosing players or permissions for a group"
-          hierarchy.role.list_permissions:
-            default: "op"
-            description: "Allows to list the permissions for a role"
-          hierarchy.role.list_players:
-            default: "op"
-            description: "Allows to list the players with a role"
+            description: "Allows the sender to take roles"
       hierarchy.member:
         default: "false"
         description: "Allows member commands"

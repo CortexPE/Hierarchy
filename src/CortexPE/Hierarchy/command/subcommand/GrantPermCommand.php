@@ -27,37 +27,22 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\cmd\subcommand;
+namespace CortexPE\Hierarchy\command\subcommand;
 
 
-use CortexPE\Hierarchy\cmd\SubCommand;
-use CortexPE\Hierarchy\Hierarchy;
-use CortexPE\Hierarchy\lang\MessageStore;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
+use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
+use pocketmine\permission\Permission;
 
-class CreateRoleCommand extends SubCommand {
-	public function __construct(
-		Hierarchy $hierarchy,
-		Command $parent,
-		string $name,
-		array $aliases,
-		string $usageMessage,
-		string $descriptionMessage
-	) {
-		parent::__construct($hierarchy, $parent, $name, $aliases, $usageMessage, $descriptionMessage);
-		$this->setPermission("hierarchy.role.create");
+class GrantPermCommand extends ACPermissionModifierCommand {
+	protected const CHILD_PERMISSION = "add_permission";
+	protected const MESSAGE_ROOT = "grantperm";
+
+	protected function doOperationOnMember(BaseMember $member, Permission $permission): void {
+		$member->addMemberPermission($permission);
 	}
 
-	public function execute(CommandSender $sender, array $args): void {
-		if(count($args) === 1) {
-			$newRole = $this->plugin->getRoleManager()->createRole($args[0]);
-			$sender->sendMessage(MessageStore::getMessage("cmd.create.success", [
-				"role" => $newRole->getName(),
-				"role_id" => $newRole->getId()
-			]));
-		} else {
-			$this->sendUsage($sender);
-		}
+	protected function doOperationOnRole(Role $role, Permission $permission): void {
+		$role->addPermission($permission);
 	}
 }
