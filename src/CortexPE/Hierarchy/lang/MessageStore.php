@@ -75,8 +75,8 @@ class MessageStore {
 		"cmd.info.member.m_perm_entry" => "&e - {color}{permission}",
 
 		"cmd.info.role.header" => "&9 ----- Role Info for &b{role} ({role_id})&9 ----- ",
-		"cmd.info.role.position" => "&e&lPosition: {position}",
-		"cmd.info.role.default" => "&e&lDefault Role: {isDefault}",
+		"cmd.info.role.position" => "&e&lPosition: &r&6{position}",
+		"cmd.info.role.default" => "&e&lDefault Role: &r{isDefault}",
 		"cmd.info.role.perms_header" => "&e&lPermissions:",
 		"cmd.info.role.perm_entry" => "&e - {color}{permission}",
 		"cmd.info.role.members_header" => "&e&lOnline Members ({count}):",
