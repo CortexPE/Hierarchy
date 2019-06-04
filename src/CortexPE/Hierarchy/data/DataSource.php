@@ -56,8 +56,8 @@ abstract class DataSource {
 	abstract public function initialize(): void;
 
 	protected function postInitialize(array $roles): void {
-		$this->plugin->continueStartup();
 		$this->plugin->getRoleManager()->loadRoles($roles);
+		$this->plugin->continueStartup();
 	}
 
 	/**

@@ -18,5 +18,7 @@
 | Form GUI | ✔️ | ❌ |
 
 ### TODO (sorted by priority):
+ - [ ] PurePerms data migrator (probably on another plugin)
+ - [ ] Documentation, documentation, DOCUMENTATION!
  - [ ] Minor `IndexedDataSource` & `SQLDataSource` cleanup
  - [ ] (Possibly) A WebGUI extension

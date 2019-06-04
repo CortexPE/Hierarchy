@@ -62,6 +62,12 @@ class MessageStore {
 		"cmd.grantperm.role.success" => "&aSuccessfully added the permission '{permission}' to Role {role}({role_id})",
 		"cmd.grantperm.member.success" => "&aSuccessfully added the permission '{permission}' to {member}",
 
+		"cmd.info.menu_form.description" => "Choose target:",
+		"cmd.info.member_form.instruction" => "Enter member to get info from:",
+		"cmd.info.member_form.opt_text" => "Member Name",
+		"cmd.info.role_form.instruction" => "Select role to get info from:",
+		"cmd.info.role_form.opt_text" => "Select Role",
+
 		"cmd.info.member.header" => "&9 ----- Member Info for '&b{member}&9' ----- ",
 		"cmd.info.member.roles_header" => "&e&lRoles:",
 		"cmd.info.member.role_entry" => "&e - {role} ({role_id})",
@@ -75,7 +81,7 @@ class MessageStore {
 		"cmd.info.role.perm_entry" => "&e - {color}{permission}",
 		"cmd.info.role.members_header" => "&e&lOnline Members ({count}):",
 		"cmd.info.role.member_entry" => "&e - {member}",
-		"cmd.info.role.no_online_members" => "&e - {member}",
+		"cmd.info.role.no_online_members" => "&e - &cNo online members",
 
 		"cmd.info.role_list.header" => "&9&lAvailable Roles ({count}):",
 		"cmd.info.role_list.entry" => "&e - {role} ({role_id})",

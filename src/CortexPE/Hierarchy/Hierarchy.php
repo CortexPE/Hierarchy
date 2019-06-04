@@ -41,6 +41,7 @@ use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;
+use function strtolower;
 
 class Hierarchy extends PluginBase {
 	/** @var DataSource */
@@ -96,6 +97,10 @@ class Hierarchy extends PluginBase {
 		}
 
 		DefaultPermissions::registerCorePermissions();
+
+		$this->roleManager = new RoleManager($this);
+		$this->memberFactory = new MemberFactory($this);
+
 		$this->dataSource->initialize();
 	}
 
@@ -103,16 +108,14 @@ class Hierarchy extends PluginBase {
 	 * @internal used to continue startup after the data source has finished initialization
 	 */
 	public function continueStartup(): void {
-		$this->roleManager = new RoleManager($this);
-		$this->memberFactory = new MemberFactory($this);
-
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+
 		if(!PacketHooker::isRegistered()) {
 			PacketHooker::register($this);
 		}
 		$this->getServer()->getCommandMap()->register(
-			"hrk",
-			new HierarchyCommand($this, "hrk", "Hierarchy main command", ["role"])
+			strtolower($this->getName()),
+			new HierarchyCommand($this, "hrk", "Hierarchy main command")
 		);
 	}
 

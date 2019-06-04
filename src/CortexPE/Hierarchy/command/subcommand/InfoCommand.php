@@ -30,20 +30,87 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\command\subcommand;
 
 
+use CortexPE\Commando\BaseCommand;
 use CortexPE\Hierarchy\command\args\InfoTargetEnumArgument;
 use CortexPE\Hierarchy\command\args\MemberArgument;
 use CortexPE\Hierarchy\command\args\RoleArgument;
 use CortexPE\Hierarchy\command\HierarchySubCommand;
+use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
+use dktapps\pmforms\CustomForm;
+use dktapps\pmforms\CustomFormResponse;
+use dktapps\pmforms\element\Dropdown;
+use dktapps\pmforms\element\Input;
+use dktapps\pmforms\element\Label;
+use dktapps\pmforms\MenuForm;
+use dktapps\pmforms\MenuOption;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use function array_map;
 use function count;
 use function implode;
 
-class InfoCommand extends HierarchySubCommand {
+class InfoCommand extends HierarchySubCommand implements FormedCommand {
+	/** @var array */
+	private $opts = [];
+
+	public function __construct(Hierarchy $plugin, string $name, string $description = "", array $aliases = []) {
+		parent::__construct($plugin, $name, $description, $aliases);
+		$roles = [];
+		$roles_i = [];
+		foreach($this->roleManager->getRoles() as $role) {
+			$roles[] = "{$role->getName()} ({$role->getId()})";
+			$roles_i[] = $role->getId();
+		}
+		$this->opts = [
+			[
+				new MenuOption("Member"),
+				InfoTargetEnumArgument::TARGET_MEMBER,
+				[
+					new Label("instruction", MessageStore::getMessage("cmd.info.member_form.instruction")),
+					new Input("member", MessageStore::getMessage("cmd.info.member_form.opt_text"))
+				],
+				function (Player $player, CustomFormResponse $response): void {
+					$this->setCurrentSender($player);
+					$this->onRun($player, $this->getName(), [
+						"targetType" => InfoTargetEnumArgument::TARGET_MEMBER,
+						"target" => $this->memberFactory->getMember($response->getString("member"))
+					]);
+				}
+			],
+			[
+				new MenuOption("Role"),
+				InfoTargetEnumArgument::TARGET_ROLE,
+				[
+					new Label("instruction", MessageStore::getMessage("cmd.info.role_form.instruction")),
+					new Dropdown(
+						"roles",
+						MessageStore::getMessage("cmd.info.role_form.opt_text"),
+						$roles
+					)
+				],
+				function (Player $player, CustomFormResponse $response) use ($roles, $roles_i): void {
+					$this->setCurrentSender($player);
+					$this->onRun($player, $this->getName(), [
+						"targetType" => InfoTargetEnumArgument::TARGET_ROLE,
+						"target" => $this->roleManager->getRole($roles_i[$response->getInt("roles")])
+					]);
+				}
+			],
+			[
+				new MenuOption("Role List"),
+				InfoTargetEnumArgument::TARGET_ROLE_LIST,
+				null,
+				null
+			],
+		];
+	}
+
 	protected function prepare(): void {
-		$this->registerArgument(0, new InfoTargetEnumArgument("targetType", false));
+		$this->registerArgument(0, new InfoTargetEnumArgument("targetType", true));
 		$this->registerArgument(1, new MemberArgument("target", true));
 		$this->registerArgument(1, new RoleArgument("target", true));
 		$this->setPermission(implode(";", [
@@ -56,6 +123,16 @@ class InfoCommand extends HierarchySubCommand {
 	}
 
 	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
+		if($this->isSenderInGameNoArguments($args)) {
+			$this->sendForm();
+
+			return;
+		} elseif(count($args) < 1) {
+			$this->sendError(BaseCommand::ERR_INSUFFICIENT_ARGUMENTS);
+
+			return;
+		}
+
 		if($args["targetType"] === InfoTargetEnumArgument::TARGET_MEMBER && isset($args["target"])) {
 			if($sender->hasPermission("hierarchy.info.member")) {
 				/** @var BaseMember $target */
@@ -133,6 +210,36 @@ class InfoCommand extends HierarchySubCommand {
 			}
 		} else {
 			$this->sendUsage();
+		}
+	}
+
+	public function sendForm(): void {
+		if($this->currentSender instanceof Player) {
+			$this->currentSender->sendForm(
+				new MenuForm(
+					$this->plugin->getName(),
+					MessageStore::getMessage("cmd.info.menu_form.description"),
+					array_map(function (array $opt): MenuOption {
+						return $opt[0];
+					}, $this->opts),
+					function (Player $player, int $selectedOption): void {
+						if($this->opts[$selectedOption][2] !== null) {
+							$player->sendForm(
+								new CustomForm(
+									$this->plugin->getName(),
+									$this->opts[$selectedOption][2],
+									$this->opts[$selectedOption][3]
+								)
+							);
+						} else {
+							$this->setCurrentSender($player);
+							$this->onRun($player, $this->getName(), [
+								"targetType" => $this->opts[$selectedOption][1]
+							]);
+						}
+					}
+				)
+			);
 		}
 	}
 }
