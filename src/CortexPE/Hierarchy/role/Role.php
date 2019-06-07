@@ -75,7 +75,7 @@ class Role {
 				continue;
 			}
 
-			$invert = ($permission{0} == "-");
+			$invert = (($permission{0} ?? "") == "-");
 			$this->permissions[($permission = !$invert ? $permission : substr($permission, 1))] = !$invert;
 
 			// do checks after everything has finished starting up
