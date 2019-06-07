@@ -235,6 +235,7 @@ abstract class SQLDataSource extends DataSource {
 
 	public function shutdown(): void {
 		if($this->db instanceof DataConnector) {
+			$this->db->waitAll();
 			$this->db->close();
 		}
 	}
