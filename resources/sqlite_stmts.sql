@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS Roles
 (
     ID        INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-    Position  INTEGER      NOT NULL UNIQUE,
+    Position  INTEGER      NOT NULL,
     Name      VARCHAR(100) NOT NULL DEFAULT 'new role',
     isDefault BOOLEAN      NOT NULL DEFAULT 0
 );
