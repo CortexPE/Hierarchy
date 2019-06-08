@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\member;
 
 
 use CortexPE\Hierarchy\Hierarchy;
+use pocketmine\OfflinePlayer;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -51,7 +52,7 @@ class MemberFactory {
 	}
 
 	/**
-	 * @param Player|string $player
+	 * @param Player|OfflinePlayer|string $player
 	 * @param bool          $loadData
 	 * @param callable|null $onLoad
 	 *
@@ -60,9 +61,7 @@ class MemberFactory {
 	public function getMember($player, bool $loadData = true, ?callable $onLoad = null): BaseMember {
 		$newMember = false;
 		if(!($player instanceof Player)) {
-			if(($p = Server::getInstance()->getPlayerExact($player)) instanceof Player) {
-				$player = $p;
-			}
+			$player = Server::getInstance()->getOfflinePlayer((string)$player);
 		}
 		if($player instanceof Player) {
 			if(!isset($this->onlineMembers[($n = $player->getId())])) {
@@ -72,7 +71,7 @@ class MemberFactory {
 			$m = $this->onlineMembers[$n];
 		} else {
 			if(!isset($this->offlineMembers[$player])) {
-				$this->offlineMembers[$player] = new OfflineMember($this->plugin, $player);
+				$this->offlineMembers[$player] = new OfflineMember($this->plugin, $player->getName());
 				$newMember = true;
 			}
 			$m = $this->offlineMembers[$player];
@@ -83,10 +82,8 @@ class MemberFactory {
 					($onLoad)($m);
 				}
 			});
-		} else {
-			if($onLoad !== null) {
-				($onLoad)($m);
-			}
+		} elseif($onLoad !== null) {
+			($onLoad)($m);
 		}
 
 		return $m;
