@@ -41,4 +41,9 @@ class SQLiteDataSource extends SQLDataSource {
 			"file" => $plugin->getDataFolder() . $config["dbPath"]
 		];
 	}
+
+	public function shiftRoles(int $offset, int $amount = 1): void {
+		parent::shiftRoles($offset, $amount);
+		$this->db->executeChange("hierarchy.role.position.invertSQLiteHack");
+	}
 }

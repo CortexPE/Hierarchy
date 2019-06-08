@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS Roles
 (
     ID        INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-    Position  INTEGER      NOT NULL,
+    Position  INTEGER      NOT NULL UNIQUE,
     Name      VARCHAR(100) NOT NULL DEFAULT 'new role',
     isDefault BOOLEAN      NOT NULL DEFAULT 0
 );
@@ -96,15 +96,15 @@ FROM Roles;
 -- #    }
 -- #    { create
 -- #      :name string
+-- #      :position int
 INSERT INTO Roles (Position, Name)
-VALUES (IFNULL((SELECT Max(ID) FROM Roles), 0),
-        :name);
+VALUES (:position, :name);
 -- #    }
 -- #    { createDefault
 -- #      :name string
+-- #      :position int
 INSERT INTO Roles (Position, Name, isDefault)
-VALUES (IFNULL((SELECT Max(ID) FROM Roles), 0),
-        :name, 1);
+VALUES (:position, :name, 1);
 -- #    }
 -- #    { delete
 -- #      :role_id int
@@ -112,11 +112,19 @@ DELETE
 FROM Roles
 WHERE ID = :role_id;
 -- #    }
--- #    { bumpPosition
--- #      :role_id int
+-- #    { position
+-- #      { shift
+-- #        :offset int
+-- #        :amount int
 UPDATE Roles
-SET Position = Position + 1
-WHERE ID = :role_id;
+SET Position = -(Position + :amount)
+WHERE Position > :offset;
+-- #      }
+-- #      { invertSQLiteHack
+UPDATE Roles
+SET Position = -Position
+WHERE Position < 0;
+-- #      }
 -- #    }
 -- #    { permissions
 -- #      { get

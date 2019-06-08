@@ -75,7 +75,7 @@ class RoleManager {
 					throw new RoleCollissionError("Role '{$i_role->getName()}'({$i_role->getId()}) has a colliding Position");
 				}
 			}
-			if($roleData["ID"] < 0){
+			if($roleData["ID"] < 0) {
 				throw new HierarchyException("Role '{$role->getName()}'({$role->getId()}) has a negative ID");
 			}
 			if(!isset($this->roles[$roleData["ID"]])) {
@@ -106,11 +106,11 @@ class RoleManager {
 		return $this->roles[$id] ?? null;
 	}
 
-	private function indexLookupTable():void {
+	private function indexLookupTable(): void {
 		$this->lookupTable = $hasDupes = [];
-		foreach($this->roles as $id => $role){
+		foreach($this->roles as $id => $role) {
 			$name = $role->getName();
-			if(isset($this->lookupTable[$name])){
+			if(isset($this->lookupTable[$name])) {
 				$hasDupes[$name] = true;
 
 				$_id = $this->lookupTable[$name];
@@ -119,7 +119,7 @@ class RoleManager {
 			}
 
 			$id = $role->getId();
-			if(!isset($hasDupes[$name])){
+			if(!isset($hasDupes[$name])) {
 				$this->lookupTable[$name] = $id;
 			} else {
 				$this->lookupTable["{$name}.{$id}"] = $id;
@@ -164,13 +164,13 @@ class RoleManager {
 	 */
 	public function createRole(string $name = "new role"): Role {
 		$newRolePos = ($defRolePos = $this->defaultRole->getPosition()) + 1;
-		$this->dataSource->createRoleOnStorage($name, $this->lastID += 1, $newRolePos);
 		foreach($this->roles as $role) {
 			if($role->getPosition() > $defRolePos) {
 				$role->bumpPosition();
-				$this->dataSource->bumpPosition($role);
 			}
 		}
+		$this->dataSource->shiftRoles($defRolePos);
+		$this->dataSource->createRoleOnStorage($name, $this->lastID += 1, $newRolePos);
 		$role = $this->roles[$this->lastID] = new Role($this->plugin, $this->lastID, $name, [
 			"position" => $newRolePos
 		]);

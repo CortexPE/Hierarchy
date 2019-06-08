@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS Roles
 CREATE TABLE IF NOT EXISTS RolePermissions
 (
     RoleID     INTEGER NOT NULL,
-    Permission TEXT    NOT NULL,
+    Permission VARCHAR(128)    NOT NULL,
     PRIMARY KEY (RoleID, Permission)
 );
 -- #    }
@@ -94,15 +94,15 @@ FROM Roles;
 -- #    }
 -- #    { create
 -- #      :name string
+-- #      :position int
 INSERT INTO Roles (Position, Name)
-SELECT IFNULL(Max(ID), 0), :name
-FROM Roles;
+VALUES (:position, :name);
 -- #    }
 -- #    { createDefault
 -- #      :name string
+-- #      :position int
 INSERT INTO Roles (Position, Name, isDefault)
-SELECT IFNULL(Max(ID), 0), :name, 1
-FROM Roles;
+VALUES (:position, :name, 1);
 -- #    }
 -- #    { delete
 -- #      :role_id int
@@ -110,11 +110,15 @@ DELETE
 FROM Roles
 WHERE ID = :role_id;
 -- #    }
--- #    { bumpPosition
--- #      :role_id int
+-- #    { position
+-- #      { shift
+-- #        :offset int
+-- #        :amount int
 UPDATE Roles
-SET Position = Position + 1
-WHERE ID = :role_id;
+SET Position = Position + :amount
+WHERE Position > :offset
+ORDER BY Position DESC;
+-- #      }
 -- #    }
 -- #    { permissions
 -- #      { get

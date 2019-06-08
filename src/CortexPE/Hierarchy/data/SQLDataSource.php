@@ -76,10 +76,12 @@ abstract class SQLDataSource extends DataSource {
 			if(empty($roles)) {
 				// create default role & add default permissions
 				yield $this->asyncInsert("hierarchy.role.createDefault", [
-					"name" => "Member"
+					"name" => "Member",
+					"position" => 0
 				]);
 				yield $this->asyncInsert("hierarchy.role.create", [
-					"name" => "Operator"
+					"name" => "Operator",
+					"position" => 1
 				]);
 				$roles = yield $this->asyncSelect("hierarchy.role.list");
 				$pMgr = PermissionManager::getInstance();
@@ -217,7 +219,8 @@ abstract class SQLDataSource extends DataSource {
 
 	public function createRoleOnStorage(string $name, int $id, int $position): void {
 		$this->db->executeInsert("hierarchy.role.create", [
-			"name" => $name
+			"name" => $name,
+			"position" => $position
 		]);
 	}
 
@@ -227,10 +230,15 @@ abstract class SQLDataSource extends DataSource {
 		]);
 	}
 
-	public function bumpPosition(Role $role): void {
-		$this->db->executeChange("hierarchy.role.bumpPosition", [
-			"role_id" => $role->getId()
+	public function shiftRoles(int $offset, int $amount = 1): void {
+		$this->db->executeChange("hierarchy.role.position.shift", [
+			"offset" => $offset,
+			"amount" => $amount
 		]);
+	}
+
+	public function unshiftRoles(int $offset, int $amount = 1): void {
+		$this->shiftRoles($offset, -$amount);
 	}
 
 	public function shutdown(): void {

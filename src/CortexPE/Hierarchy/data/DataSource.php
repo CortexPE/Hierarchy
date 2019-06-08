@@ -122,11 +122,20 @@ abstract class DataSource {
 	abstract public function deleteRoleFromStorage(Role $role): void;
 
 	/**
-	 * @param Role $role
+	 * @param int $offset
+	 * @param int $amount
 	 *
-	 * @internal Add one to role position
+	 * @internal Shift role positions
 	 */
-	abstract public function bumpPosition(Role $role): void;
+	abstract public function shiftRoles(int $offset, int $amount = 1): void;
+
+	/**
+	 * @param int $offset
+	 * @param int $amount
+	 *
+	 * @internal Unshift role positions
+	 */
+	abstract public function unshiftRoles(int $offset, int $amount = 1): void;
 
 	/**
 	 * Gracefully shutdown the data source
