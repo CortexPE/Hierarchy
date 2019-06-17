@@ -211,7 +211,7 @@ abstract class SQLDataSource extends DataSource {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
-		$this->db->executeInsert("hierarchy.role.permissions.remove", [
+		$this->db->executeChange("hierarchy.role.permissions.remove", [
 			"role_id" => $role->getId(),
 			"permission" => $permission
 		]);
@@ -225,7 +225,7 @@ abstract class SQLDataSource extends DataSource {
 	}
 
 	public function deleteRoleFromStorage(Role $role): void {
-		$this->db->executeInsert("hierarchy.role.delete", [
+		$this->db->executeChange("hierarchy.role.delete", [
 			"role_id" => $role->getId()
 		]);
 	}
