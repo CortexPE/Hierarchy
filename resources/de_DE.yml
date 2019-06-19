@@ -1,0 +1,55 @@
+---
+# German Language file.
+cmd.createrole.success: '&aGruppe ''{role}'' mit der ID: {role_id} wurde erfolgreich erstellt!'
+cmd.deleterole.fail_role_default: '&eYDu kannst die Standardgruppe nicht löschen.'
+cmd.deleterole.success: '&eGruppe {role} ({role_id}) erfolgreich gelöscht!'
+cmd.denyperm.form.choose_type: Bitte wähle den Zieltyp dem du Berechtigungen entziehen möchtest von den unten gelisteten Optionen.
+cmd.denyperm.form.type_role: Gruppe
+cmd.denyperm.form.type_member: Mitglied
+cmd.denyperm.role.success: '&eDie Berechting ''{permission}'' wurde erfolgreich für die Gruppe {role}({role_id}) verboten.'
+cmd.denyperm.member.success: '&eDie Berechtigung ''{permission}'' wurde erfolgreich von {member} entzogen.'
+cmd.flush.success: '&aGruppen Daten wurden erfolgreich gespeichert.'
+cmd.giverole.success: '&aGruppe ''{role}'' an {member} vergeben.'
+cmd.giverole.has_role: '&c{member} hat bereits die Gruppe ''{role}''.'
+cmd.giverole.default: '&c{member} hat bereits die Standard Gruppe.'
+cmd.grantperm.form.choose_type: Bitte wähle den Zieltyp dem du Berechtigungen gewähren möchtest von den unten gelisteten Optionen.
+cmd.grantperm.form.type_role: Gruppe
+cmd.grantperm.form.type_member: Mitglied
+cmd.grantperm.role.success: '&aBerechtigung ''{permission}'' wurde erfolgreich zu der Gruppe {role}({role_id}) hinzugefügt.'
+cmd.grantperm.member.success: '&aBerechtigung ''{permission}'' erfolgreich zu {member} hinzugefügt.'
+cmd.info.menu_form.description: 'Wähle Ziel:'
+cmd.info.member_form.instruction: 'Gebe einen Spieler an um Informationen zu erhalten:'
+cmd.info.member_form.opt_text: Spieler Name
+cmd.info.role_form.instruction: 'Gebe eine Gruppe ein umd Information darüber zu erhalten:'
+cmd.info.role_form.opt_text: Wähle Gruppe
+cmd.info.member.header: '&9 ----- Nutzer Info für ''&b{member}&9'' ----- '
+cmd.info.member.roles_header: '&e&lGruppen:'
+cmd.info.member.role_entry: '&e - {role} ({role_id})'
+cmd.info.member.m_perms_header: '&e&lMitglied Berechtigungen überschreiben:'
+cmd.info.member.m_perm_entry: '&e - {color}{permission}'
+cmd.info.role.header: '&9 ----- Gruppen Info für &b{role} ({role_id})&9 ----- '
+cmd.info.role.position: '&e&lPosition: &r&6{position}'
+cmd.info.role.default: '&e&lStandard Gruppe: &r{isDefault}'
+cmd.info.role.perms_header: '&e&lBerechtigungen:'
+cmd.info.role.perm_entry: '&e - {color}{permission}'
+cmd.info.role.members_header: '&e&lMitglieder Online ({count}):'
+cmd.info.role.member_entry: '&e - {member}'
+cmd.info.role.no_online_members: '&e - &cKeine Mitglieder Online'
+cmd.info.role_list.header: '&9&lVerfügbare Gruppen ({count}):'
+cmd.info.role_list.entry: '&e - {role} ({role_id})'
+cmd.revokeperm.form.choose_type: Bitte wähle den Zieltyp zum entfernen von Berechtigungen von den Optionen unten aus.
+cmd.revokeperm.form.type_role: Gruppe
+cmd.revokeperm.form.type_member: Mitglied
+cmd.revokeperm.role.success: '&eBerechtigung ''{permission}'' wurde erfolgreich von der Gruppe {role}({role_id}) entfernt.'
+cmd.revokeperm.member.success: '&eBerechtigung ''{permission}'' wurde {member} erfolgreich entzogen.'
+cmd.takerole.success: '&eGruppe ''{role}'' entfernt von {member}.'
+cmd.takerole.no_role: '&c{member} besitzt nicht die Gruppe ''{role}'''
+cmd.takerole.default: '&cDie Standard Gruppe kann nicht von {member} entfernt werden'
+err.target_higher_hrk: '&cDu kannst diesen Command nicht an ''{target}'' nutzen, da er/sie eine höhere Gruppenfolge hat.'
+err.unknown_permission: '&cUnbekannte Berechtigung.'
+err.unknown_role: '&cGruppe nicht gefunden. Für eine komplette Liste der Gruppen führe ''/hrk info role_list'' aus.'
+err.no_permissions: '&cDiese Gruppe hat keine Berechtigungen.'
+err.no_roles: '&cEs wurden noch keine Gruppen eingestellt.'
+err.no_roles_for_action: '&cEs sind keine rollen für diese Aktion verfügbar.'
+err.player_only: '&cDieser Command funktioniert nur als Spieler.'
+...
