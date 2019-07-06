@@ -47,6 +47,7 @@ use dktapps\pmforms\element\Label;
 use dktapps\pmforms\MenuForm;
 use dktapps\pmforms\MenuOption;
 use pocketmine\command\CommandSender;
+use pocketmine\permission\PermissionManager;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use function array_map;
@@ -106,6 +107,12 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 				null,
 				null
 			],
+			[
+				new MenuOption("Permission List"),
+				InfoTargetEnumArgument::TARGET_PERM_LIST,
+				null,
+				null
+			],
 		];
 	}
 
@@ -117,6 +124,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 			"hierarchy",
 			"hierarchy.info",
 			"hierarchy.info.list_roles",
+			"hierarchy.info.list_perms",
 			"hierarchy.info.member",
 			"hierarchy.info.role"
 		]));
@@ -203,6 +211,20 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					$this->sendFormattedMessage("cmd.info.role_list.entry", [
 						"role" => $role->getName(),
 						"role_id" => $role->getId(),
+					]);
+				}
+			} else {
+				$this->sendFormattedMessage("err.no_roles");
+			}
+		} elseif($args["targetType"] === InfoTargetEnumArgument::TARGET_PERM_LIST) {
+			$list = PermissionManager::getInstance()->getPermissions();
+			$this->sendFormattedMessage("cmd.info.perm_list.header", [
+				"count" => ($c = count($list))
+			]);
+			if($c > 0) {
+				foreach($list as $perm) {
+					$this->sendFormattedMessage("cmd.info.perm_list.entry", [
+						"permission" => $perm->getName(),
 					]);
 				}
 			} else {

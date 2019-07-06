@@ -37,10 +37,12 @@ class InfoTargetEnumArgument extends StringEnumArgument {
 	public const TARGET_MEMBER = "member";
 	public const TARGET_ROLE = "role";
 	public const TARGET_ROLE_LIST = "role_list";
+	public const TARGET_PERM_LIST = "perm_list";
 	protected const VALUES = [
 		"member" => self::TARGET_MEMBER,
 		"role" => self::TARGET_ROLE,
 		"role_list" => self::TARGET_ROLE_LIST,
+		"perm_list" => self::TARGET_PERM_LIST,
 	];
 
 	public function parse(string $argument, CommandSender $sender) {

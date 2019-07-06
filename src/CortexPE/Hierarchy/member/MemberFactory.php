@@ -30,18 +30,17 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\member;
 
 
+use CortexPE\Hierarchy\data\SQLDataSource;
 use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
-use pocketmine\Server;
+use function is_string;
 
 class MemberFactory {
 	/** @var Hierarchy */
 	protected $plugin;
 	/** @var Member[] */
 	protected $onlineMembers = [];
-	/** @var OfflineMember[] */
-	protected $offlineMembers = [];
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
@@ -59,10 +58,10 @@ class MemberFactory {
 	 * @return BaseMember
 	 */
 	public function getMember($player, bool $loadData = true, ?callable $onLoad = null): BaseMember {
-		$newMember = false;
-		if(!($player instanceof Player)) {
-			$player = Server::getInstance()->getOfflinePlayer((string)$player);
+		if(is_string($player)) {
+			$player = $this->plugin->getServer()->getOfflinePlayer((string)$player);
 		}
+		$newMember = false;
 		if($player instanceof Player) {
 			if(!isset($this->onlineMembers[($n = $player->getId())])) {
 				$this->onlineMembers[$n] = new Member($this->plugin, $player);
@@ -70,18 +69,24 @@ class MemberFactory {
 			}
 			$m = $this->onlineMembers[$n];
 		} else {
-			if(!isset($this->offlineMembers[$player])) {
-				$this->offlineMembers[$player] = new OfflineMember($this->plugin, $player->getName());
-				$newMember = true;
-			}
-			$m = $this->offlineMembers[$player];
+			$m = new OfflineMember($this->plugin, $player->getName());
+			$newMember = true;
 		}
 		if($loadData && $newMember) {
-			$this->plugin->getDataSource()->loadMemberData($m, function () use ($m, $onLoad) {
+			($ds = $this->plugin->getDataSource())->loadMemberData($m, function () use ($m, $onLoad) {
 				if($onLoad !== null) {
 					($onLoad)($m);
 				}
 			});
+			if($m instanceof OfflinePlayer && $ds instanceof SQLDataSource){
+				/**
+				 * TODO:
+				 *  Make this better...
+				 *  the sole reason this hack exists is because of the typical usage of OfflineMember,
+				 *  data has to be manipulated right away therefore it has to be available right away.
+				 */
+				$ds->getDB()->waitAll();
+			}
 		} elseif($onLoad !== null) {
 			($onLoad)($m);
 		}

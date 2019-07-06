@@ -251,4 +251,11 @@ abstract class SQLDataSource extends DataSource {
 	public function flush(): void {
 		// noop
 	}
+
+	/**
+	 * @return DataConnector
+	 */
+	public function getDB(): DataConnector {
+		return $this->db;
+	}
 }

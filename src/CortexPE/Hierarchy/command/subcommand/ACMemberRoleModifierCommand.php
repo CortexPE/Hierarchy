@@ -86,7 +86,7 @@ abstract class ACMemberRoleModifierCommand extends HierarchySubCommand implement
 			];
 
 			if(!$role->isDefault()) {
-				$this->doOperationOnMember($member, $role, !($args["temporary"] ?? false), $formats);
+				$this->doOperationOnMember($member, $role, ($args["temporary"] ?? false), $formats);
 			} else {
 				$this->sendFormattedMessage("cmd." . static::MESSAGE_ROOT . ".default", $formats);
 			}

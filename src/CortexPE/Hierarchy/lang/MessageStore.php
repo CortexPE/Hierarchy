@@ -86,6 +86,9 @@ class MessageStore {
 		"cmd.info.role_list.header" => "&9&lAvailable Roles ({count}):",
 		"cmd.info.role_list.entry" => "&e - {role} ({role_id})",
 
+		"cmd.info.perm_list.header" => "&9&lAvailable Permissions ({count}):",
+		"cmd.info.perm_list.entry" => "&e - {permission}",
+
 		"cmd.revokeperm.form.choose_type" => "Please choose the target type you'd like to remove permissions from, from the options below",
 		"cmd.revokeperm.form.type_role" => "Role",
 		"cmd.revokeperm.form.type_member" => "Member",

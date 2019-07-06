@@ -51,6 +51,10 @@ class RoleArgument extends RawStringArgument {
 		return $this->roleMgr->getRoleByName($argument);
 	}
 
+	public function canParse(string $testString, CommandSender $sender): bool {
+		return $this->parse($testString, $sender) !== null;
+	}
+
 	public function getTypeName(): string {
 		return "role";
 	}

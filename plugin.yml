@@ -22,6 +22,9 @@ permissions:
           hierarchy.info.list_roles:
             default: "op"
             description: "Allows to check role listing"
+          hierarchy.info.list_perms:
+            default: "op"
+            description: "Allows to check permission listing"
           hierarchy.info.member:
             default: "true"
             description: "Allows to check member information"
