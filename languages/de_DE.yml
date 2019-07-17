@@ -1,7 +1,7 @@
 ---
 # German Language file.
 cmd.createrole.success: '&aRolle ''{role}'' mit der ID: {role_id} wurde erfolgreich erstellt!'
-cmd.deleterole.fail_role_default: '&eYDu kannst die Standardrolle nicht löschen.'
+cmd.deleterole.fail_role_default: '&eYDu kannst die Standard Rolle nicht löschen.'
 cmd.deleterole.success: '&eRolle {role} ({role_id}) erfolgreich gelöscht!'
 cmd.denyperm.form.choose_type: Bitte wähle den Zieltyp dem du Berechtigungen entziehen möchtest von den unten gelisteten Optionen.
 cmd.denyperm.form.type_role: Rolle
