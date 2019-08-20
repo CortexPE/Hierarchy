@@ -19,7 +19,7 @@ dataSource:
   # These settings will only apply when you chose mysql as dataSource type
   mysql:
     host: "localhost"
-    user: "hierarchy"
+    username: "hierarchy"
     password: "youShallNotPass"
     database: "hierarchy"
     schema: "hierarchy"
