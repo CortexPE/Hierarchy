@@ -81,45 +81,49 @@ abstract class ACPermissionModifierCommand extends HierarchySubCommand implement
 			return;
 		}
 
-		/** @var BaseMember|Role|null $target */
-		$target = $args["target"];
 		/** @var Permission|null $permission */
 		$permission = $args["permission"];
 
 		if($permission instanceof Permission) {
 			switch($args["targetType"] ?? "undefined") {
 				case TargetEnumArgument::TARGET_MEMBER:
-					if($target instanceof BaseMember) {
-						if($sender->hasPermission("hierarchy.member." . static::CHILD_PERMISSION)) {
-							if($this->doHierarchyPositionCheck($target, $permission)) {
-								$this->doOperationOnMember($target, $permission);
-								$this->sendFormattedMessage("cmd." . static::MESSAGE_ROOT . ".member.success", [
-									"permission" => $permission->getName(),
-									"member" => $target->getName()
-								]);
+					foreach($args["target"] as $target){
+						if($target instanceof BaseMember) {
+							if($sender->hasPermission("hierarchy.member." . static::CHILD_PERMISSION)) {
+								if($this->doHierarchyPositionCheck($target, $permission)) {
+									$this->doOperationOnMember($target, $permission);
+									$this->sendFormattedMessage("cmd." . static::MESSAGE_ROOT . ".member.success", [
+										"permission" => $permission->getName(),
+										"member" => $target->getName()
+									]);
+								} else {
+									$this->sendFormattedMessage("err.target_higher_hrk");
+								}
 							} else {
-								$this->sendFormattedMessage("err.target_higher_hrk");
+								$this->sendPermissionError();
 							}
-						} else {
-							$this->sendPermissionError();
+							break;
 						}
 					}
 					break;
 				case TargetEnumArgument::TARGET_ROLE:
-					if($target instanceof Role) {
-						if($sender->hasPermission("hierarchy.role." . static::CHILD_PERMISSION)) {
-							if($this->doHierarchyPositionCheck($target)) {
-								$this->doOperationOnRole($target, $permission);
-								$this->sendFormattedMessage("cmd." . static::MESSAGE_ROOT . ".role.success", [
-									"permission" => $permission->getName(),
-									"role" => $target->getName(),
-									"role_id" => $target->getId()
-								]);
+					foreach($args["target"] as $target) {
+						if($target instanceof Role) {
+							if($sender->hasPermission("hierarchy.role." . static::CHILD_PERMISSION)) {
+								if($this->doHierarchyPositionCheck($target)) {
+									$this->doOperationOnRole($target, $permission);
+									$this->sendFormattedMessage("cmd." . static::MESSAGE_ROOT . ".role.success", [
+										"permission" => $permission->getName(),
+										"role" => $target->getName(),
+										"role_id" => $target->getId()
+									]);
+								} else {
+									$this->sendFormattedMessage("err.target_higher_hrk");
+								}
 							} else {
-								$this->sendFormattedMessage("err.target_higher_hrk");
+								$this->sendPermissionError();
 							}
-						} else {
-							$this->sendPermissionError();
+							break;
 						}
 					}
 					break;
@@ -137,18 +141,7 @@ abstract class ACPermissionModifierCommand extends HierarchySubCommand implement
 				function (Player $player, bool $choice): void {
 					if($choice) {
 						$this->setCurrentSender($player);
-						$roles = [];
-						$roles_i = [];
-						foreach($this->roleManager->getRoles() as $role) {
-							if($role->isDefault() || !$this->doHierarchyPositionCheck($role)) {
-								continue;
-							}
-							$roles[] = "{$role->getName()} ({$role->getId()})";
-							$roles_i[] = $role->getId();
-						}
-						if(empty($roles)) {
-							$this->sendFormattedMessage("err.no_roles_for_action");
-
+						if(!$this->getRolesApplicable($roles, $roles_i)) {
 							return;
 						}
 						$player->sendForm(new CustomForm($this->plugin->getName(), [

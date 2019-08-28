@@ -134,4 +134,22 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 			)
 		);
 	}
+
+	protected function getRolesApplicable(&$roles, &$roles_i):bool {
+		$roles = [];
+		$roles_i = [];
+		foreach($this->roleManager->getRoles() as $role) {
+			if($role->isDefault() || !$this->isSenderHigher($role)) {
+				continue;
+			}
+			$roles[] = "{$role->getName()} ({$role->getId()})";
+			$roles_i[] = $role->getId();
+		}
+		if(empty($roles)) {
+			$this->sendFormattedMessage("err.no_roles_for_action");
+
+			return false;
+		}
+		return true;
+	}
 }
