@@ -162,6 +162,7 @@ abstract class IndexedDataSource extends DataSource {
 			$this->roles[$k]["Permissions"][] = $permission;
 		}
 		$this->reIndex($this->roles[$k]["Permissions"]);
+		$this->flush();
 	}
 
 	public function removeRolePermission(Role $role, $permission): void {
@@ -171,6 +172,7 @@ abstract class IndexedDataSource extends DataSource {
 		$k = $this->resolveRoleIndex($role->getId());
 		self::removePermissionFromArray($permission, $this->roles[$k]["Permissions"]);
 		$this->reIndex($this->roles[$k]["Permissions"]);
+		$this->flush();
 	}
 
 	private static function permissionInArray(string $permission, array $array): bool {
@@ -198,10 +200,12 @@ abstract class IndexedDataSource extends DataSource {
 			"isDefault" => false,
 			"Permissions" => []
 		];
+		$this->flush();
 	}
 
 	public function deleteRoleFromStorage(Role $role): void {
 		unset($this->roles[$this->resolveRoleIndex($role->getId())]);
+		$this->flush();
 	}
 
 	/**
@@ -232,7 +236,7 @@ abstract class IndexedDataSource extends DataSource {
 	}
 
 	public function shutdown(): void {
-		$this->flush();
+		// should be saved already
 	}
 
 	public function flush(): void {
