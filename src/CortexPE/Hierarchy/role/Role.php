@@ -155,7 +155,7 @@ class Role {
 	 */
 	public function addPermission(Permission $permission, bool $update = true): void {
 		$this->permissions[$permission->getName()] = true;
-		$this->plugin->getDataSource()->addRolePermission($this, $permission, false);
+		$this->plugin->getRoleDataSource()->addRolePermission($this, $permission, false);
 		if($update) {
 			$this->updateMemberPermissions();
 		}
@@ -163,7 +163,7 @@ class Role {
 
 	public function denyPermission(Permission $permission, bool $update = true): void {
 		$this->permissions[$permission->getName()] = false;
-		$this->plugin->getDataSource()->addRolePermission($this, $permission, true);
+		$this->plugin->getRoleDataSource()->addRolePermission($this, $permission, true);
 		if($update) {
 			$this->updateMemberPermissions();
 		}
@@ -177,7 +177,7 @@ class Role {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
-		$this->plugin->getDataSource()->removeRolePermission($this, $permission);
+		$this->plugin->getRoleDataSource()->removeRolePermission($this, $permission);
 		if($update) {
 			$this->updateMemberPermissions();
 		}

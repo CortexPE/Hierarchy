@@ -27,18 +27,15 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\data;
+namespace CortexPE\Hierarchy\data\traits;
 
 
-use CortexPE\Hierarchy\Hierarchy;
+trait YAMLProcessing {
+	public function encode(array $data): string {
+		return yaml_emit($data, YAML_UTF8_ENCODING);
+	}
 
-class MySQLDataSource extends SQLDataSource {
-	protected const DIALECT = "mysql";
-	protected const STMTS_FILE = "mysql_stmts.sql";
-
-	public function getExtraDBSettings(Hierarchy $plugin, array $config): array {
-		$config["schema"] = $config["schema"] ?? strtolower($plugin->getName());
-
-		return $config;
+	public function decode(string $string): array {
+		return yaml_parse($string);
 	}
 }

@@ -1,5 +1,7 @@
 -- # !sqlite
 
+-- Role-related queries are only here for data migration purposes
+
 -- #{ hierarchy
 
 -- #  { init

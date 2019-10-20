@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\member;
 
 
 use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\data\member\MemberDataSource;
 use CortexPE\Hierarchy\event\MemberRoleAddEvent;
 use CortexPE\Hierarchy\event\MemberRoleRemoveEvent;
 use CortexPE\Hierarchy\Hierarchy;
@@ -45,7 +46,7 @@ use function substr;
 abstract class BaseMember {
 	/** @var Hierarchy */
 	protected $plugin;
-	/** @var DataSource */
+	/** @var MemberDataSource */
 	protected $dataSource;
 	/** @var PermissionManager */
 	protected $permMgr;
@@ -58,7 +59,7 @@ abstract class BaseMember {
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
-		$this->dataSource = $plugin->getDataSource();
+		$this->dataSource = $plugin->getMemberDataSource();
 		$this->permMgr = PermissionManager::getInstance();
 		$this->server = $plugin->getServer();
 	}
@@ -77,7 +78,7 @@ abstract class BaseMember {
 				$this->roles[$roleId] = $role;
 			} else {
 				// un-existent role
-				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $roleId);
+				$this->plugin->getLogger()->debug("Ignoring non-existent role ID $roleId from " . $this->getName());
 			}
 		}
 		foreach($memberData["permissions"] ?? [] as $perm) {
@@ -100,7 +101,7 @@ abstract class BaseMember {
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
-		if($save){
+		if($save) {
 			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, $permission);
 		}
 	}
@@ -111,7 +112,7 @@ abstract class BaseMember {
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
-		if($save){
+		if($save) {
 			$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_PERMS_ADD, "-" . $permission);
 		}
 	}
@@ -137,7 +138,7 @@ abstract class BaseMember {
 			$ev->call();
 			$this->roles[$role->getId()] = $role;
 			$role->bind($this);
-			if($save){
+			if($save) {
 				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			}
 
@@ -178,7 +179,7 @@ abstract class BaseMember {
 			$ev->call();
 			unset($this->roles[$role->getId()]);
 			$role->unbind($this);
-			if($save){
+			if($save) {
 				$this->dataSource->updateMemberData($this, DataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			}
 			if($recalculate) {

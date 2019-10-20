@@ -27,20 +27,19 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\member;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+use CortexPE\Hierarchy\Hierarchy;
+use function strtolower;
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
-	}
+class MySQLMemberDS extends SQLMemberDS {
+	protected const DIALECT = "mysql";
+	protected const STMTS_FILE = "mysql_stmts.sql";
 
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
+	public function getExtraDBSettings(Hierarchy $plugin, array $config): array {
+		$config["schema"] = $config["schema"] ?? strtolower($plugin->getName());
+
+		return $config;
 	}
 }

@@ -27,21 +27,20 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\data;
+namespace CortexPE\Hierarchy\data\traits;
 
 
 use CortexPE\Hierarchy\Hierarchy;
+use function json_decode;
+use function json_encode;
+use const JSON_PRETTY_PRINT;
 
-class JSONDataSource extends IndexedDataSource {
-	/** @var string */
-	protected const FILE_EXTENSION = "json";
-
+trait JSONProcessing {
 	/** @var bool */
 	protected $prettyPrint = false;
 
-	public function __construct(Hierarchy $plugin, array $config) {
+	protected function readConfig(array $config) : void{
 		$this->prettyPrint = (bool)$config["prettyPrint"];
-		parent::__construct($plugin);
 	}
 
 	public function encode(array $data): string {

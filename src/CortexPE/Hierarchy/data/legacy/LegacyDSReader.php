@@ -27,20 +27,24 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\legacy;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+use CortexPE\Hierarchy\Hierarchy;
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
+class LegacyDSReader {
+
+	/** @var Hierarchy */
+	protected $plugin;
+
+	public function __construct(Hierarchy $plugin) {
+		$this->plugin = $plugin;
 	}
 
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
+	/**
+	 * @return Hierarchy
+	 */
+	public function getPlugin(): Hierarchy {
+		return $this->plugin;
 	}
 }

@@ -27,20 +27,34 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\member;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\member\BaseMember;
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
-	}
+abstract class MemberDataSource extends DataSource {
+	public const ACTION_MEMBER_ROLE_ADD = "member.role.add";
+	public const ACTION_MEMBER_ROLE_REMOVE = "member.role.remove";
+	public const ACTION_MEMBER_PERMS_ADD = "member.perm.add";
+	public const ACTION_MEMBER_PERMS_REMOVE = "member.perm.remove";
 
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
-	}
+	/**
+	 * @param BaseMember $member
+	 * @param callable   $onLoad
+	 *
+	 * @internal Get member data from the data source then pass to member object
+	 *
+	 */
+	abstract public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void;
+
+	/**
+	 * @param BaseMember $member
+	 * @param string     $action
+	 * @param mixed      $data
+	 *
+	 * @internal Update member data on data source
+	 *
+	 */
+	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
 }

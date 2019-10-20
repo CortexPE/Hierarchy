@@ -27,18 +27,29 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\data;
+namespace CortexPE\Hierarchy\data\traits;
 
 
-class YAMLDataSource extends IndexedDataSource {
-	/** @var string */
-	protected const FILE_EXTENSION = "yml";
+use function array_search;
+use function array_unique;
+use function array_values;
+use function in_array;
 
-	public function encode(array $data): string {
-		return yaml_emit($data, YAML_UTF8_ENCODING);
+trait IndexedDataUtilities {
+	private static function permissionInArray(string $permission, array $array): bool {
+		return in_array($permission, $array) || in_array("-" . $permission, $array);
 	}
 
-	public function decode(string $string): array {
-		return yaml_parse($string);
+	private static function removePermissionFromArray(string $permission, array &$array): void {
+		if(self::permissionInArray($permission, $array)) {
+			unset(
+				$array[array_search($permission, $array)],
+				$array[array_search("-" . $permission, $array)]
+			);
+		}
+	}
+
+	private function reIndex(array &$array): void {
+		$array = array_values(array_unique($array));
 	}
 }
