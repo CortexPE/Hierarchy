@@ -40,6 +40,7 @@ use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 use SOFe\AwaitGenerator\Await;
 use Throwable;
+use function substr;
 
 abstract class SQLDataSource extends DataSource {
 	protected const STMTS_FILE = null;
@@ -184,6 +185,12 @@ abstract class SQLDataSource extends DataSource {
 				]);
 				break;
 			case self::ACTION_MEMBER_PERMS_ADD:
+				if($data[0] === "-"){
+					$this->db->executeChange("hierarchy.member.permissions.remove", [
+						"username" => $member->getName(),
+						"permission" => substr($data, 1)
+					]);
+				}
 				$this->db->executeChange("hierarchy.member.permissions.add", [
 					"username" => $member->getName(),
 					"permission" => $data

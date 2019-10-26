@@ -52,8 +52,8 @@ class MemberFactory {
 
 	/**
 	 * @param Player|OfflinePlayer|string $player
-	 * @param bool          $loadData
-	 * @param callable|null $onLoad
+	 * @param bool                        $loadData
+	 * @param callable|null               $onLoad
 	 *
 	 * @return BaseMember
 	 */
@@ -78,7 +78,7 @@ class MemberFactory {
 					($onLoad)($m);
 				}
 			});
-			if($m instanceof OfflinePlayer && $ds instanceof SQLDataSource){
+			if($m instanceof OfflineMember && $ds instanceof SQLDataSource) {
 				/**
 				 * TODO:
 				 *  Make this better...
