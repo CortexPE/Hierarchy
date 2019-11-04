@@ -1,6 +1,6 @@
 name: Hierarchy
 main: CortexPE\Hierarchy\Hierarchy
-version: 1.0.0
+version: 1.1.0
 api: 3.0.0
 load: POSTWORLD
 author: CortexPE

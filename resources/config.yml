@@ -38,4 +38,6 @@ memberDataSource:
 
 # Allow OPs to bypass permission checks
 superAdminOPs: false
+
+configVersion: 1.5
 ...

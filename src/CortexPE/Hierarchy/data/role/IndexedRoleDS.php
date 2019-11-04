@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy\data\role;
 
 use CortexPE\Hierarchy\data\traits\IndexedDataUtilities;
 use CortexPE\Hierarchy\exception\UnresolvedRoleException;
+use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
@@ -53,8 +54,13 @@ abstract class IndexedRoleDS extends RoleDataSource {
 	/** @var string */
 	protected $rolesFile;
 
+	public function __construct(Hierarchy $plugin) {
+		parent::__construct($plugin);
+		$this->rolesFile = $this->plugin->getDataFolder() . "roles." . static::FILE_EXTENSION;
+	}
+
 	public function initialize(): void {
-		if(file_exists(($this->rolesFile = $this->plugin->getDataFolder() . "roles." . static::FILE_EXTENSION))) {
+		if(file_exists($this->rolesFile)) {
 			$this->roles = $this->decode(file_get_contents($this->rolesFile));
 		} else {
 			// create default role & add default permissions
@@ -154,6 +160,14 @@ abstract class IndexedRoleDS extends RoleDataSource {
 
 	public function shutdown(): void {
 		// should be saved already
+	}
+
+	/**
+	 * @param array $roles
+	 * @internal Only used for writing data directly
+	 */
+	public function setRoles(array $roles): void {
+		$this->roles = $roles;
 	}
 
 	public function flush(): void {

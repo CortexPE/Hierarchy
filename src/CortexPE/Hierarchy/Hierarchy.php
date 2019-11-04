@@ -36,12 +36,15 @@ use CortexPE\Hierarchy\data\member\MemberDataSource;
 use CortexPE\Hierarchy\data\member\MySQLMemberDS;
 use CortexPE\Hierarchy\data\member\SQLiteMemberDS;
 use CortexPE\Hierarchy\data\member\YAMLMemberDS;
+use CortexPE\Hierarchy\data\migrator\DSMigrator;
 use CortexPE\Hierarchy\data\role\JSONRoleDS;
 use CortexPE\Hierarchy\data\role\RoleDataSource;
 use CortexPE\Hierarchy\data\role\YAMLRoleDS;
+use CortexPE\Hierarchy\exception\StartupFailureException;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
+use Exception;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;
 use function extension_loaded;
@@ -62,68 +65,62 @@ class Hierarchy extends PluginBase {
 	private $superAdminOPs = false;
 
 	public function onEnable(): void {
-		$this->saveResource("config.yml");
-		(new MessageStore($this->getDataFolder() . "messages.yml"));
-		$conf = $this->getConfig();
+		try{
+			DSMigrator::tryMigration($this);
 
-		$this->superAdminOPs = $conf->get("superAdminOPs", $this->superAdminOPs);
+			$this->saveResource("config.yml");
+			(new MessageStore($this->getDataFolder() . "messages.yml"));
+			$conf = $this->getConfig();
 
-		switch($conf->getNested("roleDataSource.type", "yaml")) {
-			case "json":
-				$this->roleDS = new JSONRoleDS($this, $conf->getNested("roleDataSource.json"));
-				break;
-			case "yaml":
-				$this->roleDS = new YAMLRoleDS($this);
-				break;
-			default:
-				$this->getLogger()->error("Invalid role data source type, must be one of the following: 'json', 'yaml'");
-				$this->getServer()->getPluginManager()->disablePlugin($this);
+			$this->superAdminOPs = $conf->get("superAdminOPs", $this->superAdminOPs);
 
-				return;
+			switch($conf->getNested("roleDataSource.type", "yaml")) {
+				case "json":
+					$this->roleDS = new JSONRoleDS($this, $conf->getNested("roleDataSource.json"));
+					break;
+				case "yaml":
+					$this->roleDS = new YAMLRoleDS($this);
+					break;
+				default:
+					throw new StartupFailureException("Invalid role data source type, must be one of the following: 'json', 'yaml'");
+			}
+
+			switch($conf->getNested("memberDataSource.type", "yaml")) {
+				case "json":
+					$this->memberDS = new JSONMemberDS($this, $conf->getNested("memberDataSource.json"));
+					break;
+				case "yaml":
+					$this->memberDS = new YAMLMemberDS($this);
+					break;
+				case "sqlite3":
+					if(!extension_loaded("sqlite3")) {
+						throw new StartupFailureException("SQLite3 PHP Extension is not enabled! Please check php.ini or choose a different data source type");
+					}
+					$this->memberDS = new SQLiteMemberDS($this, $conf->getNested("memberDataSource.sqlite3"));
+					break;
+				case "mysql":
+					if(!extension_loaded("mysqli")) {
+						throw new StartupFailureException("MySQLi PHP Extension is not enabled! Please check php.ini or choose a different data source type");
+					}
+					$this->memberDS = new MySQLMemberDS($this, $conf->getNested("memberDataSource.mysql"));
+					break;
+
+				default:
+					throw new StartupFailureException("Invalid role data source type, must be one of the following: 'json', 'yaml'");
+			}
+
+			DefaultPermissions::registerCorePermissions();
+
+			$this->roleManager = new RoleManager($this);
+			$this->memberFactory = new MemberFactory($this);
+
+			$this->roleDS->initialize();
+			$this->memberDS->initialize();
+		} catch(Exception $e){
+			$this->getLogger()->logException($e);
+			$this->getLogger()->warning("Forcefully shutting down server for the sake of security.");
+			$this->getServer()->forceShutdown();
 		}
-
-		switch($conf->getNested("memberDataSource.type", "yaml")) {
-			case "json":
-				$this->memberDS = new JSONMemberDS($this, $conf->getNested("memberDataSource.json"));
-				break;
-			case "yaml":
-				$this->memberDS = new YAMLMemberDS($this);
-				break;
-			case "sqlite3":
-				if(!extension_loaded("sqlite3")) {
-					$this->getLogger()
-						 ->error("SQLite3 PHP Extension is not enabled! Please check php.ini or choose a different data source type");
-					$this->getServer()->getPluginManager()->disablePlugin($this);
-
-					return;
-				}
-				$this->memberDS = new SQLiteMemberDS($this, $conf->getNested("dataSource.sqlite3"));
-				break;
-			case "mysql":
-				if(!extension_loaded("mysqli")) {
-					$this->getLogger()
-						 ->error("MySQLi PHP Extension is not enabled! Please check php.ini or choose a different data source type");
-					$this->getServer()->getPluginManager()->disablePlugin($this);
-
-					return;
-				}
-				$this->memberDS = new MySQLMemberDS($this, $conf->getNested("dataSource.mysql"));
-				break;
-
-			default:
-				$this->getLogger()->error("Invalid role data source type, must be one of the following: 'json', 'yaml'");
-				$this->getServer()->getPluginManager()->disablePlugin($this);
-
-				return;
-		}
-
-		DefaultPermissions::registerCorePermissions();
-
-		$this->roleManager = new RoleManager($this);
-		$this->memberFactory = new MemberFactory($this);
-
-		$this->roleDS->initialize();
-		$this->memberDS->initialize();
 	}
 
 	/**

@@ -1,7 +1,5 @@
 -- # !sqlite
 
--- Role-related queries are only here for data migration purposes
-
 -- #{ hierarchy
 
 -- #  { init
@@ -40,7 +38,20 @@ CREATE TABLE IF NOT EXISTS MemberPermissions
 -- #    }
 -- #  }
 
+-- #  { drop
+-- #    { rolesTable
+DROP TABLE Roles;
+-- #    }
+-- #    { rolePermissionTable
+DROP TABLE RolePermissions;
+-- #    }
+-- #  }
+
 -- # { member
+-- #   { list
+SELECT Player
+FROM MemberRoles;
+-- #   }
 -- #   { roles
 -- #     { get
 -- #       :username string
