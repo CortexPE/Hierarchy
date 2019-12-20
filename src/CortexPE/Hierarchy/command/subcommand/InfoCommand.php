@@ -78,7 +78,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_MEMBER,
-						"target" => $this->memberFactory->getMember($response->getString("member"))
+						"targetMember" => $this->memberFactory->getMember($response->getString("member"))
 					]);
 				}
 			],
@@ -97,7 +97,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_ROLE,
-						"target" => $this->roleManager->getRole($roles_i[$response->getInt("roles")])
+						"targetRole" => $this->roleManager->getRole($roles_i[$response->getInt("roles")])
 					]);
 				}
 			],
