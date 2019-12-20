@@ -78,7 +78,7 @@ class MemberFactory {
 					($onLoad)($m);
 				}
 			});
-			if($m instanceof OfflinePlayer && $ds instanceof SQLMemberDS){
+			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS){
 				/**
 				 * TODO:
 				 *  Make this better...
