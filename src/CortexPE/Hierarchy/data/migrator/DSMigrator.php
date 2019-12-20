@@ -34,6 +34,7 @@ use CortexPE\Hierarchy\data\legacy\IndexedLDR;
 use CortexPE\Hierarchy\data\legacy\JSONLDR;
 use CortexPE\Hierarchy\data\legacy\MySQLLDR;
 use CortexPE\Hierarchy\data\legacy\SQLiteLDR;
+use CortexPE\Hierarchy\data\legacy\SQLLDR;
 use CortexPE\Hierarchy\data\legacy\YAMLLDR;
 use CortexPE\Hierarchy\data\role\YAMLRoleDS;
 use CortexPE\Hierarchy\exception\StartupFailureException;
@@ -95,7 +96,7 @@ class DSMigrator {
 					$target->flush();
 					$target->shutdown();
 				}
-				if($source instanceof SQLiteLDR){
+				if($source instanceof SQLLDR){
 					$db = $source->getDB();
 					$db->executeGeneric("hierarchy.drop.rolesTable");
 					$db->executeGeneric("hierarchy.drop.rolePermissionTable");
