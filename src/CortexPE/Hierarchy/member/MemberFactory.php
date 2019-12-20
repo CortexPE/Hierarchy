@@ -52,8 +52,8 @@ class MemberFactory {
 
 	/**
 	 * @param Player|OfflinePlayer|string $player
-	 * @param bool          $loadData
-	 * @param callable|null $onLoad
+	 * @param bool                        $loadData
+	 * @param callable|null               $onLoad
 	 *
 	 * @return BaseMember
 	 */
