@@ -78,7 +78,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_MEMBER,
-						"target" => [$this->memberFactory->getMember($response->getString("member"))]
+						"targetMember" => $this->memberFactory->getMember($response->getString("member"))
 					]);
 				}
 			],
@@ -97,7 +97,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_ROLE,
-						"target" => [$this->roleManager->getRole($roles_i[$response->getInt("roles")])]
+						"targetRole" => $this->roleManager->getRole($roles_i[$response->getInt("roles")])
 					]);
 				}
 			],
@@ -118,8 +118,8 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 
 	protected function prepare(): void {
 		$this->registerArgument(0, new InfoTargetEnumArgument("targetType", true));
-		$this->registerArgument(1, new MemberArgument("target", true));
-		$this->registerArgument(1, new RoleArgument("target", true));
+		$this->registerArgument(1, new MemberArgument("targetMember", true));
+		$this->registerArgument(1, new RoleArgument("targetRole", true));
 		$this->setPermission(implode(";", [
 			"hierarchy",
 			"hierarchy.info",
@@ -141,68 +141,62 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 			return;
 		}
 
-		if($args["targetType"] === InfoTargetEnumArgument::TARGET_MEMBER && isset($args["target"])) {
+		if($args["targetType"] === InfoTargetEnumArgument::TARGET_MEMBER && isset($args["targetMember"])) {
 			if($sender->hasPermission("hierarchy.info.member")) {
-				foreach($args["target"] as $target){
-					if($target instanceof BaseMember){
-						$this->sendFormattedMessage("cmd.info.member.header", [
-							"member" => $target->getName()
-						]);
-						$this->sendFormattedMessage("cmd.info.member.roles_header");
-						foreach($target->getRoles() as $role) {
-							$this->sendFormattedMessage("cmd.info.member.role_entry", [
-								"role" => $role->getName(),
-								"role_id" => $role->getId()
-							]);
-						}
-						$this->sendFormattedMessage("cmd.info.member.m_perms_header");
-						foreach($target->getMemberPermissions() as $permission => $allowed) {
-							$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
-								"permission" => $permission,
-								"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-							]);
-						}
-						break;
-					}
+				/** @var BaseMember $target */
+				$target = $args["targetMember"];
+				$this->sendFormattedMessage("cmd.info.member.header", [
+					"member" => $target->getName()
+				]);
+				$this->sendFormattedMessage("cmd.info.member.roles_header");
+				foreach($target->getRoles() as $role) {
+					$this->sendFormattedMessage("cmd.info.member.role_entry", [
+						"role" => $role->getName(),
+						"role_id" => $role->getId()
+					]);
+				}
+				$this->sendFormattedMessage("cmd.info.member.m_perms_header");
+				foreach($target->getMemberPermissions() as $permission => $allowed) {
+					$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
+						"permission" => $permission,
+						"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
+					]);
 				}
 			} else {
 				$this->sendPermissionError();
 			}
-		} elseif($args["targetType"] === InfoTargetEnumArgument::TARGET_ROLE && isset($args["target"])) {
+		} elseif($args["targetType"] === InfoTargetEnumArgument::TARGET_ROLE && isset($args["targetRole"])) {
 			if($sender->hasPermission("hierarchy.info.role")) {
-				foreach($args["target"] as $target){
-					if($target instanceof Role){
-						$this->sendFormattedMessage("cmd.info.role.header", [
-							"role" => $target->getName(),
-							"role_id" => $target->getId()
+				/** @var Role $target */
+				$target = $args["targetRole"];
+				$this->sendFormattedMessage("cmd.info.role.header", [
+					"role" => $target->getName(),
+					"role_id" => $target->getId()
+				]);
+				$this->sendFormattedMessage("cmd.info.role.position", [
+					"position" => $target->getPosition()
+				]);
+				$this->sendFormattedMessage("cmd.info.role.default", [
+					"isDefault" => $target->isDefault() ? TextFormat::GREEN . "YES" : TextFormat::RED . "NO"
+				]);
+				$this->sendFormattedMessage("cmd.info.role.perms_header");
+				foreach($target->getPermissions() as $permission => $allowed) {
+					$this->sendFormattedMessage("cmd.info.role.perm_entry", [
+						"permission" => $permission,
+						"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
+					]);
+				}
+				$this->sendFormattedMessage("cmd.info.role.members_header", [
+					"count" => ($c = count($target->getMembers()))
+				]);
+				if($c > 0) {
+					foreach($target->getMembers() as $member) {
+						$this->sendFormattedMessage("cmd.info.role.member_entry", [
+							"member" => $member->getName()
 						]);
-						$this->sendFormattedMessage("cmd.info.role.position", [
-							"position" => $target->getPosition()
-						]);
-						$this->sendFormattedMessage("cmd.info.role.default", [
-							"isDefault" => $target->isDefault() ? TextFormat::GREEN . "YES" : TextFormat::RED . "NO"
-						]);
-						$this->sendFormattedMessage("cmd.info.role.perms_header");
-						foreach($target->getPermissions() as $permission => $allowed) {
-							$this->sendFormattedMessage("cmd.info.role.perm_entry", [
-								"permission" => $permission,
-								"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-							]);
-						}
-						$this->sendFormattedMessage("cmd.info.role.members_header", [
-							"count" => ($c = count($target->getMembers()))
-						]);
-						if($c > 0) {
-							foreach($target->getMembers() as $member) {
-								$this->sendFormattedMessage("cmd.info.role.member_entry", [
-									"member" => $member->getName()
-								]);
-							}
-						} else {
-							$this->sendFormattedMessage("cmd.info.role.no_online_members");
-						}
-						break;
 					}
+				} else {
+					$this->sendFormattedMessage("cmd.info.role.no_online_members");
 				}
 			} else {
 				$this->sendPermissionError();

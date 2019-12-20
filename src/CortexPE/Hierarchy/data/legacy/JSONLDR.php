@@ -27,20 +27,14 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\legacy;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+class JSONLDR extends IndexedLDR {
+	/** @var string */
+	protected const FILE_EXTENSION = "json";
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
-	}
-
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
+	public function decode(string $string): array {
+		return json_decode($string, true);
 	}
 }

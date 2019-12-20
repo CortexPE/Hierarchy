@@ -27,20 +27,29 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\traits;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+use function array_search;
+use function array_unique;
+use function array_values;
+use function in_array;
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
+trait IndexedDataUtilities {
+	private static function permissionInArray(string $permission, array $array): bool {
+		return in_array($permission, $array) || in_array("-" . $permission, $array);
 	}
 
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
+	private static function removePermissionFromArray(string $permission, array &$array): void {
+		if(self::permissionInArray($permission, $array)) {
+			unset(
+				$array[array_search($permission, $array)],
+				$array[array_search("-" . $permission, $array)]
+			);
+		}
+	}
+
+	private function reIndex(array &$array): void {
+		$array = array_values(array_unique($array));
 	}
 }

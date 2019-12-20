@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\role;
 
 
-use CortexPE\Hierarchy\data\DataSource;
+use CortexPE\Hierarchy\data\role\RoleDataSource;
 use CortexPE\Hierarchy\exception\HierarchyException;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
@@ -44,7 +44,7 @@ class RoleManager {
 	protected $roles = [];
 	/** @var Role */
 	protected $defaultRole = null;
-	/** @var DataSource */
+	/** @var RoleDataSource */
 	protected $dataSource;
 	/** @var int */
 	protected $lastID = PHP_INT_MIN;
@@ -53,7 +53,7 @@ class RoleManager {
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
-		$this->dataSource = $plugin->getDataSource();
+		$this->dataSource = $plugin->getRoleDataSource();
 	}
 
 	/**

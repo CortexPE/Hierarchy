@@ -27,18 +27,22 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\data;
+namespace CortexPE\Hierarchy\data\member;
 
 
-class YAMLDataSource extends IndexedDataSource {
-	/** @var string */
-	protected const FILE_EXTENSION = "yml";
+use CortexPE\Hierarchy\Hierarchy;
+use function strtolower;
 
-	public function encode(array $data): string {
-		return yaml_emit($data, YAML_UTF8_ENCODING);
-	}
+class MySQLMemberDS extends SQLMemberDS {
+	protected const DIALECT = "mysql";
+	protected const STMTS_FILE = "mysql_stmts.sql";
 
-	public function decode(string $string): array {
-		return yaml_parse($string);
+	public function getExtraDBSettings(Hierarchy $plugin, array $config): array {
+		if(isset($config["user"]) && !isset($config["username"])){
+			$config["username"] = $config["user"];
+		}
+		$config["schema"] = $config["schema"] ?? strtolower($plugin->getName());
+
+		return $config;
 	}
 }

@@ -27,20 +27,14 @@
 
 declare(strict_types=1);
 
-namespace CortexPE\Hierarchy\command\subcommand;
+namespace CortexPE\Hierarchy\data\member;
 
 
-use CortexPE\Hierarchy\command\HierarchySubCommand;
-use pocketmine\command\CommandSender;
+use CortexPE\Hierarchy\data\traits\YAMLProcessing;
 
-class FlushCommand extends HierarchySubCommand {
-	protected function prepare(): void {
-		$this->setPermission("hierarchy;hierarchy.flush");
-	}
+class YAMLMemberDS extends IndexedMemberDS {
+	use YAMLProcessing;
 
-	public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
-		$this->plugin->getRoleDataSource()->flush();
-		$this->plugin->getMemberDataSource()->flush();
-		$this->sendFormattedMessage("cmd.flush.success");
-	}
+	/** @var string */
+	protected const FILE_EXTENSION = "yml";
 }

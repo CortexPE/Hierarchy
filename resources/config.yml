@@ -1,6 +1,16 @@
 ---
-# Hierarchy DataSource options & settings
-dataSource:
+# Hierarchy Role & Permission sets DataSource options & settings
+roleDataSource:
+  # Available Types: json, yaml
+  type: "yaml"
+
+  # These settings will only apply when you chose json as dataSource type
+  json:
+    # Save JSON data files in a human-readable way
+    prettyPrint: true
+
+# Hierarchy Member DataSource options & settings
+memberDataSource:
   # Available Types: json, sqlite3, mysql, yaml
   type: "sqlite3"
 
@@ -12,7 +22,7 @@ dataSource:
   # These settings will only apply when you chose sqlite3 as dataSource type
   sqlite3:
     # Database path
-    dbPath: "hierarchy.sqlite"
+    dbPath: "members.sqlite"
     # The maximum number of simultaneous queries
     workerLimit: 1
 
@@ -21,11 +31,13 @@ dataSource:
     host: "localhost"
     username: "hierarchy"
     password: "youShallNotPass"
-    database: "hierarchy"
-    schema: "hierarchy"
+    database: "hierarchyMembers"
+    schema: "hierarchyMembers"
     # The maximum number of simultaneous queries
     workerLimit: 2 # Increase the value if you have a slow connection to the MySQL server
 
 # Allow OPs to bypass permission checks
 superAdminOPs: false
+
+configVersion: 1.5
 ...

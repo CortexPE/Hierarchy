@@ -7,7 +7,7 @@ projects:
     path: ""
     libs:
       - src: poggit/libasynql/libasynql
-        version: ^3.2.0
+        version: ^3.2.1
       - src: SOF3/await-generator/await-generator
         version: ^2.2.0
       - src: dktapps-pm-pl/pmforms/pmforms

@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\member;
 
 
-use CortexPE\Hierarchy\data\SQLDataSource;
+use CortexPE\Hierarchy\data\member\SQLMemberDS;
 use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\OfflinePlayer;
 use pocketmine\Player;
@@ -73,12 +73,12 @@ class MemberFactory {
 			$newMember = true;
 		}
 		if($loadData && $newMember) {
-			($ds = $this->plugin->getDataSource())->loadMemberData($m, function () use ($m, $onLoad) {
+			($ds = $this->plugin->getMemberDataSource())->loadMemberData($m, function () use ($m, $onLoad) {
 				if($onLoad !== null) {
 					($onLoad)($m);
 				}
 			});
-			if($m instanceof OfflineMember && $ds instanceof SQLDataSource) {
+			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS){
 				/**
 				 * TODO:
 				 *  Make this better...
