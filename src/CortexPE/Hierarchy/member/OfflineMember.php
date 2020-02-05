@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\member;
 
 
 use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\role\Role;
 use pocketmine\Player;
 
 class OfflineMember extends BaseMember {
@@ -49,4 +50,16 @@ class OfflineMember extends BaseMember {
 	public function getName(): string {
 		return $this->username;
 	}
+
+    protected function onRoleAdd(Role $role): void {
+        // noop
+    }
+
+    protected function onRoleRemove(Role $role): void {
+        // noop
+    }
+
+    public function onDestroy(): void {
+        // noop
+    }
 }

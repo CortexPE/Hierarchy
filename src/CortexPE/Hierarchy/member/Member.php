@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy\member;
 
 use CortexPE\Hierarchy\event\MemberRoleUpdateEvent;
 use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\Player;
 
@@ -72,8 +73,25 @@ class Member extends BaseMember {
 
 	public function loadData(array $memberData): void {
 		parent::loadData($memberData);
+		foreach($this->roles as $role){
+            $role->bind($this);
+        }
 
 		// broadcast that our data has loaded, and our roles has updated from being empty
 		(new MemberRoleUpdateEvent($this))->call();
 	}
+
+	protected function onRoleAdd(Role $role): void {
+	    $role->bind($this);
+    }
+
+    protected function onRoleRemove(Role $role): void {
+	    $role->unbind($this);
+    }
+
+    public function onDestroy(): void {
+        foreach($this->roles as $k => $role){
+            $role->unbind($this);
+        }
+    }
 }

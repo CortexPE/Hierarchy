@@ -63,9 +63,10 @@ class MemberFactory {
 		}
 		$newMember = false;
 		if($player instanceof Player) {
-			if(!isset($this->onlineMembers[($n = $player->getId())])) {
+			if(!isset($this->onlineMembers[($n = $player->getName())])) {
 				$this->onlineMembers[$n] = new Member($this->plugin, $player);
 				$newMember = true;
+                $this->plugin->getLogger()->debug("Created {$player->getName()}'s Session");
 			}
 			$m = $this->onlineMembers[$n];
 		} else {
@@ -81,9 +82,9 @@ class MemberFactory {
 			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS){
 				/**
 				 * TODO:
-				 *  Make this better...
-				 *  the sole reason this hack exists is because of the typical usage of OfflineMember,
-				 *  data has to be manipulated right away therefore it has to be available right away.
+				 *   Make this better...
+				 *   the sole reason this hack exists is because of the typical usage of OfflineMember,
+				 *   data has to be manipulated right away therefore it has to be available right away.
 				 */
 				$ds->getDB()->waitAll();
 			}
@@ -101,6 +102,11 @@ class MemberFactory {
 	}
 
 	public function destroySession(Player $player): void {
-		unset($this->onlineMembers[$player->getId()]);
+	    $this->plugin->getLogger()->debug("Destroying {$player->getName()}'s Session");
+	    $k = $player->getName();
+	    if(isset($this->onlineMembers[$k])){
+            $this->onlineMembers[$k]->onDestroy();;
+        }
+		unset($this->onlineMembers[$k]);
 	}
 }

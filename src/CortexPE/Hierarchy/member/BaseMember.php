@@ -75,7 +75,6 @@ abstract class BaseMember {
 			$role = $this->plugin->getRoleManager()->getRole($roleId);
 			if($role instanceof Role) {
 				$this->roles[$roleId] = $role;
-				$role->bind($this);
 			} else {
 				// un-existent role
 				$this->plugin->getLogger()->debug("Ignoring non-existent role ID $roleId from " . $this->getName());
@@ -137,7 +136,7 @@ abstract class BaseMember {
 			$ev = new MemberRoleAddEvent($this, $role);
 			$ev->call();
 			$this->roles[$role->getId()] = $role;
-			$role->bind($this);
+			$this->onRoleAdd($role);
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			}
@@ -147,6 +146,8 @@ abstract class BaseMember {
 			}
 		}
 	}
+
+    abstract protected function onRoleAdd(Role $role): void;
 
 	public function hasRole(Role $role): bool {
 		return in_array($role, $this->roles, true);
@@ -178,7 +179,7 @@ abstract class BaseMember {
 			$ev = new MemberRoleRemoveEvent($this, $role);
 			$ev->call();
 			unset($this->roles[$role->getId()]);
-			$role->unbind($this);
+			$this->onRoleRemove($role);
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			}
@@ -187,6 +188,8 @@ abstract class BaseMember {
 			}
 		}
 	}
+
+	abstract protected function onRoleRemove(Role $role): void;
 
 	public function getTopRole(): Role {
 		$maxPos = $basePos = ($defaultRole = $this->plugin->getRoleManager()->getDefaultRole())->getPosition();
@@ -267,4 +270,9 @@ abstract class BaseMember {
 	abstract public function getPlayer(): ?Player;
 
 	abstract public function getName(): string;
+
+    /**
+     * @internal
+     */
+	abstract public function onDestroy(): void;
 }
