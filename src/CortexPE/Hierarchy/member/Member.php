@@ -73,25 +73,25 @@ class Member extends BaseMember {
 
 	public function loadData(array $memberData): void {
 		parent::loadData($memberData);
-		foreach($this->roles as $role){
-            $role->bind($this);
-        }
+		foreach($this->roles as $role) {
+			$role->bind($this);
+		}
 
 		// broadcast that our data has loaded, and our roles has updated from being empty
 		(new MemberRoleUpdateEvent($this))->call();
 	}
 
 	protected function onRoleAdd(Role $role): void {
-	    $role->bind($this);
-    }
+		$role->bind($this);
+	}
 
-    protected function onRoleRemove(Role $role): void {
-	    $role->unbind($this);
-    }
+	protected function onRoleRemove(Role $role): void {
+		$role->unbind($this);
+	}
 
-    public function onDestroy(): void {
-        foreach($this->roles as $k => $role){
-            $role->unbind($this);
-        }
-    }
+	public function onDestroy(): void {
+		foreach($this->roles as $k => $role) {
+			$role->unbind($this);
+		}
+	}
 }

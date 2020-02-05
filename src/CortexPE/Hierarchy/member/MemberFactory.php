@@ -52,8 +52,8 @@ class MemberFactory {
 
 	/**
 	 * @param Player|OfflinePlayer|string $player
-	 * @param bool                        $loadData
-	 * @param callable|null               $onLoad
+	 * @param bool $loadData
+	 * @param callable|null $onLoad
 	 *
 	 * @return BaseMember
 	 */
@@ -66,7 +66,7 @@ class MemberFactory {
 			if(!isset($this->onlineMembers[($n = $player->getName())])) {
 				$this->onlineMembers[$n] = new Member($this->plugin, $player);
 				$newMember = true;
-                $this->plugin->getLogger()->debug("Created {$player->getName()}'s Session");
+				$this->plugin->getLogger()->debug("Created {$player->getName()}'s Session");
 			}
 			$m = $this->onlineMembers[$n];
 		} else {
@@ -74,12 +74,12 @@ class MemberFactory {
 			$newMember = true;
 		}
 		if($loadData && $newMember) {
-			($ds = $this->plugin->getMemberDataSource())->loadMemberData($m, function () use ($m, $onLoad) {
+			($ds = $this->plugin->getMemberDataSource())->loadMemberData($m, function() use ($m, $onLoad) {
 				if($onLoad !== null) {
 					($onLoad)($m);
 				}
 			});
-			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS){
+			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS) {
 				/**
 				 * TODO:
 				 *   Make this better...
@@ -102,11 +102,11 @@ class MemberFactory {
 	}
 
 	public function destroySession(Player $player): void {
-	    $this->plugin->getLogger()->debug("Destroying {$player->getName()}'s Session");
-	    $k = $player->getName();
-	    if(isset($this->onlineMembers[$k])){
-            $this->onlineMembers[$k]->onDestroy();;
-        }
+		$this->plugin->getLogger()->debug("Destroying {$player->getName()}'s Session");
+		$k = $player->getName();
+		if(isset($this->onlineMembers[$k])) {
+			$this->onlineMembers[$k]->onDestroy();;
+		}
 		unset($this->onlineMembers[$k]);
 	}
 }

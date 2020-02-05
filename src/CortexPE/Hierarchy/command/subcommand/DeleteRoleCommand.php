@@ -84,20 +84,9 @@ class DeleteRoleCommand extends HierarchySubCommand implements FormedCommand {
 
 	public function sendForm(): void {
 		if($this->currentSender instanceof Player) {
-			$roles = [];
-			$roles_i = [];
-			foreach($this->roleManager->getRoles() as $role) {
-				if($role->isDefault() || !$this->isSenderHigher($role)) {
-					continue;
-				}
-				$roles[] = "{$role->getName()} ({$role->getId()})";
-				$roles_i[] = $role->getId();
-			}
-			if(empty($roles)) {
-				$this->sendFormattedMessage("err.no_roles_for_action");
-
-				return;
-			}
+            if(!$this->getRolesApplicable($roles, $roles_i)) {
+                return;
+            }
 			$this->currentSender->sendForm(new CustomForm($this->plugin->getName(), [
 				new Label("description", $this->getDescription()),
 				new Dropdown("role", "Role", $roles),

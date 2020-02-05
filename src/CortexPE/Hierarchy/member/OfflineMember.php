@@ -51,15 +51,15 @@ class OfflineMember extends BaseMember {
 		return $this->username;
 	}
 
-    protected function onRoleAdd(Role $role): void {
-        // noop
-    }
+	protected function onRoleAdd(Role $role): void {
+		// noop
+	}
 
-    protected function onRoleRemove(Role $role): void {
-        // noop
-    }
+	protected function onRoleRemove(Role $role): void {
+		// noop
+	}
 
-    public function onDestroy(): void {
-        // noop
-    }
+	public function onDestroy(): void {
+		// noop
+	}
 }

@@ -118,7 +118,7 @@ abstract class BaseMember {
 
 	/**
 	 * @param Permission|string $permission
-	 * @param bool              $recalculate
+	 * @param bool $recalculate
 	 */
 	public function removeMemberPermission($permission, bool $recalculate = true): void {
 		if($permission instanceof Permission) {
@@ -147,7 +147,7 @@ abstract class BaseMember {
 		}
 	}
 
-    abstract protected function onRoleAdd(Role $role): void;
+	abstract protected function onRoleAdd(Role $role): void;
 
 	public function hasRole(Role $role): bool {
 		return in_array($role, $this->roles, true);
@@ -194,13 +194,13 @@ abstract class BaseMember {
 	public function getTopRole(): Role {
 		$maxPos = $basePos = ($defaultRole = $this->plugin->getRoleManager()->getDefaultRole())->getPosition();
 		$ri = 0;
-		foreach($this->roles as $i => $role){
-			if($role->getPosition() > $maxPos){
+		foreach($this->roles as $i => $role) {
+			if($role->getPosition() > $maxPos) {
 				$maxPos = $role->getPosition();
 				$ri = $i;
 			}
 		}
-		if($maxPos === $basePos){
+		if($maxPos === $basePos) {
 			return $defaultRole;
 		}
 		return $this->roles[$ri];
@@ -215,7 +215,7 @@ abstract class BaseMember {
 
 	/**
 	 * @param Permission|string $permissionNode
-	 * @param BaseMember        $target
+	 * @param BaseMember $target
 	 *
 	 * @return bool
 	 */
@@ -271,8 +271,8 @@ abstract class BaseMember {
 
 	abstract public function getName(): string;
 
-    /**
-     * @internal
-     */
+	/**
+	 * @internal
+	 */
 	abstract public function onDestroy(): void;
 }

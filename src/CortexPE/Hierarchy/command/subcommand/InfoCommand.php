@@ -74,7 +74,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					new Label("instruction", MessageStore::getMessage("cmd.info.member_form.instruction")),
 					new Input("member", MessageStore::getMessage("cmd.info.member_form.opt_text"))
 				],
-				function (Player $player, CustomFormResponse $response): void {
+				function(Player $player, CustomFormResponse $response): void {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_MEMBER,
@@ -93,7 +93,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 						$roles
 					)
 				],
-				function (Player $player, CustomFormResponse $response) use ($roles, $roles_i): void {
+				function(Player $player, CustomFormResponse $response) use ($roles, $roles_i): void {
 					$this->setCurrentSender($player);
 					$this->onRun($player, $this->getName(), [
 						"targetType" => InfoTargetEnumArgument::TARGET_ROLE,
@@ -157,15 +157,15 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 					}
 					$this->sendFormattedMessage("cmd.info.member.m_perms_header");
 					if(count($target->getMemberPermissions()) > 0) {
-                        foreach ($target->getMemberPermissions() as $permission => $allowed) {
-                            $this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
-                                "permission" => $permission,
-                                "color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-                            ]);
-                        }
-                    } else {
-                        $this->sendFormattedMessage("cmd.info.member.no_extra_perms");
-                    }
+						foreach($target->getMemberPermissions() as $permission => $allowed) {
+							$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
+								"permission" => $permission,
+								"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
+							]);
+						}
+					} else {
+						$this->sendFormattedMessage("cmd.info.member.no_extra_perms");
+					}
 					break;
 				}
 			} else {
@@ -174,7 +174,7 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 		} elseif($args["targetType"] === InfoTargetEnumArgument::TARGET_ROLE && isset($args["targetRole"])) {
 			if($sender->hasPermission("hierarchy.info.role")) {
 				/** @var Role $target */
-				foreach($args["targetRole"] as $target){
+				foreach($args["targetRole"] as $target) {
 					$this->sendFormattedMessage("cmd.info.role.header", [
 						"role" => $target->getName(),
 						"role_id" => $target->getId()
@@ -249,10 +249,10 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 				new MenuForm(
 					$this->plugin->getName(),
 					MessageStore::getMessage("cmd.info.menu_form.description"),
-					array_map(function (array $opt): MenuOption {
+					array_map(function(array $opt): MenuOption {
 						return $opt[0];
 					}, $this->opts),
-					function (Player $player, int $selectedOption): void {
+					function(Player $player, int $selectedOption): void {
 						if($this->opts[$selectedOption][2] !== null) {
 							$player->sendForm(
 								new CustomForm(
