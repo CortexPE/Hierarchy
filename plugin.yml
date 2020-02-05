@@ -69,3 +69,6 @@ permissions:
           hierarchy.member.remove_permission:
             default: "op"
             description: "Allows the removal of permissions from a member"
+          hierarchy.member.transfer_privileges:
+            default: "op"
+            description: "Allows to transfer privileges between two players"

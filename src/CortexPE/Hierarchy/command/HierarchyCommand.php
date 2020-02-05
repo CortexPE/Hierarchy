@@ -40,6 +40,7 @@ use CortexPE\Hierarchy\command\subcommand\GrantPermCommand;
 use CortexPE\Hierarchy\command\subcommand\InfoCommand;
 use CortexPE\Hierarchy\command\subcommand\RevokePermCommand;
 use CortexPE\Hierarchy\command\subcommand\TakeRoleCommand;
+use CortexPE\Hierarchy\command\subcommand\TransferPrivilegesCommand;
 use CortexPE\Hierarchy\Hierarchy;
 use pocketmine\command\CommandSender;
 
@@ -117,6 +118,13 @@ class HierarchyCommand extends BaseCommand {
 				"info",
 				"Get the role list and role or member information",
 				["i"]
+			)
+		);
+		$this->registerSubCommand(
+			new TransferPrivilegesCommand(
+				$this->plugin,
+				"transferprvlgs",
+				"Transfer privileges between players"
 			)
 		);
 	}

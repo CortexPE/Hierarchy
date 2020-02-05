@@ -100,6 +100,9 @@ class MessageStore {
 		"cmd.takerole.no_role" => "&c{member} does not have the '{role}' role",
 		"cmd.takerole.default" => "&cCannot remove default role from {member}",
 
+        "cmd.transfer_privileges.same_member" => "&cCannot transfer privileges to the same player.",
+        "cmd.transfer_privileges.success" => "&aTransferred privileges from {source} to {target}",
+
 		"err.target_higher_hrk" => "&cYou cannot use this command on '{target}' due to higher role hierarchy",
 		"err.unknown_permission" => "&cUnknown permission node.",
 		"err.unknown_role" => "&cRole not found. For a complete list of roles, please use '/hrk info role_list'",
