@@ -156,12 +156,16 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 						]);
 					}
 					$this->sendFormattedMessage("cmd.info.member.m_perms_header");
-					foreach($target->getMemberPermissions() as $permission => $allowed) {
-						$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
-							"permission" => $permission,
-							"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-						]);
-					}
+					if(count($target->getMemberPermissions()) > 0) {
+                        foreach ($target->getMemberPermissions() as $permission => $allowed) {
+                            $this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
+                                "permission" => $permission,
+                                "color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
+                            ]);
+                        }
+                    } else {
+                        $this->sendFormattedMessage("cmd.info.member.no_extra_perms");
+                    }
 					break;
 				}
 			} else {

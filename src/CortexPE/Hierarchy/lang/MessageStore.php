@@ -70,9 +70,10 @@ class MessageStore {
 
 		"cmd.info.member.header" => "&9 ----- Member Info for '&b{member}&9' ----- ",
 		"cmd.info.member.roles_header" => "&e&lRoles:",
-		"cmd.info.member.role_entry" => "&e - {role} ({role_id})",
+		"cmd.info.member.role_entry" => "&e - &6{role} ({role_id})",
 		"cmd.info.member.m_perms_header" => "&e&lMember Permission Overrides:",
 		"cmd.info.member.m_perm_entry" => "&e - {color}{permission}",
+        "cmd.info.member.no_extra_perms" => "&e - &cNo extra member permissions",
 
 		"cmd.info.role.header" => "&9 ----- Role Info for &b{role} ({role_id})&9 ----- ",
 		"cmd.info.role.position" => "&e&lPosition: &r&6{position}",
