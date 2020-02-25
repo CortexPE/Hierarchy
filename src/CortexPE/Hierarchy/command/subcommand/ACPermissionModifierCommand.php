@@ -58,8 +58,8 @@ abstract class ACPermissionModifierCommand extends HierarchySubCommand implement
 
 	protected function prepare(): void {
 		$this->registerArgument(0, new TargetEnumArgument("targetType", true));
-		$this->registerArgument(1, new MemberArgument("target", true));
 		$this->registerArgument(1, new RoleArgument("target", true));
+		$this->registerArgument(1, new MemberArgument("target", true));
 		$this->registerArgument(2, new PermissionArgument("permission", true));
 		$this->setPermission(implode(";", [
 			"hierarchy",
