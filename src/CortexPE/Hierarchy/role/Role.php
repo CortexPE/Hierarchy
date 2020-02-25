@@ -177,6 +177,7 @@ class Role {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
+		unset($this->permissions[$permission]);
 		$this->plugin->getRoleDataSource()->removeRolePermission($this, $permission);
 		if($update) {
 			$this->updateMemberPermissions();
