@@ -30,25 +30,27 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy;
 
 
+use CortexPE\Hierarchy\member\MemberFactory;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 
 class EventListener implements Listener {
-	/** @var Hierarchy */
-	protected $plugin;
+	/** @var MemberFactory */
+	protected $memberFactory;
 
 	public function __construct(Hierarchy $plugin) {
-		$this->plugin = $plugin;
+		$this->memberFactory = $plugin->getMemberFactory();
 	}
 
 	/**
-	 * @param PlayerJoinEvent $ev
+	 * @param PlayerLoginEvent $ev
 	 *
-	 * @priority LOWEST
+	 * @priority HIGHEST
+	 * @ignoreCancelled true
 	 */
-	public function onJoin(PlayerJoinEvent $ev) {
-		$this->plugin->getMemberFactory()->createSession($ev->getPlayer());
+	public function onLogin(PlayerLoginEvent $ev) {
+		$this->memberFactory->createSession($ev->getPlayer());
 	}
 
 	/**
@@ -57,6 +59,6 @@ class EventListener implements Listener {
 	 * @priority LOWEST
 	 */
 	public function onLeave(PlayerQuitEvent $ev) {
-		$this->plugin->getMemberFactory()->destroySession($ev->getPlayer());
+		$this->memberFactory->destroySession($ev->getPlayer());
 	}
 }
