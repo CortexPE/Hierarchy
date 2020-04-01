@@ -13,4 +13,6 @@ projects:
         version: ^1.0.0
       - src: CortexPE/Commando/Commando
         version: ^0.5.0
+    lint:
+      phpstan: false
 ...
