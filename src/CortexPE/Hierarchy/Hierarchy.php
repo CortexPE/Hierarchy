@@ -44,6 +44,7 @@ use CortexPE\Hierarchy\exception\StartupFailureException;
 use CortexPE\Hierarchy\lang\MessageStore;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\RoleManager;
+use CortexPE\Hierarchy\task\InvalidRolePermissionCheckTask;
 use Exception;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PluginBase;
@@ -116,6 +117,8 @@ class Hierarchy extends PluginBase {
 
 			$this->roleDS->initialize();
 			$this->memberDS->initialize();
+
+			$this->getScheduler()->scheduleTask(new InvalidRolePermissionCheckTask($this));
 		} catch(Exception $e){
 			$this->getLogger()->logException($e);
 			$this->getLogger()->warning("Forcefully shutting down server for the sake of security.");

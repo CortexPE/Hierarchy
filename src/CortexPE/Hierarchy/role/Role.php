@@ -34,13 +34,9 @@ use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use pocketmine\scheduler\ClosureTask;
 use function substr;
 
 class Role {
-	public const PERM_TYPE_ADD = 0;
-	public const PERM_TYPE_REMOVE = 1;
-
 	/** @var Hierarchy */
 	protected $plugin;
 
@@ -77,25 +73,6 @@ class Role {
 
 			$invert = (($permission{0} ?? "") == "-");
 			$this->permissions[($permission = !$invert ? $permission : substr($permission, 1))] = !$invert;
-
-			// do checks after everything has finished starting up
-			$plugin->getScheduler()->scheduleTask(new ClosureTask(function (int $_): void {
-				$pMgr = PermissionManager::getInstance();
-				$changed = false;
-				foreach($this->permissions as $permission => $val) {
-					$perm = $pMgr->getPermission($permission);
-					if(!($perm instanceof Permission)) {
-						$changed = true;
-						unset($this->permissions[$permission]);
-						$this->plugin->getLogger()
-									 ->warning("Unknown permission node '" . $permission . "' on " . $this->name . "(" . $this->id . ") role");
-						//throw new UnknownPermissionNode("Unknown permission node '" . $permission . "' on " . $name . " role");
-					}
-				}
-				if($changed) {
-					$this->updateMemberPermissions();
-				}
-			}));
 		}
 	}
 
@@ -177,11 +154,20 @@ class Role {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
-		unset($this->permissions[$permission]);
+		$this->removePermissionInternal($permission);
 		$this->plugin->getRoleDataSource()->removeRolePermission($this, $permission);
 		if($update) {
 			$this->updateMemberPermissions();
 		}
+	}
+
+	/**
+	 * @internal
+	 *
+	 * @param string $permission
+	 */
+	public function removePermissionInternal(string $permission): void {
+		unset($this->permissions[$permission]);
 	}
 
 	public function updateMemberPermissions(): void {
