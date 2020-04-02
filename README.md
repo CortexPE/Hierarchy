@@ -7,15 +7,16 @@
 | :-----: | :-------: | :-------: |
 | Multiple roles/groups per user | ✔️ | ❌ |
 | Allows same role/group names | ✔️ | ❌ |
-| Asynchronous I/O | ✔️ | ❌ |
+| Asynchronous Database I/O | ✔️ | ❌ |
 | MySQL DB Support | ✔️ | ✔️ |
 | SQLite3 DB Support | ✔️ | ✔️ |
 | YAML Storage Support | ✔️ | ✔️ |
 | JSON Storage Support | ✔️ | ❌ |
 | Per-Player-Permission | ✔️ | ✔️ |
-| Lightweight | ✔️ | ❌ |
+| Lightweight & concise | ✔️ | ❌ |
 | Extremely modular | ✔️ | ❌ |
-| Form GUI | ✔️ | ❌ |
+| In-game Form UI | ✔️ | ❌ |
+| In-game cmd argument list | ✔️ | ❌ |
 
 ### TODO (sorted by priority):
  - [ ] Documentation, documentation, DOCUMENTATION!
