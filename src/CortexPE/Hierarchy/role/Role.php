@@ -70,9 +70,12 @@ class Role {
 				}
 				continue;
 			}
-
-			$invert = (($permission{0} ?? "") == "-");
-			$this->permissions[($permission = !$invert ? $permission : substr($permission, 1))] = !$invert;
+			$value = true;
+			if(substr($permission, 0, 1) === "-"){
+				$value = false;
+				$permission = substr($permission, 1);
+			}
+			$this->permissions[$permission] = $value;
 		}
 	}
 
