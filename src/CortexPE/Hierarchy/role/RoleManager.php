@@ -57,13 +57,13 @@ class RoleManager {
 	}
 
 	/**
+	 * @internal Used to load role data from a data source
+	 *
 	 * @param array $roles
 	 *
 	 * @throws HierarchyException
-	 * @internal Used to load role data from a data source
-	 *
 	 */
-	public function loadRoles(array $roles) {
+	public function loadRoles(array $roles): void {
 		foreach($roles as $roleData) {
 			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
@@ -102,10 +102,19 @@ class RoleManager {
 		$this->plugin->getLogger()->info("Loaded " . count($this->roles) . " roles");
 	}
 
+	/**
+	 * Gets a role by its ID
+	 *
+	 * @param int $id
+	 * @return Role|null
+	 */
 	public function getRole(int $id): ?Role {
 		return $this->roles[$id] ?? null;
 	}
 
+	/**
+	 * Indexes role list to produce a lookup dictionary where Role Name => ID
+	 */
 	private function indexLookupTable(): void {
 		$this->lookupTable = $hasDupes = [];
 		foreach($this->roles as $id => $role) {
@@ -149,6 +158,8 @@ class RoleManager {
 	}
 
 	/**
+	 * Gets all roles in the server.
+	 *
 	 * @return Role[]
 	 */
 	public function getRoles(): array {
@@ -180,12 +191,20 @@ class RoleManager {
 		return $role;
 	}
 
+	/**
+	 * Sorts roles by position (ascending)
+	 */
 	private function sortRoles(): void {
-		uasort($this->roles, function (Role $a, Role $b) {
-			return $a->getPosition() > $b->getPosition();
+		uasort($this->roles, function (Role $a, Role $b): int {
+			return $a->getPosition() <=> $b->getPosition();
 		});
 	}
 
+	/**
+	 * Deletes a role, also deletes from the database.
+	 *
+	 * @param Role $role
+	 */
 	public function deleteRole(Role $role): void {
 		if($role->isDefault()) {
 			throw new RuntimeException("Default role cannot be deleted while at runtime");
@@ -198,12 +217,5 @@ class RoleManager {
 		$this->sortRoles();
 		$this->indexLookupTable();
 		$this->dataSource->deleteRoleFromStorage($role);
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getLookupTable(): array {
-		return $this->lookupTable;
 	}
 }

@@ -93,8 +93,8 @@ abstract class SQLMemberDS extends MemberDataSource {
 		return yield Await::ONCE;
 	}
 
-	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
-		Await::f2c(function () use ($member, $onLoad) {
+	public function loadMemberData(BaseMember $member): void {
+		Await::f2c(function () use ($member) {
 			$data = [
 				"roles" => [
 					$this->plugin->getRoleManager()->getDefaultRole()->getId()
@@ -113,11 +113,7 @@ abstract class SQLMemberDS extends MemberDataSource {
 				$data["permissions"][] = $row["Permission"];
 			}
 			$member->loadData($data);
-			if($onLoad !== null) {
-				$onLoad($member);
-			}
-		}, function () {
-		}, function (Throwable $err) {
+		}, null, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
 		});
 	}

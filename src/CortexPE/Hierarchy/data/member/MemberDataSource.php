@@ -41,12 +41,11 @@ abstract class MemberDataSource extends DataSource {
 
 	/**
 	 * @param BaseMember $member
-	 * @param callable   $onLoad
 	 *
 	 * @internal Get member data from the data source then pass to member object
 	 *
 	 */
-	abstract public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void;
+	abstract public function loadMemberData(BaseMember $member): void;
 
 	/**
 	 * @param BaseMember $member

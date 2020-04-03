@@ -64,12 +64,19 @@ abstract class BaseMember {
 	}
 
 	/**
+	 * Returns a list of all the Roles a member has
+	 *
 	 * @return Role[]
 	 */
 	public function getRoles(): array {
 		return $this->roles;
 	}
 
+	/**
+	 * @internal
+	 *
+	 * @param array $memberData
+	 */
 	public function loadData(array $memberData): void {
 		foreach($memberData["roles"] ?? [] as $roleId) {
 			$role = $this->plugin->getRoleManager()->getRole($roleId);
@@ -94,6 +101,13 @@ abstract class BaseMember {
 		$this->recalculatePermissions();
 	}
 
+	/**
+	 * Allow a member to use a permission
+	 *
+	 * @param Permission $permission
+	 * @param bool $recalculate
+	 * @param bool $save
+	 */
 	public function addMemberPermission(Permission $permission, bool $recalculate = true, bool $save = true): void {
 		$permission = $permission->getName();
 		$this->memberPermissions[$permission] = true;
@@ -105,6 +119,13 @@ abstract class BaseMember {
 		}
 	}
 
+	/**
+	 * Deny a member from using a permission
+	 *
+	 * @param Permission $permission
+	 * @param bool $recalculate
+	 * @param bool $save
+	 */
 	public function denyMemberPermission(Permission $permission, bool $recalculate = true, bool $save = true): void {
 		$permission = $permission->getName();
 		$this->memberPermissions[$permission] = false;
@@ -117,10 +138,14 @@ abstract class BaseMember {
 	}
 
 	/**
+	 * This function allows the removal of permissions based on their name because it may be a missing permission
+	 * intentionally being removed... A consideration for multi-server scenarios.
+	 *
 	 * @param Permission|string $permission
 	 * @param bool $recalculate
+	 * @param bool $save
 	 */
-	public function removeMemberPermission($permission, bool $recalculate = true): void {
+	public function removeMemberPermission($permission, bool $recalculate = true, bool $save = true): void {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
@@ -128,9 +153,18 @@ abstract class BaseMember {
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
-		$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_PERMS_REMOVE, $permission);
+		if($save){
+			$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_PERMS_REMOVE, $permission);
+		}
 	}
 
+	/**
+	 * Gives the member a role
+	 *
+	 * @param Role $role
+	 * @param bool $recalculate
+	 * @param bool $save
+	 */
 	public function addRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if(!$this->hasRole($role)) {
 			$ev = new MemberRoleAddEvent($this, $role);
@@ -147,12 +181,27 @@ abstract class BaseMember {
 		}
 	}
 
+	/**
+	 * Called after a role is added, before being saved into the database. Used for giving a reference to the member
+	 * to a role on Online Members.
+	 *
+	 * @param Role $role
+	 */
 	abstract protected function onRoleAdd(Role $role): void;
 
+	/**
+	 * Allows to check if the member has a specific role.
+	 *
+	 * @param Role $role
+	 * @return bool
+	 */
 	public function hasRole(Role $role): bool {
 		return in_array($role, $this->roles, true);
 	}
 
+	/**
+	 * Called to recalculate member permissions.
+	 */
 	public function recalculatePermissions(): void {
 		$this->permissions = [];
 		$perms = []; // default
@@ -164,6 +213,12 @@ abstract class BaseMember {
 		$this->permissions = array_replace_recursive(...$perms);
 	}
 
+	/**
+	 * Removes all roles that are loaded. (This excludes roles that are missing)
+	 *
+	 * @param bool $recalculate
+	 * @param bool $save
+	 */
 	public function clearRoles(bool $recalculate = true, bool $save = true): void {
 		foreach($this->roles as $role) {
 			$this->removeRole($role, false, $save);
@@ -174,6 +229,13 @@ abstract class BaseMember {
 		}
 	}
 
+	/**
+	 * Removes a specific role
+	 *
+	 * @param Role $role
+	 * @param bool $recalculate
+	 * @param bool $save
+	 */
 	public function removeRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if($this->hasRole($role)) {
 			$ev = new MemberRoleRemoveEvent($this, $role);

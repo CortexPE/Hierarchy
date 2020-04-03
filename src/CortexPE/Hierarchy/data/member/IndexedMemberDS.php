@@ -58,11 +58,8 @@ abstract class IndexedMemberDS extends MemberDataSource {
 
 	abstract function encode(array $data): string;
 
-	public function loadMemberData(BaseMember $member, ?callable $onLoad = null): void {
+	public function loadMemberData(BaseMember $member): void {
 		$member->loadData($this->readMemberData($member));
-		if($onLoad !== null) {
-			$onLoad();
-		}
 	}
 
 	public function updateMemberData(BaseMember $member, string $action, $data): void {

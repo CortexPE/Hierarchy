@@ -52,12 +52,10 @@ class MemberFactory {
 
 	/**
 	 * @param Player|OfflinePlayer|string $player
-	 * @param bool $loadData
-	 * @param callable|null $onLoad
 	 *
 	 * @return BaseMember
 	 */
-	public function getMember($player, bool $loadData = true, ?callable $onLoad = null): BaseMember {
+	public function getMember($player): BaseMember {
 		if(is_string($player)) {
 			$player = $this->plugin->getServer()->getOfflinePlayer((string)$player);
 		}
@@ -73,12 +71,8 @@ class MemberFactory {
 			$m = new OfflineMember($this->plugin, $player->getName());
 			$newMember = true;
 		}
-		if($loadData && $newMember) {
-			($ds = $this->plugin->getMemberDataSource())->loadMemberData($m, function() use ($m, $onLoad) {
-				if($onLoad !== null) {
-					($onLoad)($m);
-				}
-			});
+		if($newMember) {
+			($ds = $this->plugin->getMemberDataSource())->loadMemberData($m);
 			if($m instanceof OfflineMember && $ds instanceof SQLMemberDS) {
 				/**
 				 * TODO:
@@ -88,8 +82,6 @@ class MemberFactory {
 				 */
 				$ds->getDB()->waitAll();
 			}
-		} elseif($onLoad !== null) {
-			($onLoad)($m);
 		}
 
 		return $m;
