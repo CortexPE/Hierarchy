@@ -34,6 +34,7 @@ use CortexPE\Hierarchy\data\role\RoleDataSource;
 use CortexPE\Hierarchy\exception\HierarchyException;
 use CortexPE\Hierarchy\exception\RoleCollissionError;
 use CortexPE\Hierarchy\Hierarchy;
+use CortexPE\Hierarchy\member\OfflineMember;
 use RuntimeException;
 use function uasort;
 
@@ -204,6 +205,7 @@ class RoleManager {
 	 * Deletes a role, also deletes from the database.
 	 *
 	 * @param Role $role
+	 * @throws HierarchyException
 	 */
 	public function deleteRole(Role $role): void {
 		if($role->isDefault()) {
@@ -213,9 +215,15 @@ class RoleManager {
 		foreach($members as $member) {
 			$member->removeRole($role);
 		}
-		unset($this->roles[$role->getId()]);
-		$this->sortRoles();
-		$this->indexLookupTable();
-		$this->dataSource->deleteRoleFromStorage($role);
+		$role->getOfflineMembers(function(array $members) use ($role): void{
+			/** @var OfflineMember $member */
+			foreach($members as $member){
+				$member->removeRole($role, false);
+			}
+			unset($this->roles[$role->getId()]);
+			$this->sortRoles();
+			$this->indexLookupTable();
+			$this->dataSource->deleteRoleFromStorage($role);
+		});
 	}
 }

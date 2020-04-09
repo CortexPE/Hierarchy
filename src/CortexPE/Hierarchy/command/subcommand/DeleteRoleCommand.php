@@ -64,7 +64,7 @@ class DeleteRoleCommand extends HierarchySubCommand implements FormedCommand {
 		if($role instanceof Role) {
 			$formats = [
 				"role" => $role->getName(),
-				"id" => $role->getId(),
+				"role_id" => $role->getId(),
 			];
 
 			if(!$this->doHierarchyPositionCheck($role)) {
