@@ -69,20 +69,4 @@ abstract class RoleDataSource extends DataSource {
 	 * @internal Delete role from storage
 	 */
 	abstract public function deleteRoleFromStorage(Role $role): void;
-
-	/**
-	 * @param int $offset
-	 * @param int $amount
-	 *
-	 * @internal Shift role positions
-	 */
-	abstract public function shiftRoles(int $offset, int $amount = 1): void;
-
-	/**
-	 * @param int $offset
-	 * @param int $amount
-	 *
-	 * @internal Unshift role positions
-	 */
-	abstract public function unshiftRoles(int $offset, int $amount = 1): void;
 }

@@ -68,7 +68,6 @@ abstract class IndexedRoleDS extends RoleDataSource {
 			file_put_contents($this->rolesFile, $this->encode(($this->roles = [
 				[
 					"ID" => 1,
-					"Position" => 0,
 					"Name" => "Member",
 					"isDefault" => true,
 					"Permissions" => array_map(function (Permission $perm) {
@@ -77,7 +76,6 @@ abstract class IndexedRoleDS extends RoleDataSource {
 				],
 				[
 					"ID" => 2,
-					"Position" => 1,
 					"Name" => "Operator",
 					"isDefault" => false,
 					"Permissions" => array_map(function (Permission $perm) {
@@ -116,13 +114,12 @@ abstract class IndexedRoleDS extends RoleDataSource {
 	}
 
 	public function createRoleOnStorage(string $name, int $id, int $position): void {
-		$this->roles[] = [ // we dont need to find index, it's a new role.
+		array_splice($this->roles, $position, 0, [
 			"ID" => $id,
-			"Position" => $position,
 			"Name" => $name,
 			"isDefault" => false,
 			"Permissions" => []
-		];
+		]);
 		$this->flush();
 	}
 
@@ -146,18 +143,6 @@ abstract class IndexedRoleDS extends RoleDataSource {
 		throw new UnresolvedRoleException("Unable to resolve unknown role with ID {$roleID}");
 	}
 
-	public function shiftRoles(int $offset, int $amount = 1): void {
-		foreach($this->roles as $rID => $role) {
-			if($role["Position"] > $offset) {
-				$this->roles[$rID]["Position"] += $amount;
-			}
-		}
-	}
-
-	public function unshiftRoles(int $offset, int $amount = 1): void {
-		$this->shiftRoles($offset, -$amount);
-	}
-
 	public function shutdown(): void {
 		// should be saved already
 	}
@@ -171,6 +156,7 @@ abstract class IndexedRoleDS extends RoleDataSource {
 	}
 
 	public function flush(): void {
+		ksort($this->roles);
 		file_put_contents($this->rolesFile, $this->encode($this->roles));
 	}
 }

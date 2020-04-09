@@ -88,6 +88,9 @@ class RoleManager {
 				$this->lastID = $roleData["ID"];
 			}
 			if($roleData["isDefault"]) {
+				if($i !== 0){
+					throw new HierarchyException("Default role must always be the first role (lowest position).");
+				}
 				if($this->defaultRole === null) {
 					$this->defaultRole = $role;
 				} else {
@@ -181,7 +184,6 @@ class RoleManager {
 				$role->bumpPosition();
 			}
 		}
-		$this->dataSource->shiftRoles($defRolePos);
 		$this->dataSource->createRoleOnStorage($name, $this->lastID += 1, $newRolePos);
 		$role = $this->roles[$this->lastID] = new Role($this->plugin, $this->lastID, $name, [
 			"position" => $newRolePos
