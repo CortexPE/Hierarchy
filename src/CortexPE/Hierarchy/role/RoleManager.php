@@ -67,10 +67,18 @@ class RoleManager {
 	public function loadRoles(array $roles): void {
 		foreach($roles as $i => $roleData) {
 			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
-				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
 				"position" => $i,
 				"isDefault" => $roleData["isDefault"]
 			]);
+			foreach($roleData["Inherits"] ?? [] as $inherit){
+				if(!isset($this->lookupTable[$inherit])){
+					$this->plugin->getLogger()->warning("Cannot inherit role '$inherit' from '{$roleData['Name']}' ({$roleData['ID']}). Roles can only inherit permissions from other roles with lower positions.");
+					continue;
+				}
+				$role->inheritRole($this->getRoleByName($inherit));
+			}
+			$role->loadPermissions($roleData["Permissions"] ?? []);
+
 			if($roleData["ID"] < 0) {
 				throw new HierarchyException("Role '{$role->getName()}'({$role->getId()}) has a negative ID");
 			}
@@ -92,12 +100,12 @@ class RoleManager {
 					throw new RoleCollissionError("There can only be one default role");
 				}
 			}
+			$this->addToLookupTable($role);
 		}
 		if(!($this->defaultRole instanceof Role)) {
 			throw new RuntimeException("No default role is set");
 		}
 		$this->sortRoles();
-		$this->indexLookupTable();
 		$this->plugin->getLogger()->info("Loaded " . count($this->roles) . " roles");
 	}
 
@@ -112,28 +120,22 @@ class RoleManager {
 	}
 
 	/**
-	 * Indexes role list to produce a lookup dictionary where Role Name => ID
+	 * Adds a role to the lookup dictionary where Role Name => ID
+	 *
+	 * @param Role $role
 	 */
-	private function indexLookupTable(): void {
-		$this->lookupTable = $hasDupes = [];
-		foreach($this->roles as $id => $role) {
-			$name = $role->getName();
-			if(isset($this->lookupTable[$name])) {
-				$hasDupes[$name] = true;
-
-				$_id = $this->lookupTable[$name];
-				unset($this->lookupTable[$name]);
-				$this->lookupTable["{$name}.{$_id}"] = $_id;
-			}
-
-			$id = $role->getId();
-			if(!isset($hasDupes[$name])) {
-				$this->lookupTable[$name] = $id;
-			} else {
-				$this->lookupTable["{$name}.{$id}"] = $id;
-			}
-			$this->lookupTable[$id] = $id;
+	private function addToLookupTable(Role $role): void {
+		$name = $role->getName();
+		$id = $role->getId();
+		if(isset($this->lookupTable[$name])) {
+			$_id = $this->lookupTable[$name];
+			unset($this->lookupTable[$name]);
+			$this->lookupTable["{$name}.{$_id}"] = $_id;
+			$this->lookupTable["{$name}.{$id}"] = $role->getId();
+		} else {
+			$this->lookupTable[$name] = $id;
 		}
+		$this->lookupTable[$id] = $id;
 	}
 
 	/**

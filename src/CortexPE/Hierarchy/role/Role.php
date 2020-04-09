@@ -66,22 +66,6 @@ class Role {
 		$this->name = $name;
 		$this->position = $roleData["position"];
 		$this->isDefault = (bool)($roleData["isDefault"] ?? false);
-
-		$pMgr = PermissionManager::getInstance();
-		foreach($roleData["permissions"] ?? [] as $permission) {
-			if($permission == "*") {
-				foreach($pMgr->getPermissions() as $perm) {
-					$this->permissions[$perm->getName()] = true;
-				}
-				continue;
-			}
-			$value = true;
-			if(substr($permission, 0, 1) === "-"){
-				$value = false;
-				$permission = substr($permission, 1);
-			}
-			$this->permissions[$permission] = $value;
-		}
 	}
 
 	/**
@@ -219,5 +203,39 @@ class Role {
 	public function bumpPosition(): void {
 		$this->position++;
 		$this->updateMemberPermissions();
+	}
+
+	/**
+	 * @internal Used internally for loading permissions from an inherited role
+	 *
+	 * @param Role $role
+	 */
+	public function inheritRole(Role $role):void {
+		foreach($role->getPermissions() as $permission => $toggle){
+			$this->permissions[$permission] = $toggle;
+		}
+	}
+
+	/**
+	 * @internal Used internally for loading permissions from storage
+	 *
+	 * @param array $permissions
+	 */
+	public function loadPermissions(array $permissions):void {
+		$pMgr = PermissionManager::getInstance();
+		foreach($permissions ?? [] as $permission) {
+			if($permission == "*") {
+				foreach($pMgr->getPermissions() as $perm) {
+					$this->permissions[$perm->getName()] = true;
+				}
+				continue;
+			}
+			$value = true;
+			if(substr($permission, 0, 1) === "-"){
+				$value = false;
+				$permission = substr($permission, 1);
+			}
+			$this->permissions[$permission] = $value;
+		}
 	}
 }
