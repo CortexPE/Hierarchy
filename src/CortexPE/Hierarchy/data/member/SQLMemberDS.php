@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy\data\member;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
 use Generator;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
@@ -145,6 +146,12 @@ abstract class SQLMemberDS extends MemberDataSource {
 				]);
 				break;
 		}
+	}
+
+	public function getMemberNamesOf(Role $role): \Generator {
+		return $this->asyncSelect("hierarchy.role.members", [
+			"role_id" => $role->getId()
+		]);
 	}
 
 	public function shutdown(): void {

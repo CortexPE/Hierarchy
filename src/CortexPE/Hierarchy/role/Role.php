@@ -30,10 +30,15 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\role;
 
 
+use CortexPE\Hierarchy\exception\HierarchyException;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\member\Member;
+use CortexPE\Hierarchy\member\OfflineMember;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
+use pocketmine\utils\Utils;
+use SOFe\AwaitGenerator\Await;
 use function substr;
 
 class Role {
@@ -52,8 +57,8 @@ class Role {
 	/** @var bool */
 	protected $isDefault = false;
 
-	/** @var BaseMember[] */
-	protected $members = [];
+	/** @var Member[] */
+	protected $onlineMembers = [];
 
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
 		$this->plugin = $plugin;
@@ -108,18 +113,47 @@ class Role {
 	}
 
 	public function bind(BaseMember $member): void {
-		$this->members[$member->getName()] = $member;
+		$this->onlineMembers[strtolower($member->getName())] = $member;
 	}
 
 	public function unbind(BaseMember $member): void {
-		unset($this->members[$member->getName()]);
+		unset($this->onlineMembers[strtolower($member->getName())]);
 	}
 
 	/**
-	 * @return BaseMember[]
+	 * @return Member[]
 	 */
-	public function getMembers(): array {
-		return $this->members;
+	public function getOnlineMembers(): array {
+		return $this->onlineMembers;
+	}
+
+	/**
+	 * Triggers the callback with a list of OfflineMember objects
+	 *
+	 * @param callable $callback
+	 * @throws HierarchyException
+	 */
+	public function getOfflineMembers(callable $callback): void {
+		Utils::validateCallableSignature(function(array $member):void{}, $callback);
+		if($this->isDefault){ // basically everyone who joined the server and will ever join the server
+			throw new HierarchyException("Cannot get offline members of default role");
+		}
+		Await::f2c(function() use ($callback):\Generator{
+			$members = [];
+			foreach(yield $this->plugin->getMemberDataSource()->getMemberNamesOf($this) as $row){
+				$n = strtolower($row["Player"]);
+				if(isset($this->onlineMembers[$n])){
+					continue;
+				}
+				if(isset($members[$n])){
+					continue;
+				}
+				$members[$n] = new OfflineMember($this->plugin, $row["Player"]);
+			}
+			$callback($members);
+		}, null, function(\Throwable $e):void{
+			$this->plugin->getLogger()->logException($e);
+		});
 	}
 
 	/**
@@ -174,7 +208,7 @@ class Role {
 	}
 
 	public function updateMemberPermissions(): void {
-		foreach($this->members as $member) {
+		foreach($this->onlineMembers as $member) {
 			$member->recalculatePermissions();
 		}
 	}

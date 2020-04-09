@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy\data\member;
 
 use CortexPE\Hierarchy\data\DataSource;
 use CortexPE\Hierarchy\member\BaseMember;
+use CortexPE\Hierarchy\role\Role;
 
 abstract class MemberDataSource extends DataSource {
 	public const ACTION_MEMBER_ROLE_ADD = "member.role.add";
@@ -56,4 +57,6 @@ abstract class MemberDataSource extends DataSource {
 	 *
 	 */
 	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
+
+	abstract public function getMemberNamesOf(Role $role): \Generator;
 }

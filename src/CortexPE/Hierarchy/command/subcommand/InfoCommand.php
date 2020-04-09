@@ -175,35 +175,53 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 			if($sender->hasPermission("hierarchy.info.role")) {
 				/** @var Role $target */
 				foreach($args["targetRole"] as $target) {
-					$this->sendFormattedMessage("cmd.info.role.header", [
+					$lines = [];
+					$lines[] = MessageStore::getMessage("cmd.info.role.header", [
 						"role" => $target->getName(),
 						"role_id" => $target->getId()
 					]);
-					$this->sendFormattedMessage("cmd.info.role.position", [
+					$lines[] = MessageStore::getMessage("cmd.info.role.position", [
 						"position" => $target->getPosition()
 					]);
-					$this->sendFormattedMessage("cmd.info.role.default", [
+					$lines[] = MessageStore::getMessage("cmd.info.role.default", [
 						"isDefault" => $target->isDefault() ? TextFormat::GREEN . "YES" : TextFormat::RED . "NO"
 					]);
-					$this->sendFormattedMessage("cmd.info.role.perms_header");
+					$lines[] = MessageStore::getMessage("cmd.info.role.perms_header");
 					foreach($target->getPermissions() as $permission => $allowed) {
-						$this->sendFormattedMessage("cmd.info.role.perm_entry", [
+						$lines[] = MessageStore::getMessage("cmd.info.role.perm_entry", [
 							"permission" => $permission,
 							"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
 						]);
 					}
-					$this->sendFormattedMessage("cmd.info.role.members_header", [
-						"count" => ($c = count($target->getMembers()))
+					$lines[] = MessageStore::getMessage("cmd.info.role.members_header", [
+						"count" => ($c = count($target->getOnlineMembers()))
 					]);
 					if($c > 0) {
-						foreach($target->getMembers() as $member) {
-							$this->sendFormattedMessage("cmd.info.role.member_entry", [
+						foreach($target->getOnlineMembers() as $member) {
+							$lines[] = MessageStore::getMessage("cmd.info.role.member_entry", [
 								"member" => $member->getName()
 							]);
 						}
 					} else {
-						$this->sendFormattedMessage("cmd.info.role.no_online_members");
+						$lines[] = MessageStore::getMessage("cmd.info.role.no_online_members");
 					}
+					$target->getOfflineMembers(function(array $members) use ($lines, $sender):void{
+						$lines[] = MessageStore::getMessage("cmd.info.role.offline_members_header", [
+							"count" => ($c = count($members))
+						]);
+						if($c > 0) {
+							foreach($members as $member) {
+								$lines[] = MessageStore::getMessage("cmd.info.role.offline_member_entry", [
+									"member" => $member->getName()
+								]);
+							}
+						} else {
+							$lines[] = MessageStore::getMessage("cmd.info.role.no_offline_members");
+						}
+						foreach($lines as $line){
+							$sender->sendMessage($line);
+						}
+					});
 					break;
 				}
 			} else {

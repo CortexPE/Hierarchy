@@ -83,6 +83,9 @@ class MessageStore {
 		"cmd.info.role.members_header" => "&e&lOnline Members ({count}):",
 		"cmd.info.role.member_entry" => "&e - {member}",
 		"cmd.info.role.no_online_members" => "&e - &cNo online members",
+		"cmd.info.role.offline_members_header" => "&e&lOffline Members ({count}):",
+		"cmd.info.role.offline_member_entry" => "&e - {member}",
+		"cmd.info.role.no_offline_members" => "&e - &cNo offline members",
 
 		"cmd.info.role_list.header" => "&9&lAvailable Roles ({count}):",
 		"cmd.info.role_list.entry" => "&e - {role} ({role_id})",

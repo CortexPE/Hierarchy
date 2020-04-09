@@ -101,6 +101,12 @@ WHERE Player = :username
 -- # }
 
 -- #  { role
+-- #    { members
+-- #      :role_id int
+SELECT Player
+FROM MemberRoles
+WHERE RoleID = :role_id;
+-- #    }
 -- #    { list
 SELECT *
 FROM Roles;
