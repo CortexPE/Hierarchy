@@ -66,6 +66,7 @@ class RolePositionSimplifier extends BaseMigrator {
 		$plugin->getLogger()->info("Migrating role configuration to new format");
 		self::createBackup($plugin);
 		ksort($roles);
+		$roles = array_values($roles); // remove keys
 		switch($plugin->getConfig()->getNested("roleDataSource.type")){
 			case "yaml":
 				file_put_contents($fn, yaml_emit($roles));
