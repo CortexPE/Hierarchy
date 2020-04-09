@@ -38,6 +38,7 @@ use CortexPE\Hierarchy\data\member\SQLiteMemberDS;
 use CortexPE\Hierarchy\data\member\YAMLMemberDS;
 use CortexPE\Hierarchy\data\migrator\DSMigrator;
 use CortexPE\Hierarchy\data\migrator\IndexedToSQL;
+use CortexPE\Hierarchy\data\migrator\RolePositionSimplifier;
 use CortexPE\Hierarchy\data\role\JSONRoleDS;
 use CortexPE\Hierarchy\data\role\RoleDataSource;
 use CortexPE\Hierarchy\data\role\YAMLRoleDS;
@@ -70,6 +71,7 @@ class Hierarchy extends PluginBase {
 		try{
 			DSMigrator::tryMigration($this);
 			IndexedToSQL::tryMigration($this);
+			RolePositionSimplifier::tryMigration($this);
 
 			$this->saveResource("config.yml");
 			(new MessageStore($this->getDataFolder() . "messages.yml"));

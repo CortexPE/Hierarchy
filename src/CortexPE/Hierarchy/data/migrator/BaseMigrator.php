@@ -53,6 +53,7 @@ abstract class BaseMigrator {
 	 */
 	private static function recursiveCopy(string $path, string $destination): void {
 		mkdir($destination);
+		/** @var \SplFileInfo $item */
 		foreach(
 			$iterator = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -61,7 +62,7 @@ abstract class BaseMigrator {
 			if($item->isDir()) {
 				mkdir($destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
 			} else {
-				copy($item, $destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+				copy($item->getPathname(), $destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
 			}
 		}
 	}

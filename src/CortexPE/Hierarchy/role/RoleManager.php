@@ -65,10 +65,10 @@ class RoleManager {
 	 * @throws HierarchyException
 	 */
 	public function loadRoles(array $roles): void {
-		foreach($roles as $roleData) {
+		foreach($roles as $i => $roleData) {
 			$role = new Role($this->plugin, $roleData["ID"], $roleData["Name"], [
 				"permissions" => $roleData["Permissions"] ?? [], // permissions can be empty
-				"position" => $roleData["Position"],
+				"position" => $i,
 				"isDefault" => $roleData["isDefault"]
 			]);
 			foreach($this->roles as $i_role) {
