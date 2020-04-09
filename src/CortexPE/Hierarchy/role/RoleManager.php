@@ -71,11 +71,6 @@ class RoleManager {
 				"position" => $i,
 				"isDefault" => $roleData["isDefault"]
 			]);
-			foreach($this->roles as $i_role) {
-				if($i_role->getPosition() == $roleData["Position"]) {
-					throw new RoleCollissionError("Role '{$i_role->getName()}'({$i_role->getId()}) has a colliding Position");
-				}
-			}
 			if($roleData["ID"] < 0) {
 				throw new HierarchyException("Role '{$role->getName()}'({$role->getId()}) has a negative ID");
 			}
