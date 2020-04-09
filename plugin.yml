@@ -1,12 +1,12 @@
 name: Hierarchy
 main: CortexPE\Hierarchy\Hierarchy
-version: 1.1.4
+version: 1.2.0
 api: 3.0.0
 load: POSTWORLD
 author: CortexPE
 description: "Role-based permission management system"
 website: "https://CortexPE.xyz"
-
+extensions: ["sqlite3"]
 permissions:
   hierarchy:
     default: "false"

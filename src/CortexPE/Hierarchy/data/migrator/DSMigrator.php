@@ -39,29 +39,18 @@ use CortexPE\Hierarchy\data\legacy\YAMLLDR;
 use CortexPE\Hierarchy\data\role\YAMLRoleDS;
 use CortexPE\Hierarchy\exception\StartupFailureException;
 use CortexPE\Hierarchy\Hierarchy;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use function copy;
 use function file_exists;
-use function mkdir;
-use function realpath;
 use function unlink;
 use function yaml_emit_file;
 use function yaml_parse_file;
-use const DIRECTORY_SEPARATOR;
 
-class DSMigrator {
-	private final function __construct() {
-	}
-
+class DSMigrator extends BaseMigrator {
 	public static function tryMigration(Hierarchy $plugin): void {
 		if(file_exists(($fp = $plugin->getDataFolder() . "config.yml"))) {
 			$data = yaml_parse_file($fp);
 			if(!isset($data["configVersion"])) { // v1.0.0 -> v1.1.0
-				self::recursiveCopy(
-					$plugin->getDataFolder(),
-					realpath($plugin->getDataFolder()) . "_backup_" . date("d-m-Y_H-i-s")
-				);
+				$plugin->getLogger()->info("Migrating all data to newer Data Storage format");
+				self::createBackup($plugin);
 				unlink($fp);
 				$plugin->saveConfig();
 				$conf = $plugin->getConfig();
@@ -105,25 +94,6 @@ class DSMigrator {
 
 				$conf->save();
 				$source->shutdown();
-			}
-		}
-	}
-
-	/**
-	 * @param string $path
-	 * @param string $destination
-	 */
-	private static function recursiveCopy(string $path, string $destination): void {
-		mkdir($destination);
-		foreach(
-			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::SELF_FIRST) as $item
-		) {
-			if($item->isDir()) {
-				mkdir($destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-			} else {
-				copy($item, $destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
 			}
 		}
 	}

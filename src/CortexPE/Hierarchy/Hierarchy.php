@@ -37,6 +37,7 @@ use CortexPE\Hierarchy\data\member\MySQLMemberDS;
 use CortexPE\Hierarchy\data\member\SQLiteMemberDS;
 use CortexPE\Hierarchy\data\member\YAMLMemberDS;
 use CortexPE\Hierarchy\data\migrator\DSMigrator;
+use CortexPE\Hierarchy\data\migrator\IndexedToSQL;
 use CortexPE\Hierarchy\data\role\JSONRoleDS;
 use CortexPE\Hierarchy\data\role\RoleDataSource;
 use CortexPE\Hierarchy\data\role\YAMLRoleDS;
@@ -68,6 +69,7 @@ class Hierarchy extends PluginBase {
 	public function onEnable(): void {
 		try{
 			DSMigrator::tryMigration($this);
+			IndexedToSQL::tryMigration($this);
 
 			$this->saveResource("config.yml");
 			(new MessageStore($this->getDataFolder() . "messages.yml"));
@@ -87,12 +89,6 @@ class Hierarchy extends PluginBase {
 			}
 
 			switch($conf->getNested("memberDataSource.type", "yaml")) {
-				case "json":
-					$this->memberDS = new JSONMemberDS($this, $conf->getNested("memberDataSource.json"));
-					break;
-				case "yaml":
-					$this->memberDS = new YAMLMemberDS($this);
-					break;
 				case "sqlite3":
 					if(!extension_loaded("sqlite3")) {
 						throw new StartupFailureException("SQLite3 PHP Extension is not enabled! Please check php.ini or choose a different data source type");
@@ -107,7 +103,7 @@ class Hierarchy extends PluginBase {
 					break;
 
 				default:
-					throw new StartupFailureException("Invalid role data source type, must be one of the following: 'json', 'yaml'");
+					throw new StartupFailureException("Invalid member data source type, must be one of the following: 'sqlite3', 'mysql'");
 			}
 
 			DefaultPermissions::registerCorePermissions();
@@ -164,7 +160,7 @@ class Hierarchy extends PluginBase {
 	/**
 	 * @return MemberDataSource
 	 */
-	public function getMemberDataSource(): MemberDataSource {
+	public function getMemberDataSource(): ?MemberDataSource {
 		return $this->memberDS;
 	}
 

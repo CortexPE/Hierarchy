@@ -14,11 +14,6 @@ memberDataSource:
   # Available Types: json, sqlite3, mysql, yaml
   type: "sqlite3"
 
-  # These settings will only apply when you chose json as dataSource type
-  json:
-    # Save JSON data files in a human-readable way
-    prettyPrint: true
-
   # These settings will only apply when you chose sqlite3 as dataSource type
   sqlite3:
     # Database path
@@ -39,5 +34,5 @@ memberDataSource:
 # Allow OPs to bypass permission checks
 superAdminOPs: false
 
-configVersion: 1.5
+configVersion: 1.6
 ...
