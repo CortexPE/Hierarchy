@@ -193,35 +193,41 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 							"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
 						]);
 					}
-					$lines[] = MessageStore::getMessage("cmd.info.role.members_header", [
-						"count" => ($c = count($target->getOnlineMembers()))
-					]);
-					if($c > 0) {
-						foreach($target->getOnlineMembers() as $member) {
-							$lines[] = MessageStore::getMessage("cmd.info.role.member_entry", [
-								"member" => $member->getName()
-							]);
-						}
-					} else {
-						$lines[] = MessageStore::getMessage("cmd.info.role.no_online_members");
-					}
-					$target->getOfflineMembers(function(array $members) use ($lines, $sender):void{
-						$lines[] = MessageStore::getMessage("cmd.info.role.offline_members_header", [
-							"count" => ($c = count($members))
+					if(!$target->isDefault()){
+						$lines[] = MessageStore::getMessage("cmd.info.role.members_header", [
+							"count" => ($c = count($target->getOnlineMembers()))
 						]);
 						if($c > 0) {
-							foreach($members as $member) {
-								$lines[] = MessageStore::getMessage("cmd.info.role.offline_member_entry", [
+							foreach($target->getOnlineMembers() as $member) {
+								$lines[] = MessageStore::getMessage("cmd.info.role.member_entry", [
 									"member" => $member->getName()
 								]);
 							}
 						} else {
-							$lines[] = MessageStore::getMessage("cmd.info.role.no_offline_members");
+							$lines[] = MessageStore::getMessage("cmd.info.role.no_online_members");
 						}
+						$target->getOfflineMembers(function(array $members) use ($lines, $sender):void{
+							$lines[] = MessageStore::getMessage("cmd.info.role.offline_members_header", [
+								"count" => ($c = count($members))
+							]);
+							if($c > 0) {
+								foreach($members as $member) {
+									$lines[] = MessageStore::getMessage("cmd.info.role.offline_member_entry", [
+										"member" => $member->getName()
+									]);
+								}
+							} else {
+								$lines[] = MessageStore::getMessage("cmd.info.role.no_offline_members");
+							}
+							foreach($lines as $line){
+								$sender->sendMessage($line);
+							}
+						});
+					} else {
 						foreach($lines as $line){
 							$sender->sendMessage($line);
 						}
-					});
+					}
 					break;
 				}
 			} else {
