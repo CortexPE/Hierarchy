@@ -12,7 +12,7 @@ projects:
       - src: dktapps-pm-pl/pmforms/pmforms
         version: ^1.0.0
       - src: CortexPE/Commando/Commando
-        version: ^0.5.0
+        version: ~0.6 # change this to ^1.x.x when the time comes... we're using ~ because ~0.6 is >=0.6 <1.0.0
     lint:
       phpstan: false
 ...
