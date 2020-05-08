@@ -36,10 +36,10 @@ class RolePositionSimplifier extends BaseMigrator {
 	public static function tryMigration(Hierarchy $plugin): void {
 		switch($plugin->getConfig()->getNested("roleDataSource.type")){
 			case "yaml":
-				$data = yaml_parse_file($fn = $plugin->getDataFolder() . "roles.yml");
+				$data = file_exists($fn = $plugin->getDataFolder() . "roles.yml") ? yaml_parse_file($fn) : [];
 				break;
 			case "json":
-				$data = json_decode($fn = $plugin->getDataFolder() . "roles.json", true);
+				$data = file_exists($fn = $plugin->getDataFolder() . "roles.json") ? json_decode(file_get_contents($fn), true) : [];
 				break;
 			default:
 				throw new \InvalidStateException("Invalid role DataSource type, please use either 'json' or 'yaml'");
