@@ -139,6 +139,23 @@ class RoleManager {
 	}
 
 	/**
+	 * Removes a role from the lookup dictionary where Role Name => ID
+	 *
+	 * @param Role $role
+	 */
+	private function removeFromLookupTable(Role $role): void {
+		$name = $role->getName();
+		$id = $role->getId();
+		if(isset($this->lookupTable["{$name}.{$id}"]) && !isset($this->lookupTable[$name])){
+			unset($this->lookupTable["{$name}.{$id}"]);
+			$this->lookupTable[$name] = $id;
+		} else {
+			unset($this->lookupTable[$name]);
+		}
+		unset($this->lookupTable[$id]);
+	}
+
+	/**
 	 * Tries to resolve a role by its name.
 	 *
 	 * WARNING: This uses the `roleName.ID` (MyRole.4) format for colliding role names
@@ -186,7 +203,7 @@ class RoleManager {
 			"position" => $newRolePos
 		]);
 		$this->sortRoles();
-		$this->indexLookupTable();
+		$this->addToLookupTable($role);
 
 		return $role;
 	}
@@ -221,7 +238,7 @@ class RoleManager {
 			}
 			unset($this->roles[$role->getId()]);
 			$this->sortRoles();
-			$this->indexLookupTable();
+			$this->removeFromLookupTable($role);
 			$this->dataSource->deleteRoleFromStorage($role);
 		});
 	}
