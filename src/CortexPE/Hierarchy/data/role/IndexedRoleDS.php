@@ -114,12 +114,12 @@ abstract class IndexedRoleDS extends RoleDataSource {
 	}
 
 	public function createRoleOnStorage(string $name, int $id, int $position): void {
-		array_splice($this->roles, $position, 0, [
+		array_splice($this->roles, $position, 0, [[
 			"ID" => $id,
 			"Name" => $name,
 			"isDefault" => false,
 			"Permissions" => []
-		]);
+		]]);
 		$this->flush();
 	}
 
