@@ -167,10 +167,10 @@ abstract class BaseMember {
 	 */
 	public function addRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if(!$this->hasRole($role)) {
-			$ev = new MemberRoleAddEvent($this, $role);
-			$ev->call();
 			$this->roles[$role->getId()] = $role;
 			$this->onRoleAdd($role);
+			$ev = new MemberRoleAddEvent($this, $role);
+			$ev->call();
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			}
@@ -238,10 +238,10 @@ abstract class BaseMember {
 	 */
 	public function removeRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if($this->hasRole($role)) {
-			$ev = new MemberRoleRemoveEvent($this, $role);
-			$ev->call();
 			unset($this->roles[$role->getId()]);
 			$this->onRoleRemove($role);
+			$ev = new MemberRoleRemoveEvent($this, $role);
+			$ev->call();
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			}
