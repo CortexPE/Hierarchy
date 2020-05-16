@@ -57,6 +57,7 @@ class Member extends BaseMember {
 
 	public function recalculatePermissions(): void {
 		parent::recalculatePermissions();
+		$this->attachment->clearPermissions();
 		$this->attachment->setPermissions($this->permissions);
 	}
 
