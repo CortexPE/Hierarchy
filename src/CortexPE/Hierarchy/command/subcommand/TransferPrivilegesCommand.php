@@ -39,6 +39,8 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Input;
 use dktapps\pmforms\element\Label;
 use pocketmine\command\CommandSender;
+use pocketmine\permission\Permission;
+use pocketmine\permission\PermissionManager;
 use pocketmine\Player;
 
 class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCommand {
@@ -82,9 +84,17 @@ class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCom
 			$target->addRole($role);
 			$source->removeRole($role);
 		}
-		foreach($source->getMemberPermissions() as $permission) {
-			$target->addMemberPermission($permission);
-			$source->removeMemberPermission($permission);
+		$pMgr = PermissionManager::getInstance();
+		foreach($source->getMemberPermissions() as $permissionName => $value) {
+			$perm = $pMgr->getPermission($permissionName);
+			if($perm instanceof Permission) {
+				if($value){
+					$target->addMemberPermission($perm);
+				} else {
+					$target->denyMemberPermission($perm);
+				}
+			}
+			$source->removeMemberPermission($permissionName);
 		}
 		$this->sendFormattedMessage("cmd.transfer_privileges.success", [
 			"source" => $source->getName(),
