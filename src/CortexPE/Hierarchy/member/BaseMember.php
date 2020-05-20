@@ -169,8 +169,7 @@ abstract class BaseMember {
 		if(!$this->hasRole($role)) {
 			$this->roles[$role->getId()] = $role;
 			$this->onRoleAdd($role);
-			$ev = new MemberRoleAddEvent($this, $role);
-			$ev->call();
+			(new MemberRoleAddEvent($this, $role))->call();
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_ADD, $role->getId());
 			}
@@ -240,8 +239,7 @@ abstract class BaseMember {
 		if($this->hasRole($role)) {
 			unset($this->roles[$role->getId()]);
 			$this->onRoleRemove($role);
-			$ev = new MemberRoleRemoveEvent($this, $role);
-			$ev->call();
+			(new MemberRoleRemoveEvent($this, $role))->call();
 			if($save) {
 				$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_ROLE_REMOVE, $role->getId());
 			}
