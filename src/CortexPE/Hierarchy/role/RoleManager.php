@@ -227,6 +227,9 @@ class RoleManager {
 		if($role->isDefault()) {
 			throw new RuntimeException("Default role cannot be deleted while at runtime");
 		}
+		foreach($role->getChildren() as $child){
+			$child->unInheritRole($role);
+		}
 		$members = $role->getOnlineMembers();
 		foreach($members as $member) {
 			$member->removeRole($role);

@@ -39,6 +39,8 @@ abstract class MemberDataSource extends DataSource {
 	public const ACTION_MEMBER_ROLE_REMOVE = "member.role.remove";
 	public const ACTION_MEMBER_PERMS_ADD = "member.perm.add";
 	public const ACTION_MEMBER_PERMS_REMOVE = "member.perm.remove";
+	public const ACTION_MEMBER_UPDATE_ROLE_ETC = "member.etc.update.role";
+	public const ACTION_MEMBER_UPDATE_PERMISSION_ETC = "member.etc.update.permission";
 
 	/**
 	 * @param BaseMember $member

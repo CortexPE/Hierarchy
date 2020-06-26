@@ -31,11 +31,9 @@ namespace CortexPE\Hierarchy;
 
 use CortexPE\Commando\PacketHooker;
 use CortexPE\Hierarchy\command\HierarchyCommand;
-use CortexPE\Hierarchy\data\member\JSONMemberDS;
 use CortexPE\Hierarchy\data\member\MemberDataSource;
 use CortexPE\Hierarchy\data\member\MySQLMemberDS;
 use CortexPE\Hierarchy\data\member\SQLiteMemberDS;
-use CortexPE\Hierarchy\data\member\YAMLMemberDS;
 use CortexPE\Hierarchy\data\migrator\DSMigrator;
 use CortexPE\Hierarchy\data\migrator\IndexedToSQL;
 use CortexPE\Hierarchy\data\migrator\RolePositionSimplifier;

@@ -50,7 +50,7 @@ class HierarchyCommand extends BaseCommand {
 
 	public function __construct(Hierarchy $plugin, string $name, string $description = "", array $aliases = []) {
 		$this->plugin = $plugin;
-		parent::__construct($name, $description, $aliases);
+		parent::__construct($plugin, $name, $description, $aliases);
 	}
 
 	protected function prepare(): void {

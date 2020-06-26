@@ -55,6 +55,10 @@ abstract class BaseMember {
 	protected $roles = [];
 	/** @var Server */
 	protected $server;
+	/** @var array */
+	protected $roleAdditionalData = [];
+	/** @var array */
+	protected $permissionAdditionalData = [];
 
 	public function __construct(Hierarchy $plugin) {
 		$this->plugin = $plugin;
@@ -78,16 +82,19 @@ abstract class BaseMember {
 	 * @param array $memberData
 	 */
 	public function loadData(array $memberData): void {
-		foreach($memberData["roles"] ?? [] as $roleId) {
+		foreach($memberData["roles"] ?? [] as $roleId => $additionalData) {
 			$role = $this->plugin->getRoleManager()->getRole($roleId);
 			if($role instanceof Role) {
+				if($additionalData !== null) {
+					$this->roleAdditionalData[$roleId] = $additionalData;
+				}
 				$this->roles[$roleId] = $role;
 			} else {
 				// un-existent role
 				$this->plugin->getLogger()->debug("Ignoring non-existent role ID $roleId from " . $this->getName());
 			}
 		}
-		foreach($memberData["permissions"] ?? [] as $perm) {
+		foreach($memberData["permissions"] ?? [] as $perm => $additionalData) {
 			$inverted = false;
 			if($perm{0} === "-") {
 				$inverted = true;
@@ -95,6 +102,9 @@ abstract class BaseMember {
 			}
 			$permission = $this->permMgr->getPermission($perm);
 			if($permission instanceof Permission) {
+				if($additionalData !== null){
+					$this->roleAdditionalData[$permission->getName()] = $additionalData;
+				}
 				$this->memberPermissions[$permission->getName()] = !$inverted;
 			} // ignore missing permissions
 		}
@@ -150,6 +160,7 @@ abstract class BaseMember {
 			$permission = $permission->getName();
 		}
 		unset($this->memberPermissions[$permission]);
+		unset($this->permissionAdditionalData[$permission]);
 		if($recalculate) {
 			$this->recalculatePermissions();
 		}
@@ -205,7 +216,7 @@ abstract class BaseMember {
 		$this->permissions = [];
 		$perms = []; // default
 		foreach($this->roles as $role) {
-			$perms[$role->getPosition()] = $role->getPermissions();
+			$perms[$role->getPosition()] = $role->getCombinedPermissions();
 		}
 		$perms[PHP_INT_MAX] = $this->memberPermissions; // this overrides other permissions
 		krsort($perms);
@@ -238,6 +249,7 @@ abstract class BaseMember {
 	public function removeRole(Role $role, bool $recalculate = true, bool $save = true): void {
 		if($this->hasRole($role)) {
 			unset($this->roles[$role->getId()]);
+			unset($this->roleAdditionalData[$role->getId()]);
 			$this->onRoleRemove($role);
 			(new MemberRoleRemoveEvent($this, $role))->call();
 			if($save) {
@@ -309,7 +321,7 @@ abstract class BaseMember {
 		$topRoleWithPerm = null;
 		foreach($this->roles as $role) {
 			if(
-				isset(($role->getPermissions())[$permissionNode]) &&
+				isset(($role->getCombinedPermissions())[$permissionNode]) &&
 				$role->getPosition() > $topRolePosition
 			) {
 				$topRolePosition = $role->getPosition();
@@ -335,4 +347,36 @@ abstract class BaseMember {
 	 * @internal
 	 */
 	abstract public function onDestroy(): void;
+
+	/**
+	 * @return array
+	 */
+	public function getRoleAdditionalData(): array {
+		return $this->roleAdditionalData;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPermissionAdditionalData(): array {
+		return $this->permissionAdditionalData;
+	}
+
+	/**
+	 * @param Role $role
+	 * @param array $data
+	 */
+	public function setRoleAdditionalData(Role $role, array $data):void {
+		$this->roleAdditionalData[$role->getId()] = $data;
+		$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_UPDATE_ROLE_ETC, [$role->getId(), $data]);
+	}
+
+	/**
+	 * @param Permission $permission
+	 * @param array $data
+	 */
+	public function setPermissionAdditionalData(Permission $permission, array $data):void {
+		$this->permissionAdditionalData[$permission->getName()] = $data;
+		$this->dataSource->updateMemberData($this, MemberDataSource::ACTION_MEMBER_UPDATE_PERMISSION_ETC, [$permission->getName(), $data]);
+	}
 }

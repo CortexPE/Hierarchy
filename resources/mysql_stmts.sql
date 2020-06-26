@@ -15,26 +15,56 @@ CREATE TABLE IF NOT EXISTS Roles
 -- #    { rolePermissionTable
 CREATE TABLE IF NOT EXISTS RolePermissions
 (
-    RoleID     INTEGER NOT NULL,
-    Permission VARCHAR(128)    NOT NULL,
+    RoleID     INTEGER      NOT NULL,
+    Permission VARCHAR(128) NOT NULL,
     PRIMARY KEY (RoleID, Permission)
 );
 -- #    }
 -- #    { memberRolesTable
 CREATE TABLE IF NOT EXISTS MemberRoles
 (
-    Player VARCHAR(16) NOT NULL, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
-    RoleID INTEGER     NOT NULL,
+    Player         VARCHAR(16) NOT NULL, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
+    RoleID         INTEGER     NOT NULL,
+    AdditionalData VARCHAR(1024),
     PRIMARY KEY (Player, RoleID)
 );
 -- #    }
 -- #    { memberPermissionsTable
 CREATE TABLE IF NOT EXISTS MemberPermissions
 (
-    Player     VARCHAR(16)  NOT NULL, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
-    Permission VARCHAR(128) NOT NULL, -- who tf has a permission node with 128 characters anyways?
+    Player         VARCHAR(16)  NOT NULL, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
+    Permission     VARCHAR(128) NOT NULL, -- who tf has a permission node with 128 characters anyways?
+    AdditionalData VARCHAR(1024),
     PRIMARY KEY (Player, Permission)
 );
+-- #    }
+-- #  }
+
+-- #  { check
+-- #    { memberRoles_check1
+SELECT COUNT(*) as result
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE()
+  AND TABLE_NAME = 'MemberRoles'
+  AND COLUMN_NAME = 'AdditionalData';
+-- #    }
+-- #    { memberPermissions_check1
+SELECT COUNT(*) as result
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE()
+  AND TABLE_NAME = 'MemberPermissions'
+  AND COLUMN_NAME = 'AdditionalData';
+-- #    }
+-- #  }
+
+-- #  { migrate
+-- #    { memberRoles_patch1
+ALTER TABLE MemberRoles
+    ADD COLUMN AdditionalData VARCHAR(1024);
+-- #    }
+-- #    { memberPermissions_patch1
+ALTER TABLE MemberPermissions
+    ADD COLUMN AdditionalData VARCHAR(1024);
 -- #    }
 -- #  }
 
@@ -55,7 +85,7 @@ FROM MemberRoles;
 -- #   { roles
 -- #     { get
 -- #       :username string
-SELECT RoleID
+SELECT RoleID, AdditionalData
 FROM MemberRoles
 WHERE Player = :username;
 -- #     }
@@ -78,7 +108,7 @@ WHERE Player = :username
 -- #   { permissions
 -- #     { get
 -- #       :username string
-SELECT Permission
+SELECT Permission, AdditionalData
 FROM MemberPermissions
 WHERE Player = :username;
 -- #     }
@@ -96,6 +126,28 @@ DELETE
 FROM MemberPermissions
 WHERE Player = :username
   AND Permission LIKE CONCAT('%', :permission);
+-- #     }
+-- #   }
+-- #   { etc
+-- #     { update
+-- #       { role
+-- #         :username string
+-- #         :role_id int
+-- #         :additional_data string
+UPDATE MemberRoles
+SET AdditionalData = :additional_data
+WHERE Player = :username
+  AND RoleID = :role_id;
+-- #       }
+-- #       { permission
+-- #         :username string
+-- #         :permission string
+-- #         :additional_data string
+UPDATE MemberPermissions
+SET AdditionalData = :additional_data
+WHERE Player = :username
+  AND Permission = :permission;
+-- #       }
 -- #     }
 -- #   }
 -- # }

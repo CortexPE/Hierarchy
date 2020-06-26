@@ -67,6 +67,16 @@ abstract class SQLMemberDS extends MemberDataSource {
 			) {
 				yield $this->asyncGenericQuery($tableSchema);
 			}
+			foreach(
+				[
+					"hierarchy.check.memberRoles_check1" => "hierarchy.migrate.memberRoles_patch1",
+					"hierarchy.check.memberPermissions_check1" => "hierarchy.migrate.memberPermissions_patch1",
+				] as $checkQuery => $failedQuery
+			) {
+				if(!(bool)(yield $this->asyncSelect($checkQuery))[0]["result"]){
+					yield $this->asyncGenericQuery($failedQuery);
+				}
+			}
 		}, function () {
 		}, function (Throwable $err) {
 			$this->getPlugin()->getLogger()->logException($err);
@@ -98,20 +108,20 @@ abstract class SQLMemberDS extends MemberDataSource {
 		Await::f2c(function () use ($member) {
 			$data = [
 				"roles" => [
-					$this->plugin->getRoleManager()->getDefaultRole()->getId()
+					$this->plugin->getRoleManager()->getDefaultRole()->getId() => null
 				]
 			];
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);
 			foreach($rows as $row) {
-				$data["roles"][] = $row["RoleID"];
+				$data["roles"][$row["RoleID"]] = $row["AdditionalData"] !== null ? json_decode($row["AdditionalData"], true) : null;
 			}
 			$rows = yield $this->asyncSelect("hierarchy.member.permissions.get", [
 				"username" => $member->getName()
 			]);
 			foreach($rows as $row) {
-				$data["permissions"][] = $row["Permission"];
+				$data["permissions"][$row["Permission"]] = $row["AdditionalData"] !== null ? json_decode($row["AdditionalData"], true) : null;
 			}
 			$member->loadData($data);
 		}, null, function (Throwable $err) {
@@ -143,6 +153,20 @@ abstract class SQLMemberDS extends MemberDataSource {
 				$this->db->executeChange("hierarchy.member.permissions.remove", [
 					"username" => $member->getName(),
 					"permission" => $data
+				]);
+				break;
+			case self::ACTION_MEMBER_UPDATE_ROLE_ETC:
+				$this->db->executeChange("hierarchy.member.permissions.remove", [
+					"username" => $member->getName(),
+					"role_id" => $data[0],
+					"additional_data" => json_encode($data[1])
+				]);
+				break;
+			case self::ACTION_MEMBER_UPDATE_PERMISSION_ETC:
+				$this->db->executeChange("hierarchy.member.etc.update.permission", [
+					"username" => $member->getName(),
+					"permission" => $data[0],
+					"additional_data" => json_encode($data[1])
 				]);
 				break;
 		}

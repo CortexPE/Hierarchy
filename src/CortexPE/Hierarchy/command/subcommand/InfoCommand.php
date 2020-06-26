@@ -144,29 +144,27 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 		if($args["targetType"] === InfoTargetEnumArgument::TARGET_MEMBER && isset($args["targetMember"])) {
 			if($sender->hasPermission("hierarchy.info.member")) {
 				/** @var BaseMember $target */
-				foreach($args["targetMember"] as $target) {
-					$this->sendFormattedMessage("cmd.info.member.header", [
-						"member" => $target->getName()
+				$target = $args["targetMember"];
+				$this->sendFormattedMessage("cmd.info.member.header", [
+					"member" => $target->getName()
+				]);
+				$this->sendFormattedMessage("cmd.info.member.roles_header");
+				foreach($target->getRoles() as $role) {
+					$this->sendFormattedMessage("cmd.info.member.role_entry", [
+						"role" => $role->getName(),
+						"role_id" => $role->getId()
 					]);
-					$this->sendFormattedMessage("cmd.info.member.roles_header");
-					foreach($target->getRoles() as $role) {
-						$this->sendFormattedMessage("cmd.info.member.role_entry", [
-							"role" => $role->getName(),
-							"role_id" => $role->getId()
+				}
+				$this->sendFormattedMessage("cmd.info.member.m_perms_header");
+				if(count($target->getMemberPermissions()) > 0) {
+					foreach($target->getMemberPermissions() as $permission => $allowed) {
+						$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
+							"permission" => $permission,
+							"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
 						]);
 					}
-					$this->sendFormattedMessage("cmd.info.member.m_perms_header");
-					if(count($target->getMemberPermissions()) > 0) {
-						foreach($target->getMemberPermissions() as $permission => $allowed) {
-							$this->sendFormattedMessage("cmd.info.member.m_perm_entry", [
-								"permission" => $permission,
-								"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-							]);
-						}
-					} else {
-						$this->sendFormattedMessage("cmd.info.member.no_extra_perms");
-					}
-					break;
+				} else {
+					$this->sendFormattedMessage("cmd.info.member.no_extra_perms");
 				}
 			} else {
 				$this->sendPermissionError();
@@ -174,61 +172,59 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 		} elseif($args["targetType"] === InfoTargetEnumArgument::TARGET_ROLE && isset($args["targetRole"])) {
 			if($sender->hasPermission("hierarchy.info.role")) {
 				/** @var Role $target */
-				foreach($args["targetRole"] as $target) {
-					$lines = [];
-					$lines[] = MessageStore::getMessage("cmd.info.role.header", [
-						"role" => $target->getName(),
-						"role_id" => $target->getId()
+				$target = $args["targetRole"];
+				$lines = [];
+				$lines[] = MessageStore::getMessage("cmd.info.role.header", [
+					"role" => $target->getName(),
+					"role_id" => $target->getId()
+				]);
+				$lines[] = MessageStore::getMessage("cmd.info.role.position", [
+					"position" => $target->getPosition()
+				]);
+				$lines[] = MessageStore::getMessage("cmd.info.role.default", [
+					"isDefault" => $target->isDefault() ? TextFormat::GREEN . "YES" : TextFormat::RED . "NO"
+				]);
+				$lines[] = MessageStore::getMessage("cmd.info.role.perms_header");
+				foreach($target->getCombinedPermissions() as $permission => $allowed) {
+					$lines[] = MessageStore::getMessage("cmd.info.role.perm_entry", [
+						"permission" => $permission,
+						"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
 					]);
-					$lines[] = MessageStore::getMessage("cmd.info.role.position", [
-						"position" => $target->getPosition()
+				}
+				if(!$target->isDefault()) {
+					$lines[] = MessageStore::getMessage("cmd.info.role.members_header", [
+						"count" => ($c = count($target->getOnlineMembers()))
 					]);
-					$lines[] = MessageStore::getMessage("cmd.info.role.default", [
-						"isDefault" => $target->isDefault() ? TextFormat::GREEN . "YES" : TextFormat::RED . "NO"
-					]);
-					$lines[] = MessageStore::getMessage("cmd.info.role.perms_header");
-					foreach($target->getPermissions() as $permission => $allowed) {
-						$lines[] = MessageStore::getMessage("cmd.info.role.perm_entry", [
-							"permission" => $permission,
-							"color" => $allowed ? TextFormat::GREEN : TextFormat::RED . "-"
-						]);
+					if($c > 0) {
+						foreach($target->getOnlineMembers() as $member) {
+							$lines[] = MessageStore::getMessage("cmd.info.role.member_entry", [
+								"member" => $member->getName()
+							]);
+						}
+					} else {
+						$lines[] = MessageStore::getMessage("cmd.info.role.no_online_members");
 					}
-					if(!$target->isDefault()){
-						$lines[] = MessageStore::getMessage("cmd.info.role.members_header", [
-							"count" => ($c = count($target->getOnlineMembers()))
+					$target->getOfflineMembers(function(array $members) use ($lines, $sender): void {
+						$lines[] = MessageStore::getMessage("cmd.info.role.offline_members_header", [
+							"count" => ($c = count($members))
 						]);
 						if($c > 0) {
-							foreach($target->getOnlineMembers() as $member) {
-								$lines[] = MessageStore::getMessage("cmd.info.role.member_entry", [
+							foreach($members as $member) {
+								$lines[] = MessageStore::getMessage("cmd.info.role.offline_member_entry", [
 									"member" => $member->getName()
 								]);
 							}
 						} else {
-							$lines[] = MessageStore::getMessage("cmd.info.role.no_online_members");
+							$lines[] = MessageStore::getMessage("cmd.info.role.no_offline_members");
 						}
-						$target->getOfflineMembers(function(array $members) use ($lines, $sender):void{
-							$lines[] = MessageStore::getMessage("cmd.info.role.offline_members_header", [
-								"count" => ($c = count($members))
-							]);
-							if($c > 0) {
-								foreach($members as $member) {
-									$lines[] = MessageStore::getMessage("cmd.info.role.offline_member_entry", [
-										"member" => $member->getName()
-									]);
-								}
-							} else {
-								$lines[] = MessageStore::getMessage("cmd.info.role.no_offline_members");
-							}
-							foreach($lines as $line){
-								$sender->sendMessage($line);
-							}
-						});
-					} else {
-						foreach($lines as $line){
+						foreach($lines as $line) {
 							$sender->sendMessage($line);
 						}
+					});
+				} else {
+					foreach($lines as $line) {
+						$sender->sendMessage($line);
 					}
-					break;
 				}
 			} else {
 				$this->sendPermissionError();

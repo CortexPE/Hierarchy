@@ -54,11 +54,19 @@ class Role {
 	protected $position;
 	/** @var bool[] */
 	protected $permissions = [];
+	/** @var bool[] */
+	protected $extraPermissions = [];
 	/** @var bool */
 	protected $isDefault = false;
 
 	/** @var Member[] */
 	protected $onlineMembers = [];
+	/** @var Role[] */
+	protected $parents = [];
+	/** @var Role[] */
+	protected $children = [];
+	/** @var bool[] */
+	protected $combinedPermissions;
 
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
 		$this->plugin = $plugin;
@@ -118,7 +126,7 @@ class Role {
 	 * @throws HierarchyException
 	 */
 	public function getOfflineMembers(callable $callback): void {
-		Utils::validateCallableSignature(function(array $member):void{}, $callback);
+		Utils::validateCallableSignature(function(array $members):void{}, $callback);
 		if($this->isDefault){ // basically everyone who joined the server and will ever join the server
 			throw new HierarchyException("Cannot get offline members of default role");
 		}
@@ -153,16 +161,20 @@ class Role {
 	 */
 	public function addPermission(Permission $permission, bool $update = true): void {
 		$this->permissions[$permission->getName()] = true;
+		$this->recalculateCombinedPermissions();
 		$this->plugin->getRoleDataSource()->addRolePermission($this, $permission, false);
 		if($update) {
+			$this->updateChildrenPermissions();
 			$this->updateMemberPermissions();
 		}
 	}
 
 	public function denyPermission(Permission $permission, bool $update = true): void {
 		$this->permissions[$permission->getName()] = false;
+		$this->recalculateCombinedPermissions();
 		$this->plugin->getRoleDataSource()->addRolePermission($this, $permission, true);
 		if($update) {
+			$this->updateChildrenPermissions();
 			$this->updateMemberPermissions();
 		}
 	}
@@ -189,6 +201,8 @@ class Role {
 	 */
 	public function removePermissionInternal(string $permission): void {
 		unset($this->permissions[$permission]);
+		$this->recalculateCombinedPermissions();
+		$this->updateChildrenPermissions();
 	}
 
 	public function updateMemberPermissions(): void {
@@ -211,9 +225,20 @@ class Role {
 	 * @param Role $role
 	 */
 	public function inheritRole(Role $role):void {
-		foreach($role->getPermissions() as $permission => $toggle){
-			$this->permissions[$permission] = $toggle;
-		}
+		$this->parents[$role->getId()] = $role;
+		$role->addChild($this);
+	}
+
+	/**
+	 * @internal Used internally for loading permissions from an inherited role
+	 *
+	 * @param Role $role
+	 */
+	public function unInheritRole(Role $role):void {
+		unset($this->parents[$role->getId()]);
+		$role->removeChild($this);
+		$this->refreshInheritedPermissions();
+		$this->recalculateCombinedPermissions();
 	}
 
 	/**
@@ -237,5 +262,70 @@ class Role {
 			}
 			$this->permissions[$permission] = $value;
 		}
+		$this->refreshInheritedPermissions();
+		$this->recalculateCombinedPermissions();
+	}
+
+	public function updateChildrenPermissions(): void {
+		foreach($this->children as $role) {
+			$role->refreshInheritedPermissions();
+		}
+	}
+
+	public function refreshInheritedPermissions():void {
+		$this->extraPermissions = [];
+		foreach($this->parents as $role){
+			foreach($role->getPermissions() as $permission => $toggle){
+				$this->extraPermissions[$permission] = $toggle;
+			}
+		}
+	}
+
+	/**
+	 * @param Role $child
+	 * @internal Used for keeping references to roles inheriting its permissions
+	 */
+	public function addChild(Role $child):void {
+		$this->children[$child->getId()] = $child;
+	}
+
+	/**
+	 * @param Role $child
+	 * @internal Used for removing references to roles inheriting its permissions
+	 */
+	public function removeChild(Role $child):void {
+		unset($this->children[$child->getId()]);
+	}
+
+	/**
+	 * @internal Used for getting roles inheriting its permissions
+	 */
+	public function getChildren(): array {
+		return $this->children;
+	}
+
+	/**
+	 * @return Role[]
+	 */
+	public function getParents(): array {
+		return $this->parents;
+	}
+
+	/**
+	 * @return bool[]
+	 */
+	public function getExtraPermissions(): array {
+		return $this->extraPermissions;
+	}
+
+	private function recalculateCombinedPermissions():void {
+		$this->combinedPermissions = array_replace_recursive($this->getExtraPermissions(), $this->getPermissions());
+	}
+
+	/**
+	 * @return bool[]
+	 */
+	public function getCombinedPermissions(): array {
+		return $this->combinedPermissions;
 	}
 }
