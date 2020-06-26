@@ -103,7 +103,7 @@ abstract class BaseMember {
 			$permission = $this->permMgr->getPermission($perm);
 			if($permission instanceof Permission) {
 				if($additionalData !== null){
-					$this->roleAdditionalData[$permission->getName()] = $additionalData;
+					$this->permissionAdditionalData[$permission->getName()] = $additionalData;
 				}
 				$this->memberPermissions[$permission->getName()] = !$inverted;
 			} // ignore missing permissions
