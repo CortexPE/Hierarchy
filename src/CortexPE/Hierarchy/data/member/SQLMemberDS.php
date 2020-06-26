@@ -156,7 +156,7 @@ abstract class SQLMemberDS extends MemberDataSource {
 				]);
 				break;
 			case self::ACTION_MEMBER_UPDATE_ROLE_ETC:
-				$this->db->executeChange("hierarchy.member.permissions.remove", [
+				$this->db->executeChange("hierarchy.member.etc.update.role", [
 					"username" => $member->getName(),
 					"role_id" => $data[0],
 					"additional_data" => json_encode($data[1])
