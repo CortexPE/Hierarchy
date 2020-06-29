@@ -46,7 +46,7 @@ class InvalidRolePermissionCheckTask extends Task {
 		$this->rMgr = $plugin->getRoleManager();
 	}
 
-	public function onRun(int $currentTick) {
+	public function onRun():void {
 		foreach($this->plugin->getServer()->getPluginManager()->getPlugins() as $plugin){
 			if($plugin->isDisabled()){
 				$this->plugin->getLogger()->warning("Skipping permission existence check to avoid un-necessary console spam, please fix crashed plugins first.");

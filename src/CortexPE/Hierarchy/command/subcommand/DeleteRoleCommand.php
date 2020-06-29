@@ -39,7 +39,7 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Dropdown;
 use dktapps\pmforms\element\Label;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function count;
 
 class DeleteRoleCommand extends HierarchySubCommand implements FormedCommand {

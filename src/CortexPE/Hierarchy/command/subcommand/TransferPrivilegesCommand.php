@@ -41,7 +41,7 @@ use dktapps\pmforms\element\Label;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCommand {
 

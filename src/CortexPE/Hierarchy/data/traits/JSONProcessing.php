@@ -30,7 +30,6 @@ declare(strict_types=1);
 namespace CortexPE\Hierarchy\data\traits;
 
 
-use CortexPE\Hierarchy\Hierarchy;
 use function json_decode;
 use function json_encode;
 use const JSON_PRETTY_PRINT;

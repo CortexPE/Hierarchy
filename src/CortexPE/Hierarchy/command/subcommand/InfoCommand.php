@@ -48,7 +48,7 @@ use dktapps\pmforms\MenuForm;
 use dktapps\pmforms\MenuOption;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\PermissionManager;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function array_map;
 use function count;
@@ -56,7 +56,7 @@ use function implode;
 
 class InfoCommand extends HierarchySubCommand implements FormedCommand {
 	/** @var array */
-	private $opts = [];
+	private $opts;
 
 	public function __construct(Hierarchy $plugin, string $name, string $description = "", array $aliases = []) {
 		parent::__construct($plugin, $name, $description, $aliases);

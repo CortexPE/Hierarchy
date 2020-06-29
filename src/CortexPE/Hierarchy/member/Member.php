@@ -34,7 +34,7 @@ use CortexPE\Hierarchy\event\MemberRoleUpdateEvent;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\PermissionAttachment;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class Member extends BaseMember {
 	/** @var Player */

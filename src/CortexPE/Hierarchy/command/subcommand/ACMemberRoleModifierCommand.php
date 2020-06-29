@@ -44,7 +44,7 @@ use dktapps\pmforms\element\Input;
 use dktapps\pmforms\element\Label;
 use dktapps\pmforms\element\Toggle;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function count;
 
 abstract class ACMemberRoleModifierCommand extends HierarchySubCommand implements FormedCommand {

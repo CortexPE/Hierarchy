@@ -38,7 +38,7 @@ use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\Role;
 use CortexPE\Hierarchy\role\RoleManager;
 use pocketmine\permission\Permission;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 abstract class HierarchySubCommand extends BaseSubCommand {

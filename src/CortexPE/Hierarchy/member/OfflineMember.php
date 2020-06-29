@@ -32,7 +32,7 @@ namespace CortexPE\Hierarchy\member;
 
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class OfflineMember extends BaseMember {
 	/** @var string */

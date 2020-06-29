@@ -1,7 +1,7 @@
 name: Hierarchy
 main: CortexPE\Hierarchy\Hierarchy
 version: 2.0.1
-api: 3.0.0
+api: 4.0.0
 load: POSTWORLD
 author: CortexPE
 description: "Role-based permission management system"

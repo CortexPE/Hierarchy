@@ -32,8 +32,8 @@ namespace CortexPE\Hierarchy\member;
 
 use CortexPE\Hierarchy\data\member\SQLMemberDS;
 use CortexPE\Hierarchy\Hierarchy;
-use pocketmine\OfflinePlayer;
-use pocketmine\Player;
+use pocketmine\player\OfflinePlayer;
+use pocketmine\player\Player;
 use function is_string;
 
 class MemberFactory {

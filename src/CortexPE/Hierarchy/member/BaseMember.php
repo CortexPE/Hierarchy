@@ -37,7 +37,7 @@ use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use function in_array;
 use function substr;

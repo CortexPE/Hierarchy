@@ -48,7 +48,7 @@ use dktapps\pmforms\ModalForm;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function count;
 use function implode;
 

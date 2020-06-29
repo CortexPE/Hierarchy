@@ -38,7 +38,7 @@ use dktapps\pmforms\CustomFormResponse;
 use dktapps\pmforms\element\Input;
 use dktapps\pmforms\element\Label;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function count;
 
 class CreateRoleCommand extends HierarchySubCommand implements FormedCommand {
