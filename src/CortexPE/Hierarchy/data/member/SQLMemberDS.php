@@ -64,7 +64,7 @@ abstract class SQLMemberDS extends MemberDataSource {
 					"hierarchy.init.memberRolesTable",
 					"hierarchy.init.memberPermissionsTable",
 				] as $tableSchema
-			) {
+			){
 				yield $this->asyncGenericQuery($tableSchema);
 			}
 			foreach(
@@ -72,8 +72,8 @@ abstract class SQLMemberDS extends MemberDataSource {
 					"hierarchy.check.memberRoles_check1" => "hierarchy.migrate.memberRoles_patch1",
 					"hierarchy.check.memberPermissions_check1" => "hierarchy.migrate.memberPermissions_patch1",
 				] as $checkQuery => $failedQuery
-			) {
-				if(!(bool)(yield $this->asyncSelect($checkQuery))[0]["result"]){
+			){
+				if(!(bool)(yield $this->asyncSelect($checkQuery))[0]["result"]) {
 					yield $this->asyncGenericQuery($failedQuery);
 				}
 			}
@@ -114,13 +114,13 @@ abstract class SQLMemberDS extends MemberDataSource {
 			$rows = yield $this->asyncSelect("hierarchy.member.roles.get", [
 				"username" => $member->getName()
 			]);
-			foreach($rows as $row) {
+			foreach($rows as $row){
 				$data["roles"][$row["RoleID"]] = $row["AdditionalData"] !== null ? json_decode($row["AdditionalData"], true) : null;
 			}
 			$rows = yield $this->asyncSelect("hierarchy.member.permissions.get", [
 				"username" => $member->getName()
 			]);
-			foreach($rows as $row) {
+			foreach($rows as $row){
 				$data["permissions"][$row["Permission"]] = $row["AdditionalData"] !== null ? json_decode($row["AdditionalData"], true) : null;
 			}
 			$member->loadData($data);
@@ -129,7 +129,7 @@ abstract class SQLMemberDS extends MemberDataSource {
 		});
 	}
 
-	public function updateMemberData(BaseMember $member, string $action, $data): void {
+	public function updateMemberData(BaseMember $member, string $action, $data = null): void {
 		switch($action) {
 			case self::ACTION_MEMBER_ROLE_ADD:
 				$this->db->executeChange("hierarchy.member.roles.add", [
@@ -167,6 +167,25 @@ abstract class SQLMemberDS extends MemberDataSource {
 					"username" => $member->getName(),
 					"permission" => $data[0],
 					"additional_data" => json_encode($data[1])
+				]);
+				break;
+			case self::ACTION_MEMBER_TRANSFER_DATA:
+				$this->db->executeChange("hierarchy.member.roles.transfer", [
+					"source" => $member->getName(),
+					"target" => $data["target"],
+				]);
+				$this->db->executeChange("hierarchy.member.permissions.transfer", [
+					"source" => $member->getName(),
+					"target" => $data["target"],
+				]);
+				break;
+			case self::ACTION_MEMBER_PERMS_REMOVE_ALL:
+			case self::ACTION_MEMBER_ROLE_REMOVE_ALL:
+				$this->db->executeGeneric("hierarchy.member.roles.remove_all", [
+					"username" => $member->getName(),
+				]);
+				$this->db->executeGeneric("hierarchy.member.permissions.remove_all", [
+					"username" => $member->getName(),
 				]);
 				break;
 		}

@@ -39,6 +39,8 @@ class MessageStore {
 	protected static $config;
 	/** @var array */
 	protected static $defaults = [
+		"cmd.clear_all.success" => "&cRemoved all roles and permissions from {target}",
+
 		"cmd.createrole.success" => "&aSuccessfully created role with name '{role}' with the ID: {role_id}",
 
 		"cmd.deleterole.fail_role_default" => "&eYou cannot delete the default role.",

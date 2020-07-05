@@ -104,6 +104,19 @@ FROM MemberRoles
 WHERE Player = :username
   AND RoleID = :role_id;
 -- #     }
+-- #     { transfer
+-- #       :source string
+-- #       :target string
+UPDATE MemberRoles
+SET Player = :target
+WHERE Player = :source;
+-- #     }
+-- #     { remove_all
+-- #       :username string
+DELETE
+FROM MemberRoles
+WHERE Player = :username;
+-- #     }
 -- #   }
 -- #   { permissions
 -- #     { get
@@ -126,6 +139,19 @@ DELETE
 FROM MemberPermissions
 WHERE Player = :username
   AND Permission LIKE CONCAT('%', :permission);
+-- #     }
+-- #     { transfer
+-- #       :source string
+-- #       :target string
+UPDATE MemberPermissions
+SET Player = :target
+WHERE Player = :source;
+-- #     }
+-- #     { remove_all
+-- #       :username string
+DELETE
+FROM MemberPermissions
+WHERE Player = :username;
 -- #     }
 -- #   }
 -- #   { etc

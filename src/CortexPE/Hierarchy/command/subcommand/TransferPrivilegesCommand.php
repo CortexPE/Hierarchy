@@ -33,6 +33,7 @@ namespace CortexPE\Hierarchy\command\subcommand;
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Hierarchy\command\args\MemberArgument;
 use CortexPE\Hierarchy\command\HierarchySubCommand;
+use CortexPE\Hierarchy\data\member\MemberDataSource;
 use CortexPE\Hierarchy\member\BaseMember;
 use dktapps\pmforms\CustomForm;
 use dktapps\pmforms\CustomFormResponse;
@@ -81,21 +82,23 @@ class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCom
 		}
 
 		foreach($source->getRoles() as $role) {
-			$target->addRole($role);
-			$source->removeRole($role);
+			if($role->isDefault())continue;
+			$target->addRole($role, true, false);
+			$source->removeRole($role, true, false);
 		}
 		$pMgr = PermissionManager::getInstance();
 		foreach($source->getMemberPermissions() as $permissionName => $value) {
 			$perm = $pMgr->getPermission($permissionName);
 			if($perm instanceof Permission) {
 				if($value){
-					$target->addMemberPermission($perm);
+					$target->addMemberPermission($perm, true, false);
 				} else {
-					$target->denyMemberPermission($perm);
+					$target->denyMemberPermission($perm, true, false);
 				}
 			}
-			$source->removeMemberPermission($permissionName);
+			$source->removeMemberPermission($permissionName, true, false);
 		}
+		$this->plugin->getMemberDataSource()->updateMemberData($source, MemberDataSource::ACTION_MEMBER_TRANSFER_DATA, ["target" => $target]);
 		$this->sendFormattedMessage("cmd.transfer_privileges.success", [
 			"source" => $source->getName(),
 			"target" => $target->getName()

@@ -35,10 +35,13 @@ use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\role\Role;
 
 abstract class MemberDataSource extends DataSource {
+	public const ACTION_MEMBER_TRANSFER_DATA = "member.transfer_data";
 	public const ACTION_MEMBER_ROLE_ADD = "member.role.add";
 	public const ACTION_MEMBER_ROLE_REMOVE = "member.role.remove";
+	public const ACTION_MEMBER_ROLE_REMOVE_ALL = "member.role.remove_all";
 	public const ACTION_MEMBER_PERMS_ADD = "member.perm.add";
 	public const ACTION_MEMBER_PERMS_REMOVE = "member.perm.remove";
+	public const ACTION_MEMBER_PERMS_REMOVE_ALL = "member.perm.remove_all";
 	public const ACTION_MEMBER_UPDATE_ROLE_ETC = "member.etc.update.role";
 	public const ACTION_MEMBER_UPDATE_PERMISSION_ETC = "member.etc.update.permission";
 
@@ -58,7 +61,7 @@ abstract class MemberDataSource extends DataSource {
 	 * @internal Update member data on data source
 	 *
 	 */
-	abstract public function updateMemberData(BaseMember $member, string $action, $data): void;
+	abstract public function updateMemberData(BaseMember $member, string $action, $data = null): void;
 
 	abstract public function getMemberNamesOf(Role $role): \Generator;
 }

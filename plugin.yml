@@ -1,6 +1,6 @@
 name: Hierarchy
 main: CortexPE\Hierarchy\Hierarchy
-version: 2.0.1
+version: 2.1.1
 api: 3.0.0
 load: POSTWORLD
 author: CortexPE
@@ -72,3 +72,6 @@ permissions:
           hierarchy.member.transfer_privileges:
             default: "op"
             description: "Allows to transfer privileges between two players"
+          hierarchy.member.clear_all:
+            default: "op"
+            description: "Allows to remove all roles and permissions from a member"

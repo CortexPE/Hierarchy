@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS RolePermissions
 -- #    { memberRolesTable
 CREATE TABLE IF NOT EXISTS MemberRoles
 (
-    Player VARCHAR(16) NOT NULL COLLATE NOCASE, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
-    RoleID INTEGER     NOT NULL,
+    Player         VARCHAR(16) NOT NULL COLLATE NOCASE, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
+    RoleID         INTEGER     NOT NULL,
     AdditionalData VARCHAR(1024),
     PRIMARY KEY (Player, RoleID)
 );
@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS MemberRoles
 -- #    { memberPermissionsTable
 CREATE TABLE IF NOT EXISTS MemberPermissions
 (
-    Player     VARCHAR(16)  NOT NULL COLLATE NOCASE, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
-    Permission VARCHAR(128) NOT NULL,                -- who tf has a permission node with 128 characters anyways?
+    Player         VARCHAR(16)  NOT NULL COLLATE NOCASE, -- MC Only allows IGNs upto 3-16 chars, case in-sensitive.
+    Permission     VARCHAR(128) NOT NULL,                -- who tf has a permission node with 128 characters anyways?
     AdditionalData VARCHAR(1024),
     PRIMARY KEY (Player, Permission)
 );
@@ -42,10 +42,14 @@ CREATE TABLE IF NOT EXISTS MemberPermissions
 
 -- #  { check
 -- #    { memberRoles_check1
-SELECT COUNT(*) AS result FROM pragma_table_info('MemberRoles') WHERE name='AdditionalData';
+SELECT COUNT(*) AS result
+FROM pragma_table_info('MemberRoles')
+WHERE name = 'AdditionalData';
 -- #    }
 -- #    { memberPermissions_check1
-SELECT COUNT(*) AS result FROM pragma_table_info('MemberPermissions') WHERE name='AdditionalData';
+SELECT COUNT(*) AS result
+FROM pragma_table_info('MemberPermissions')
+WHERE name = 'AdditionalData';
 -- #    }
 -- #  }
 
@@ -97,6 +101,19 @@ FROM MemberRoles
 WHERE Player = :username
   AND RoleID = :role_id;
 -- #     }
+-- #     { transfer
+-- #       :source string
+-- #       :target string
+UPDATE MemberRoles
+SET Player = :target
+WHERE Player = :source;
+-- #     }
+-- #     { remove_all
+-- #       :username string
+DELETE
+FROM MemberRoles
+WHERE Player = :username;
+-- #     }
 -- #   }
 -- #   { permissions
 -- #     { get
@@ -120,6 +137,19 @@ DELETE
 FROM MemberPermissions
 WHERE Player = :username
   AND Permission LIKE '%' || :permission;
+-- #     }
+-- #     { transfer
+-- #       :source string
+-- #       :target string
+UPDATE MemberPermissions
+SET Player = :target
+WHERE Player = :source;
+-- #     }
+-- #     { remove_all
+-- #       :username string
+DELETE
+FROM MemberPermissions
+WHERE Player = :username;
 -- #     }
 -- #   }
 -- #   { etc

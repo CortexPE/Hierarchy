@@ -31,6 +31,7 @@ namespace CortexPE\Hierarchy\command;
 
 
 use CortexPE\Commando\BaseCommand;
+use CortexPE\Hierarchy\command\subcommand\ClearAllCommand;
 use CortexPE\Hierarchy\command\subcommand\CreateRoleCommand;
 use CortexPE\Hierarchy\command\subcommand\DeleteRoleCommand;
 use CortexPE\Hierarchy\command\subcommand\DenyPermCommand;
@@ -125,6 +126,13 @@ class HierarchyCommand extends BaseCommand {
 				$this->plugin,
 				"transferprvlgs",
 				"Transfer privileges between players"
+			)
+		);
+		$this->registerSubCommand(
+			new ClearAllCommand(
+				$this->plugin,
+				"clearall",
+				"Clear all roles and permissions of a players"
 			)
 		);
 	}
