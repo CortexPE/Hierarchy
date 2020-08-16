@@ -68,6 +68,9 @@ class Role {
 	/** @var bool[] */
 	protected $combinedPermissions;
 
+	/** @var bool */
+	protected $hasAllPermissions = false;
+
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
 		$this->plugin = $plugin;
 		$this->id = $id;
@@ -250,7 +253,8 @@ class Role {
 		$pMgr = PermissionManager::getInstance();
 		foreach($permissions ?? [] as $permission) {
 			if($permission == "*") {
-				foreach($pMgr->getPermissions() as $perm) {
+				$this->hasAllPermissions = true;
+				foreach($pMgr->getPermissions() as $perm){
 					$this->permissions[$perm->getName()] = true;
 				}
 				continue;
@@ -318,7 +322,7 @@ class Role {
 		return $this->extraPermissions;
 	}
 
-	private function recalculateCombinedPermissions():void {
+	private function recalculateCombinedPermissions(): void {
 		$this->combinedPermissions = array_replace_recursive($this->getExtraPermissions(), $this->getPermissions());
 	}
 
@@ -327,5 +331,12 @@ class Role {
 	 */
 	public function getCombinedPermissions(): array {
 		return $this->combinedPermissions;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasAllPermissions(): bool {
+		return $this->hasAllPermissions;
 	}
 }
