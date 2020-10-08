@@ -90,7 +90,7 @@ class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCom
 		foreach($source->getMemberPermissions() as $permissionName => $value) {
 			$perm = $pMgr->getPermission($permissionName);
 			if($perm instanceof Permission) {
-				if($value){
+				if($value) {
 					$target->addMemberPermission($perm, true, false);
 				} else {
 					$target->denyMemberPermission($perm, true, false);
@@ -98,7 +98,7 @@ class TransferPrivilegesCommand extends HierarchySubCommand implements FormedCom
 			}
 			$source->removeMemberPermission($permissionName, true, false);
 		}
-		$this->plugin->getMemberDataSource()->updateMemberData($source, MemberDataSource::ACTION_MEMBER_TRANSFER_DATA, ["target" => $target]);
+		$this->plugin->getMemberDataSource()->updateMemberData($source, MemberDataSource::ACTION_MEMBER_TRANSFER_DATA, ["target" => $target->getName()]);
 		$this->sendFormattedMessage("cmd.transfer_privileges.success", [
 			"source" => $source->getName(),
 			"target" => $target->getName()
