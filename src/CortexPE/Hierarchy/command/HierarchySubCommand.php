@@ -91,13 +91,15 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 			$senderPos = $this->memberFactory->getMember($this->currentSender)->getTopRole()->getPosition();
 		} else {
 			if($target instanceof BaseMember) {
-				$targetPos = $target->getTopRoleWithPermission($permission)->getPosition();
+				$tTopRole = $target->getTopRoleWithPermission($permission);
+				if($tTopRole === null)return true; // target does not have a role with that specific perm
+				$targetPos = $tTopRole->getPosition();
 			} else {
 				throw new \InvalidArgumentException("Passed argument is not a Member");
 			}
-			$senderPos = $this->memberFactory->getMember($this->currentSender)
-											 ->getTopRoleWithPermission($permission)
-											 ->getPosition();
+			$sTopRole = $this->memberFactory->getMember($this->currentSender)->getTopRoleWithPermission($permission);
+			if($tTopRole === null)return false; // sender does not have a role with that specific perm
+			$senderPos = $sTopRole->getPosition();
 		}
 
 		return $senderPos > $targetPos;
