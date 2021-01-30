@@ -96,7 +96,7 @@ abstract class BaseMember {
 		}
 		foreach($memberData["permissions"] ?? [] as $perm => $additionalData) {
 			$inverted = false;
-			if($perm{0} === "-") {
+			if($perm[0] === "-") {
 				$inverted = true;
 				$perm = substr($perm, 1);
 			}
