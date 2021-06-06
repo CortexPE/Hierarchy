@@ -52,7 +52,7 @@ abstract class RoleDataSource extends DataSource {
 	 * @internal Remove role permission
 	 *
 	 */
-	abstract public function removeRolePermission(Role $role, $permission): void;
+	abstract public function removeRolePermission(Role $role, Permission|string $permission): void;
 
 	/**
 	 * @param string $name

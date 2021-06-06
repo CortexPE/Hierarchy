@@ -55,7 +55,7 @@ class MemberFactory {
 	 *
 	 * @return BaseMember
 	 */
-	public function getMember($player): BaseMember {
+	public function getMember(Player|OfflinePlayer|string $player): BaseMember {
 		if(is_string($player)) {
 			$player = $this->plugin->getServer()->getOfflinePlayer((string)$player);
 		}
@@ -97,7 +97,7 @@ class MemberFactory {
 		$this->plugin->getLogger()->debug("Destroying {$player->getName()}'s Session");
 		$k = $player->getName();
 		if(isset($this->onlineMembers[$k])) {
-			$this->onlineMembers[$k]->onDestroy();;
+			$this->onlineMembers[$k]->onDestroy();
 		}
 		unset($this->onlineMembers[$k]);
 	}

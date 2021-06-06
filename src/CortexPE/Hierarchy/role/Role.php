@@ -183,7 +183,7 @@ class Role {
 	 * @param Permission|string $permission
 	 * @param bool              $update
 	 */
-	public function removePermission($permission, bool $update = true): void {
+	public function removePermission(Permission|string $permission, bool $update = true): void {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}

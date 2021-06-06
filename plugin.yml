@@ -11,64 +11,61 @@ permissions:
   hierarchy:
     default: "false"
     description: "Main Hierarchy root permission node"
-    children:
-      hierarchy.flush:
-        default: "op"
-        description: "Allows to use the flush command to save role configuration to disk"
-      hierarchy.info:
-        default: "op"
-        description: "Allows to check hierarchy information"
-        children:
-          hierarchy.info.list_roles:
-            default: "op"
-            description: "Allows to check role listing"
-          hierarchy.info.list_perms:
-            default: "op"
-            description: "Allows to check permission listing"
-          hierarchy.info.member:
-            default: "true"
-            description: "Allows to check member information"
-          hierarchy.info.role:
-            default: "op"
-            description: "Allows to check role information"
-      hierarchy.role:
-        default: "false"
-        description: "Allows role commands"
-        children:
-          hierarchy.role.add_permission:
-            default: "op"
-            description: "Allows the adding of permissions to a role"
-          hierarchy.role.deny_permission:
-            default: "op"
-            description: "Allows the denying of permissions from a role"
-          hierarchy.role.remove_permission:
-            default: "op"
-            description: "Allows the removal of permissions from a role"
-          hierarchy.role.create:
-            default: "op"
-            description: "Allows the creation of roles"
-          hierarchy.role.delete:
-            default: "op"
-            description: "Allows the deletion of roles"
-          hierarchy.role.give:
-            default: "op"
-            description: "Allows the giving of roles"
-          hierarchy.role.take:
-            default: "op"
-            description: "Allows the sender to take roles"
-      hierarchy.member:
-        default: "false"
-        description: "Allows member commands"
-        children:
-          hierarchy.member.add_permission:
-            default: "op"
-            description: "Allows the adding of permissions to a member"
-          hierarchy.member.deny_permission:
-            default: "op"
-            description: "Allows the denying of permissions from a member"
-          hierarchy.member.remove_permission:
-            default: "op"
-            description: "Allows the removal of permissions from a member"
-          hierarchy.member.transfer_privileges:
-            default: "op"
-            description: "Allows to transfer privileges between two players"
+
+  hierarchy.flush:
+    default: "op"
+    description: "Allows to use the flush command to save role configuration to disk"
+  hierarchy.info:
+    default: "op"
+    description: "Allows to check hierarchy information"
+  hierarchy.info.list_roles:
+    default: "op"
+    description: "Allows to check role listing"
+  hierarchy.info.list_perms:
+    default: "op"
+    description: "Allows to check permission listing"
+  hierarchy.info.member:
+    default: "true"
+    description: "Allows to check member information"
+  hierarchy.info.role:
+    default: "op"
+    description: "Allows to check role information"
+  hierarchy.role:
+    default: "false"
+    description: "Allows role commands"
+  hierarchy.role.add_permission:
+    default: "op"
+    description: "Allows the adding of permissions to a role"
+  hierarchy.role.deny_permission:
+    default: "op"
+    description: "Allows the denying of permissions from a role"
+  hierarchy.role.remove_permission:
+    default: "op"
+    description: "Allows the removal of permissions from a role"
+  hierarchy.role.create:
+    default: "op"
+    description: "Allows the creation of roles"
+  hierarchy.role.delete:
+    default: "op"
+    description: "Allows the deletion of roles"
+  hierarchy.role.give:
+    default: "op"
+    description: "Allows the giving of roles"
+  hierarchy.role.take:
+    default: "op"
+    description: "Allows the sender to take roles"
+  hierarchy.member:
+    default: "false"
+    description: "Allows member commands"
+  hierarchy.member.add_permission:
+    default: "op"
+    description: "Allows the adding of permissions to a member"
+  hierarchy.member.deny_permission:
+    default: "op"
+    description: "Allows the denying of permissions from a member"
+  hierarchy.member.remove_permission:
+    default: "op"
+    description: "Allows the removal of permissions from a member"
+  hierarchy.member.transfer_privileges:
+    default: "op"
+    description: "Allows to transfer privileges between two players"

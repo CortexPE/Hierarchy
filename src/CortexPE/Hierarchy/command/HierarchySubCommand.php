@@ -37,6 +37,7 @@ use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\Role;
 use CortexPE\Hierarchy\role\RoleManager;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\Permission;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -68,16 +69,16 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 	}
 
 	/**
-	 * @param BaseMember|Role       $target
-	 * @param Permission|string $permission
+	 * @param BaseMember|Role $target
+	 * @param Permission|string|null $permission
 	 *
 	 * @return bool
 	 */
-	protected function isSenderHigher($target, $permission = null): bool {
+	protected function isSenderHigher(BaseMember|Role $target, Permission|string|null $permission = null): bool {
 		if(!$this->isSenderInGame()) {
 			return true;
 		}
-		if($this->currentSender->isOp() && $this->opBypass) {
+		if($this->currentSender->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $this->opBypass) {
 			return true;
 		}
 		if($permission === null) {
@@ -109,7 +110,7 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 	 *
 	 * @return bool
 	 */
-	protected function doHierarchyPositionCheck($target, $permission = null): bool {
+	protected function doHierarchyPositionCheck(BaseMember|Role $target, Permission|string|null $permission = null): bool {
 		if(!($valid = $this->isSenderHigher($target, $permission))) {
 			$this->sendFormattedMessage("err.target_higher_hrk", [
 				"target" => $target->getName()

@@ -34,10 +34,9 @@ use CortexPE\Hierarchy\data\traits\IndexedDataUtilities;
 use CortexPE\Hierarchy\exception\UnresolvedRoleException;
 use CortexPE\Hierarchy\Hierarchy;
 use CortexPE\Hierarchy\role\Role;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
-use function array_map;
-use function array_values;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -70,17 +69,13 @@ abstract class IndexedRoleDS extends RoleDataSource {
 					"ID" => 1,
 					"Name" => "Member",
 					"isDefault" => true,
-					"Permissions" => array_map(function (Permission $perm) {
-						return $perm->getName();
-					}, array_values($pMgr->getDefaultPermissions(false)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_USER)->getChildren())
 				],
 				[
 					"ID" => 2,
 					"Name" => "Operator",
 					"isDefault" => false,
-					"Permissions" => array_map(function (Permission $perm) {
-						return $perm->getName();
-					}, array_values($pMgr->getDefaultPermissions(true)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_OPERATOR)->getChildren())
 				],
 			])));
 		}

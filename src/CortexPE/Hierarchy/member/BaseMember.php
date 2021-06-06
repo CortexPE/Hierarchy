@@ -96,7 +96,7 @@ abstract class BaseMember {
 		}
 		foreach($memberData["permissions"] ?? [] as $perm => $additionalData) {
 			$inverted = false;
-			if($perm{0} === "-") {
+			if($perm[0] === "-") {
 				$inverted = true;
 				$perm = substr($perm, 1);
 			}
@@ -155,7 +155,7 @@ abstract class BaseMember {
 	 * @param bool $recalculate
 	 * @param bool $save
 	 */
-	public function removeMemberPermission($permission, bool $recalculate = true, bool $save = true): void {
+	public function removeMemberPermission(Permission|string $permission, bool $recalculate = true, bool $save = true): void {
 		if($permission instanceof Permission) {
 			$permission = $permission->getName();
 		}
@@ -291,7 +291,7 @@ abstract class BaseMember {
 	 *
 	 * @return bool
 	 */
-	public function hasHigherPermissionHierarchy($permissionNode, BaseMember $target): bool {
+	public function hasHigherPermissionHierarchy(Permission|string $permissionNode, BaseMember $target): bool {
 		if($permissionNode instanceof Permission) {
 			$permissionNode = $permissionNode->getName();
 		}
@@ -313,7 +313,7 @@ abstract class BaseMember {
 	 *
 	 * @return Role|null
 	 */
-	public function getTopRoleWithPermission($permissionNode): ?Role {
+	public function getTopRoleWithPermission(Permission|string $permissionNode): ?Role {
 		if($permissionNode instanceof Permission) {
 			$permissionNode = $permissionNode->getName();
 		}

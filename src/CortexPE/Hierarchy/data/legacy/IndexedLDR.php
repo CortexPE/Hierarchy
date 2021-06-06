@@ -31,11 +31,9 @@ namespace CortexPE\Hierarchy\data\legacy;
 
 use DirectoryIterator;
 use Generator;
-use pocketmine\permission\Permission;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\PermissionManager;
-use function array_map;
 use function array_merge;
-use function array_values;
 use function file_exists;
 use function file_get_contents;
 
@@ -75,18 +73,14 @@ abstract class IndexedLDR extends LegacyDataReader {
 					"Position" => 0,
 					"Name" => "Member",
 					"isDefault" => true,
-					"Permissions" => array_map(function (Permission $perm) {
-						return $perm->getName();
-					}, array_values($pMgr->getDefaultPermissions(false)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_USER)->getChildren())
 				],
 				[
 					"ID" => 2,
 					"Position" => 1,
 					"Name" => "Operator",
 					"isDefault" => false,
-					"Permissions" => array_map(function (Permission $perm) {
-						return $perm->getName();
-					}, array_values($pMgr->getDefaultPermissions(true)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_OPERATOR)->getChildren())
 				],
 			];
 		}

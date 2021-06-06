@@ -139,7 +139,7 @@ class MessageStore {
 
 	protected static function substituteString(string $str, array $args, string $prefix, string $suffix): string {
 		foreach($args as $item => $value) {
-			$str = str_ireplace($prefix . $item . $suffix, $value, $str);
+			$str = str_ireplace($prefix . $item . $suffix, (string)$value, $str);
 		}
 
 		return $str;
