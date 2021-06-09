@@ -32,6 +32,7 @@ namespace CortexPE\Hierarchy\data\legacy;
 
 use CortexPE\Hierarchy\Hierarchy;
 use Generator;
+use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use poggit\libasynql\DataConnector;
@@ -68,22 +69,19 @@ abstract class SQLLDR extends LegacyDataReader {
 			$this->roles = yield $this->asyncSelect("hierarchy.role.list");
 			if(empty($this->roles)) {
 				$pMgr = PermissionManager::getInstance();
-				$listPerms = function (Permission $perm):string{
-					return $perm->getName();
-				};
 				$this->roles[] = [
 					"ID" => 1,
 					"Position" => 0,
 					"Name" => "Member",
 					"isDefault" => 1,
-					"Permissions" => array_values(array_map($listPerms, $pMgr->getDefaultPermissions(false)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_USER)->getChildren())
 				];
 				$this->roles[] = [
 					"ID" => 2,
 					"Position" => 1,
 					"Name" => "Operator",
 					"isDefault" => 0,
-					"Permissions" => array_values(array_map($listPerms, $pMgr->getDefaultPermissions(true)))
+					"Permissions" => array_keys($pMgr->getPermission(DefaultPermissions::ROOT_OPERATOR)->getChildren())
 				];
 			} else {
 				foreach($this->roles as $k => $role) {
