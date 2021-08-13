@@ -37,6 +37,7 @@ use CortexPE\Hierarchy\member\BaseMember;
 use CortexPE\Hierarchy\member\MemberFactory;
 use CortexPE\Hierarchy\role\Role;
 use CortexPE\Hierarchy\role\RoleManager;
+use CortexPE\Hierarchy\utils\PermissionUtils;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\Permission;
 use pocketmine\player\Player;
@@ -81,32 +82,12 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 		if($this->currentSender->hasPermission(DefaultPermissions::ROOT_OPERATOR) && $this->opBypass) {
 			return true;
 		}
-		if($permission === null) {
-			if($target instanceof BaseMember) {
-				$targetPos = $target->getTopRole()->getPosition();
-			} elseif($target instanceof Role) {
-				$targetPos = $target->getPosition();
-			} else {
-				throw new \InvalidArgumentException("Passed argument is neither a Role nor a Member");
-			}
-			$senderPos = $this->memberFactory->getMember($this->currentSender)->getTopRole()->getPosition();
-		} else {
-			if($target instanceof BaseMember) {
-				$targetPos = $target->getTopRoleWithPermission($permission)->getPosition();
-			} else {
-				throw new \InvalidArgumentException("Passed argument is not a Member");
-			}
-			$senderPos = $this->memberFactory->getMember($this->currentSender)
-											 ->getTopRoleWithPermission($permission)
-											 ->getPosition();
-		}
-
-		return $senderPos > $targetPos;
+		return PermissionUtils::checkHierarchy($this->memberFactory->getMember($this->currentSender), $target, $permission);
 	}
 
 	/**
-	 * @param BaseMember|Role       $target
-	 * @param Permission|string $permission
+	 * @param BaseMember|Role $target
+	 * @param Permission|string|null $permission
 	 *
 	 * @return bool
 	 */
@@ -124,11 +105,11 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 		return $this->memberFactory->getMember($this->currentSender);
 	}
 
-	protected function isSenderInGameNoArguments(array $args):bool {
+	protected function isSenderInGameNoArguments(array $args): bool {
 		return $this->isSenderInGame() && empty($args);
 	}
 
-	protected function sendPermissionError():void {
+	protected function sendPermissionError(): void {
 		$this->currentSender->sendMessage(
 			$this->currentSender->getServer()->getLanguage()->translateString(
 				TextFormat::RED . "%commands.generic.permission"
@@ -136,7 +117,7 @@ abstract class HierarchySubCommand extends BaseSubCommand {
 		);
 	}
 
-	protected function getRolesApplicable(&$roles, &$roles_i):bool {
+	protected function getRolesApplicable(&$roles, &$roles_i): bool {
 		$roles = [];
 		$roles_i = [];
 		foreach($this->roleManager->getRoles() as $role) {

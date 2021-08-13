@@ -66,7 +66,7 @@ class Role {
 	/** @var Role[] */
 	protected $children = [];
 	/** @var bool[] */
-	protected $combinedPermissions;
+	protected $combinedPermissions = [];
 
 	public function __construct(Hierarchy $plugin, int $id, string $name, array $roleData) {
 		$this->plugin = $plugin;
