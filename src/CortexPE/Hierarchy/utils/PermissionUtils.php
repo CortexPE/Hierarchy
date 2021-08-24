@@ -27,11 +27,19 @@ final class PermissionUtils {
 			$senderPos = $source->getTopRole()->getPosition();
 		} else {
 			if($target instanceof BaseMember) {
-				$targetPos = $target->getTopRoleWithPermission($permission)->getPosition();
+				$targetPos = 0;
+				$topRole = $target->getTopRoleWithPermission($permission);
+				if($topRole !== null) {
+					$targetPos = $topRole->getPosition();
+				}
 			} else {
 				throw new \InvalidArgumentException("Passed argument is not a Member");
 			}
-			$senderPos = $source->getTopRoleWithPermission($permission)->getPosition();
+			$senderPos = 0;
+			$topRole = $source->getTopRoleWithPermission($permission);
+			if($topRole !== null) {
+				$senderPos = $topRole->getPosition();
+			}
 		}
 
 		return $senderPos > $targetPos;
