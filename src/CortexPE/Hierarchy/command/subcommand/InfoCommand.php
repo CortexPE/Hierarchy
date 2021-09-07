@@ -145,6 +145,9 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 			if($sender->hasPermission("hierarchy.info.member")) {
 				/** @var BaseMember $target */
 				$target = $args["targetMember"];
+				// HACKKKK
+				if(is_array($target)) $target = $target[array_keys($target)[0]];
+				if(!$target instanceof BaseMember)return;
 				$this->sendFormattedMessage("cmd.info.member.header", [
 					"member" => $target->getName()
 				]);
@@ -173,6 +176,9 @@ class InfoCommand extends HierarchySubCommand implements FormedCommand {
 			if($sender->hasPermission("hierarchy.info.role")) {
 				/** @var Role $target */
 				$target = $args["targetRole"];
+				// HACKKKK
+				if(is_array($target)) $target = $target[array_keys($target)[0]];
+				if(!$target instanceof Role)return;
 				$lines = [];
 				$lines[] = MessageStore::getMessage("cmd.info.role.header", [
 					"role" => $target->getName(),
